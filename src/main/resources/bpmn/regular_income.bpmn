@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="1.6.0">
+  <bpmn:process id="Process_RegularIncome" name="Regular Income" isExecutable="true">
+    <bpmn:extensionElements>
+      <camunda:properties>
+        <camunda:property />
+      </camunda:properties>
+    </bpmn:extensionElements>
+    <bpmn:startEvent id="StartEvent_RegularIncomeDue" name="regular income due">
+      <bpmn:outgoing>SequenceFlow_1yit8vw</bpmn:outgoing>
+      <bpmn:signalEventDefinition signalRef="Signal_1do7h7b" />
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_1yit8vw" sourceRef="StartEvent_RegularIncomeDue" targetRef="Task_SelectAllActiveCharacters" />
+    <bpmn:serviceTask id="Task_SelectAllActiveCharacters" name="select all active characters" camunda:delegateExpression="${selectAllActiveCharactersTask}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:outputParameter name="activeCharacters">#{activeCharacters}</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_1yit8vw</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_16dj4iv</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="EndEvent_RegularIncomeGenerated" name="regular income generated">
+      <bpmn:incoming>SequenceFlow_11ovvzt</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:subProcess id="SubProcess_GenerateIncomePerPlayer" name="Generate income for each player">
+      <bpmn:incoming>SequenceFlow_16dj4iv</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_11ovvzt</bpmn:outgoing>
+      <bpmn:multiInstanceLoopCharacteristics camunda:collection="activeCharacters" camunda:elementVariable="character" />
+      <bpmn:startEvent id="StartEvent_GenerateIncomeSub">
+        <bpmn:outgoing>SequenceFlow_19d0fwa</bpmn:outgoing>
+      </bpmn:startEvent>
+      <bpmn:sequenceFlow id="SequenceFlow_19d0fwa" sourceRef="StartEvent_GenerateIncomeSub" targetRef="Task_GiveRegularIncome" />
+      <bpmn:endEvent id="EndEvent_GenerateIncomeSub">
+        <bpmn:incoming>SequenceFlow_1qbpz3u</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="SequenceFlow_1qbpz3u" sourceRef="Task_GiveRegularIncome" targetRef="EndEvent_GenerateIncomeSub" />
+      <bpmn:serviceTask id="Task_GiveRegularIncome" name="give regular income" camunda:delegateExpression="${giveRegularIncomeTask}">
+        <bpmn:incoming>SequenceFlow_19d0fwa</bpmn:incoming>
+        <bpmn:outgoing>SequenceFlow_1qbpz3u</bpmn:outgoing>
+      </bpmn:serviceTask>
+    </bpmn:subProcess>
+    <bpmn:sequenceFlow id="SequenceFlow_16dj4iv" sourceRef="Task_SelectAllActiveCharacters" targetRef="SubProcess_GenerateIncomePerPlayer" />
+    <bpmn:sequenceFlow id="SequenceFlow_11ovvzt" sourceRef="SubProcess_GenerateIncomePerPlayer" targetRef="EndEvent_RegularIncomeGenerated" />
+  </bpmn:process>
+  <bpmn:signal id="Signal_1do7h7b" name="Signal_RegularIncomeDue" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_RegularIncome">
+      <bpmndi:BPMNShape id="StartEvent_0v3uisb_di" bpmnElement="StartEvent_RegularIncomeDue">
+        <dc:Bounds x="28" y="123" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="8" y="159" width="75" height="24" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1yit8vw_di" bpmnElement="SequenceFlow_1yit8vw">
+        <di:waypoint xsi:type="dc:Point" x="64" y="141" />
+        <di:waypoint xsi:type="dc:Point" x="176" y="141" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="120" y="126" width="0" height="0" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_11u7hgt_di" bpmnElement="Task_SelectAllActiveCharacters">
+        <dc:Bounds x="176" y="101" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_01o6ail_di" bpmnElement="EndEvent_RegularIncomeGenerated">
+        <dc:Bounds x="851" y="123" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="831" y="159" width="75" height="24" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SubProcess_0uieec4_di" bpmnElement="SubProcess_GenerateIncomePerPlayer" isExpanded="true">
+        <dc:Bounds x="383" y="58" width="351" height="165" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_16dj4iv_di" bpmnElement="SequenceFlow_16dj4iv">
+        <di:waypoint xsi:type="dc:Point" x="276" y="141" />
+        <di:waypoint xsi:type="dc:Point" x="330" y="141" />
+        <di:waypoint xsi:type="dc:Point" x="330" y="141" />
+        <di:waypoint xsi:type="dc:Point" x="383" y="141" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="345" y="141" width="0" height="0" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_11ovvzt_di" bpmnElement="SequenceFlow_11ovvzt">
+        <di:waypoint xsi:type="dc:Point" x="734" y="141" />
+        <di:waypoint xsi:type="dc:Point" x="793" y="141" />
+        <di:waypoint xsi:type="dc:Point" x="793" y="141" />
+        <di:waypoint xsi:type="dc:Point" x="851" y="141" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="808" y="141" width="0" height="0" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="StartEvent_0r8qv0b_di" bpmnElement="StartEvent_GenerateIncomeSub">
+        <dc:Bounds x="405" y="137" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="423" y="173" width="0" height="0" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_19d0fwa_di" bpmnElement="SequenceFlow_19d0fwa">
+        <di:waypoint xsi:type="dc:Point" x="441" y="155" />
+        <di:waypoint xsi:type="dc:Point" x="508" y="155" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="475" y="140" width="0" height="0" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_04tfubm_di" bpmnElement="EndEvent_GenerateIncomeSub">
+        <dc:Bounds x="657" y="137" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="675" y="173" width="0" height="0" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1qbpz3u_di" bpmnElement="SequenceFlow_1qbpz3u">
+        <di:waypoint xsi:type="dc:Point" x="608" y="155" />
+        <di:waypoint xsi:type="dc:Point" x="657" y="155" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="633" y="140" width="0" height="0" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_0zvlajk_di" bpmnElement="Task_GiveRegularIncome">
+        <dc:Bounds x="508" y="115" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

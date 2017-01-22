@@ -1,0 +1,8 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${DATABASE_ADDRESS:127.0.0.1}:5432/${DATABASE_NAME:faf-db-pg}?useSSL=false
+    name: faf-db-pg
+    username: ${DATABASE_USERNAME:postgres}
+    password: ${DATABASE_PASSWORD:banana}
+  jpa:
+    show-sql: true

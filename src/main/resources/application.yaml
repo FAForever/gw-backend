@@ -1,0 +1,23 @@
+spring.application.name: FAF Galactic War server
+spring:
+  profiles:
+    active: ${API_PROFILE:dev}
+  jpa:
+    hibernate:
+      ddl-auto: update
+camunda:
+  bpm:
+    application:
+      isDeleteUponUndeploy: false
+      isScanForProcessDefinitions: false
+      isDeployChangedOnly: true
+      isResumePreviousVersions: true
+      resumePreviousBy: a value
+    job-execution:
+      enabled: true
+    metrics:
+      enabled: false
+      db-reporter-activate: false
+
+
+#camunda.bpm.auto-deployment-enabled: false
