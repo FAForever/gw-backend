@@ -1,8 +1,13 @@
 spring:
   datasource:
-    url: jdbc:postgresql://${DATABASE_ADDRESS:127.0.0.1}:5432/${DATABASE_NAME:faf-db-pg}?useSSL=false
-    name: faf-db-pg
-    username: ${DATABASE_USERNAME:postgres}
-    password: ${DATABASE_PASSWORD:banana}
+    url=jdbc:h2:mem:camunda
+    username=sa
+    password=sa
+    driverClassName=org.h2.Driver
+    dialect=org.hibernate.dialect.H2Dialect
+#    url: jdbc:postgresql://${DATABASE_ADDRESS:127.0.0.1}:5432/${DATABASE_NAME:faf-gw}?useSSL=false
+#    name: faf-db-pg
+#    username: ${DATABASE_USERNAME:postgres}
+#    password: ${DATABASE_PASSWORD:banana}
   jpa:
     show-sql: true

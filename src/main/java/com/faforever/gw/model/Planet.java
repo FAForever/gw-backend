@@ -1,5 +1,6 @@
 package com.faforever.gw.model;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Formula;
@@ -17,8 +18,8 @@ import java.util.UUID;
 @Table(name="gw_planet")
 public class Planet implements Serializable {
     @Id
-    @GeneratedValue(generator = "uuid2")
-    @GenericGenerator(name = "uuid2", strategy = "uuid2")
+//    @GeneratedValue(generator = "uuid2")
+//    @GenericGenerator(name = "uuid2", strategy = "uuid2")
     private UUID id;
 
     // TODO: sun system
@@ -46,5 +47,6 @@ public class Planet implements Serializable {
     @Formula("(select coalesce(b.winning_faction, b.defending_faction) " +
              "from gw_battle b where b.fk_planet = id and b.status='F' and " +
              "b.ended_at = (select max(b2.ended_at) from gw_battle b2 where b2.fk_planet = id and b2.status='F'))")
+    @Setter(AccessLevel.NONE)
     private Faction currentOwner;
 }

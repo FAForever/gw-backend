@@ -9,7 +9,7 @@ public class Scheduler {
     @Autowired
     private RegularBeans regularBeans;
 
-    @Scheduled(fixedDelay = 3000)
+    @Scheduled(fixedDelay = 30000)
     private void generateRegularIncome() {
         regularBeans.generateRegularIncome();
     }

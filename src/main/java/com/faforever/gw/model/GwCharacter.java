@@ -17,8 +17,8 @@ import java.util.UUID;
 @Table(name="gw_character")
 public class GwCharacter implements Serializable{
     @Id
-    @GeneratedValue(generator = "uuid2")
-    @GenericGenerator(name = "uuid2", strategy = "uuid2")
+//    @GeneratedValue(generator = "uuid2")
+//    @GenericGenerator(name = "uuid2", strategy = "uuid2")
     private UUID id;
 
     @Column(name="faf_id", nullable = false, updatable = false)

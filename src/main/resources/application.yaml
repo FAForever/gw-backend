@@ -4,7 +4,7 @@ spring:
     active: ${API_PROFILE:dev}
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
 camunda:
   bpm:
     application:
