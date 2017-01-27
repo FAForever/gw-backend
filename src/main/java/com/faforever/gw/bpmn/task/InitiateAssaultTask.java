@@ -5,6 +5,8 @@ import com.faforever.gw.model.GwCharacter;
 import com.faforever.gw.model.repository.BattleRepository;
 import com.faforever.gw.model.repository.CharacterRepository;
 import com.faforever.gw.model.repository.PlanetRepository;
+import com.faforever.gw.websocket.incoming.InitiateAttackMessage;
+import jersey.repackaged.com.google.common.collect.ImmutableMap;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.RuntimeService;
@@ -14,6 +16,8 @@ import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import java.util.Map;
+import java.util.UUID;
 
 @Slf4j
 @Component

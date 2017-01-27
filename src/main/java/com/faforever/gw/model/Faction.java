@@ -21,11 +21,15 @@ public enum Faction {
 
         @Override
         public String convertToDatabaseColumn(Faction attribute) {
+            if(attribute == null)
+                return null;
             return attribute.getDbKey();
         }
 
         @Override
         public Faction convertToEntityAttribute(String dbData) {
+            if(dbData == null)
+                return null;
             return Faction.fromString(dbData);
         }
     }

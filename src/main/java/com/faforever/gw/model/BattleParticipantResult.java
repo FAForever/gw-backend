@@ -20,11 +20,15 @@ public enum BattleParticipantResult {
 
         @Override
         public String convertToDatabaseColumn(BattleParticipantResult attribute) {
+            if(attribute==null)
+                return null;
             return attribute.getDbKey();
         }
 
         @Override
         public BattleParticipantResult convertToEntityAttribute(String dbData) {
+            if(dbData==null)
+                return null;
             return BattleParticipantResult.fromString(dbData);
         }
     }
