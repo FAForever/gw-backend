@@ -5,8 +5,6 @@ import com.faforever.gw.model.GwCharacter;
 import com.faforever.gw.model.repository.BattleRepository;
 import com.faforever.gw.model.repository.CharacterRepository;
 import com.faforever.gw.model.repository.PlanetRepository;
-import com.faforever.gw.websocket.incoming.InitiateAttackMessage;
-import jersey.repackaged.com.google.common.collect.ImmutableMap;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.RuntimeService;
@@ -16,7 +14,6 @@ import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
-import java.util.Map;
 import java.util.UUID;
 
 @Slf4j
@@ -39,17 +36,18 @@ public class InitiateAssaultTask implements JavaDelegate {
     @Override
     @Transactional
     public void execute(DelegateExecution execution) {
+        log.debug("validateAssault");
+
         GwCharacter gwCharacter = (GwCharacter)execution.getVariable("character");
         Planet planet = (Planet)execution.getVariable("planet");
         Faction attackingFaction = (Faction)execution.getVariable("attackingFaction");
         Faction defendingFaction = (Faction)execution.getVariable("defendingFaction");
 
         Battle battle = new Battle(planet, attackingFaction, defendingFaction);
+        battle.setId(UUID.fromString(execution.getProcessInstance().getBusinessKey()));
         BattleParticipant battleParticipant = new BattleParticipant(battle, gwCharacter, BattleRole.ATTACKER);
         battle.getParticipants().add(battleParticipant);
 
         battleRepository.save(battle);
-
-        log.debug("validateAssault");
     }
 }

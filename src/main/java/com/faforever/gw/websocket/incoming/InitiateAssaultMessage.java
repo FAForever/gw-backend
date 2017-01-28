@@ -8,6 +8,6 @@ import java.util.UUID;
 
 @Value
 @AllArgsConstructor
-public class InitiateAttackMessage {
+public class InitiateAssaultMessage {
     private UUID planetId;
 }

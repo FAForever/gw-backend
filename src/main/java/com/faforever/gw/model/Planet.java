@@ -23,7 +23,6 @@ public class Planet implements Serializable {
     private UUID id;
 
     // TODO: sun system
-    // TODO: map
 
     @OneToMany(mappedBy = "planet")
     private List<Battle> battles;
@@ -39,6 +38,10 @@ public class Planet implements Serializable {
 
     @Column(name="ground", length = 1)
     private Ground ground;
+
+    @ManyToOne
+    @JoinColumn(name = "fk_map")
+    private Map map;
 
     /***
      * The current owner is the winner of the last finished battle over this planet.

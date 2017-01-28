@@ -337,7 +337,7 @@
 </bpmn:textAnnotation>
     <bpmn:association id="Association_0q22xz0" sourceRef="ServiceTask_CreateGameOptions" targetRef="TextAnnotation_08ftkq9" />
   </bpmn:process>
-  <bpmn:message id="Message_1pyxffy" name="Message_InitiateAttack" />
+  <bpmn:message id="Message_1pyxffy" name="Message_InitiateAssault" />
   <bpmn:error id="Error_1hmln4n" name="Error_PlayerNotFreeForGame" errorCode="PlayerNotFreeForGame" />
   <bpmn:error id="Error_0zcdfqn" name="Error_PlanetNotAttackable" errorCode="PlanetNotAttackable" />
   <bpmn:message id="Message_1345zoe" name="Message_PlayerJoinsAssault" />
@@ -387,9 +387,9 @@
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="EndEvent_106jwmo_di" bpmnElement="EndEvent_Error_PlanetNotAttackable">
-        <dc:Bounds x="254" y="548" width="36" height="36" />
+        <dc:Bounds x="284" y="548" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="232" y="584" width="80" height="24" />
+          <dc:Bounds x="262" y="584" width="80" height="24" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_0t0fx81_di" bpmnElement="SequenceFlow_0t0fx81">
@@ -827,14 +827,14 @@
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="DataStoreReference_0xif995_di" bpmnElement="DataStoreReference_AssaultParticipants">
-        <dc:Bounds x="840" y="423" width="50" height="50" />
+        <dc:Bounds x="882" y="421" width="50" height="50" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="898" y="436" width="56" height="24" />
+          <dc:Bounds x="820" y="434" width="56" height="24" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="DataOutputAssociation_0e210fe_di" bpmnElement="DataOutputAssociation_0e210fe">
-        <di:waypoint xsi:type="dc:Point" x="906" y="529" />
-        <di:waypoint xsi:type="dc:Point" x="878" y="473" />
+        <di:waypoint xsi:type="dc:Point" x="921" y="529" />
+        <di:waypoint xsi:type="dc:Point" x="912" y="471" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="DataStoreReference_13wd6lx_di" bpmnElement="DataStoreReference_AssualtParticipants2">
         <dc:Bounds x="1724" y="275" width="50" height="50" />
@@ -906,7 +906,7 @@
         <di:waypoint xsi:type="dc:Point" x="1207" y="168" />
         <di:waypoint xsi:type="dc:Point" x="691" y="168" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1094" y="269" width="12" height="12" />
+          <dc:Bounds x="1184" y="269" width="12" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="IntermediateThrowEvent_1gps0wu_di" bpmnElement="IntermediateThrowEvent_Error_JoinPlayerNotFreeForGame">
@@ -922,8 +922,8 @@
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="DataOutputAssociation_0om8nxs_di" bpmnElement="DataOutputAssociation_0om8nxs">
-        <di:waypoint xsi:type="dc:Point" x="906" y="368" />
-        <di:waypoint xsi:type="dc:Point" x="878" y="423" />
+        <di:waypoint xsi:type="dc:Point" x="920" y="368" />
+        <di:waypoint xsi:type="dc:Point" x="911" y="421" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_0rbkusb_di" bpmnElement="SequenceFlow_0rbkusb">
         <di:waypoint xsi:type="dc:Point" x="977" y="328" />
@@ -1052,31 +1052,31 @@
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BoundaryEvent_07iwzjd_di" bpmnElement="BoundaryEvent_Error_InitiatePlayerNotFreeForGame">
-        <dc:Bounds x="169" y="474" width="36" height="36" />
+        <dc:Bounds x="158" y="475" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="377" y="490" width="0" height="0" />
+          <dc:Bounds x="366" y="491" width="0" height="0" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_1any1mr_di" bpmnElement="SequenceFlow_1any1mr">
-        <di:waypoint xsi:type="dc:Point" x="187" y="510" />
-        <di:waypoint xsi:type="dc:Point" x="187" y="566" />
+        <di:waypoint xsi:type="dc:Point" x="176" y="511" />
+        <di:waypoint xsi:type="dc:Point" x="176" y="566" />
         <di:waypoint xsi:type="dc:Point" x="168" y="566" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="202" y="538" width="0" height="0" />
+          <dc:Bounds x="191" y="538.5" width="0" height="0" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="BoundaryEvent_0eyzkk8_di" bpmnElement="BoundaryEvent_Error_PlanetNotAttackable">
-        <dc:Bounds x="214" y="474" width="36" height="36" />
+        <dc:Bounds x="243" y="474" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="422" y="490" width="0" height="0" />
+          <dc:Bounds x="451" y="490" width="0" height="0" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_024fep7_di" bpmnElement="SequenceFlow_024fep7">
-        <di:waypoint xsi:type="dc:Point" x="232" y="510" />
-        <di:waypoint xsi:type="dc:Point" x="232" y="566" />
-        <di:waypoint xsi:type="dc:Point" x="254" y="566" />
+        <di:waypoint xsi:type="dc:Point" x="261" y="510" />
+        <di:waypoint xsi:type="dc:Point" x="261" y="566" />
+        <di:waypoint xsi:type="dc:Point" x="284" y="566" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="247" y="538" width="0" height="0" />
+          <dc:Bounds x="276" y="538" width="0" height="0" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_086aaic_di" bpmnElement="SequenceFlow_086aaic">
