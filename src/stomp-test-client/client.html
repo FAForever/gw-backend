@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Galactic Ware STOMP test client</title>
+    <script src="jquery-3.1.1.js"></script>
+    <script src="stomp.js"></script>
+
+    <style>
+        input {
+            width: 300px;
+        }
+
+        textarea {
+            width: 500px;
+            height: 200px;
+        }
+    </style>
+
+    <script type="text/javascript">
+        var stompClient;
+        var subscriptions = [];
+
+        (function () {
+            var exLog = console.log;
+            console.log = function (msg) {
+                exLog.apply(this, arguments);
+                onLogReceived("Log", msg)
+            };
+
+            var exWarn = console.warn;
+            console.warn = function (msg) {
+                exLog.apply(this, arguments);
+                onLogReceived("Warn", msg)
+            };
+
+            var exError = console.error();
+            console.error = function (msg) {
+                exLog.apply(this, arguments);
+                onLogReceived("Error", msg)
+            };
+        })()
+
+        function connect() {
+            $("#subscribtionLog").val("");
+            $("#activityLog").val("");
+
+            console.log("connecting to " + $("#connectionString").val());
+            stompClient = Stomp.client($("#connectionString").val(), "v11.stomp");
+            var stompStatus = false;
+
+            var stompSuccessCallback = function (frame) {
+                stompStatus = true;
+                console.log('STOMP: Connection successful');
+                $("#connectionStatus").text("connected");
+                subscribe();
+            };
+
+            var stompFailureCallback = function (error) {
+                stompStatus = false;
+                console.log('STOMP: ' + error);
+
+                subscriptions = []
+                setTimeout(connect, 10000);
+                console.log('STOMP: Reconecting in 10 seconds');
+                $("#connectionStatus").text("disconnected");
+            };
+
+            console.log('STOMP: Attempting connection');
+            stompClient.connect('', '', stompSuccessCallback, stompFailureCallback);
+
+        }
+
+        function subscribe() {
+            var arrayOfChannels = $('#subscribedChannels').val().split('\n');
+
+            // unsubscribe removed channels
+            subscriptions.forEach(function (channel) {
+                    if ($.inArray(channel, arrayOfChannels) == -1) {
+                        subscriptions.splice(subscriptions.indexOf(channel), 1);
+                        stompClient.unsubscribe(channel);
+                    }
+                }
+            );
+
+            // subscribe to new channels
+            $.each(arrayOfChannels, function (channelIndex, channelName) {
+                if ($.inArray(channelName, subscriptions) == -1) {
+                    subscriptions.push(channelName);
+                    stompClient.subscribe(channelName, function (msg) {
+                        onMessageReceived(msg);
+                    });
+                }
+            });
+        }
+
+        function onLogReceived(type, message) {
+            var textArea = $("#activityLog");
+            textArea.val(function (index, value) {
+                return value + type + ": " + message + "\n";
+            });
+            textArea.stop(true).animate({scrollTop: textArea[0].scrollHeight - textArea.height()} );
+        }
+
+        function onMessageReceived(message) {
+            var logEntry = "Channel: " + message.headers["destination"] + "\nContent: " + message.body;
+
+            var textArea = $("#subscribtionLog");
+            textArea.val(function (index, value) {
+                return value + logEntry + "\n\n";
+            });
+            textArea.animate({scrollTop: textArea[0].scrollHeight - textArea.height()} );
+        }
+
+
+        $(document).ready(function () {
+            $("#reconnectButton").on("click", connect);
+            $("#resubscribeButton").on("click", subscribe);
+            $("#resetSubscriptionLog").on("click", function () {
+                $("#subscribtionLog").val("");
+            });
+            $("#resetActivityLog").on("click", function () {
+                $("#activityLog").val("");
+            });
+
+
+            $("#initateAssaultSend").on("click", function () {
+                stompClient.send("/action/initiateAssault", {}, $("#initateAssaultValue").val());
+            });
+            $("#joinAssaultSend").on("click", function () {
+                stompClient.send("/action/joinAssault", {}, $("#joinAssaultValue").val());
+            });
+            $("#leaveAssaultSend").on("click", function () {
+                stompClient.send("/action/leaveAssault", {}, $("#leaveAssaultValue").val());
+            });
+            $("#genericActionSend").on("click", function () {
+                stompClient.send($("#genericAction").val(), {}, $("#genericActionValue").val());
+            });
+            connect();
+        });
+    </script>
+</head>
+<body>
+<h1>Galactic War - STOMP test client</h1>
+<table>
+    <tr>
+        <td>
+            <h2>Connection</h2>
+            <table>
+                <tr>
+                    <td>Connection string:</td>
+                    <td><input id="connectionString" value="ws://localhost:8080/websocket"/>
+                        <button id="reconnectButton">reconnect</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Status:</td>
+                    <td id="connectionStatus">disconnected</td>
+                </tr>
+            </table>
+            <h2>Actions</h2>
+            <table>
+                <tr>
+                    <td>/action/initiateAssault</td>
+                    <td><input id="initateAssaultValue" value='{"planetId":"e1e4c4c4-e35c-11e6-bf01-fe55135034f3"}'/>
+                        <button id="initateAssaultSend">send</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>/action/joinAssault</td>
+                    <td><input id="joinAssaultValue" value='{"battleId":"56774dc6-c4d5-401c-9b2c-c7742318aea4"}'/>
+                        <button id="joinAssaultSend">send</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>/action/leaveAssault</td>
+                    <td><input id="leaveAssaultValue" value='{"battleId":"56774dc6-c4d5-401c-9b2c-c7742318aea4"}'/>
+                        <button id="leaveAssaultSend">send</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td><input id="genericAction" style="width: 100%" value="/action/test"></td>
+                    <td><input id="genericActionValue" value='{}'/>
+                        <button id="genericActionSend">send</button>
+                    </td>
+                </tr>
+            </table>
+            <h2>Subscriptions</h2>
+            <textarea id="subscribedChannels">
+/planets/attacked
+/battles/character_joined
+/battles/character_left</textarea><br/>
+            <button id="resubscribeButton">resubscribe</button>
+        </td>
+        <td>
+            <h2>Subscription log</h2>
+            <textarea id="subscribtionLog"></textarea><br />
+            <button id="resetSubscriptionLog">reset</button>
+            <h2>Debug log</h2>
+            <textarea id="activityLog"></textarea><br />
+            <button id="resetActivityLog">reset</button>
+        </td>
+    </tr>
+</table>
+</body>
+</html>
