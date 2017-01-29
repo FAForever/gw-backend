@@ -19,7 +19,7 @@ import java.util.UUID;
 public class InitiateAssaultEventMessage {
     private final RuntimeService runtimeService;
 
-    public static final String MESSAGE_NAME = "Message_InitiateAttack";
+    public static final String MESSAGE_NAME = "Message_InitiateAssault";
 
     @Inject
     public InitiateAssaultEventMessage(RuntimeService runtimeService) {

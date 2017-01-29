@@ -45,10 +45,10 @@ public class PlanetaryAssaultTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         DelegateExpressions.registerJavaDelegateMock("initiateAssaultTask");
-        DelegateExpressions.registerJavaDelegateMock("assaultInitiatedSuccessMessage");
-        DelegateExpressions.registerJavaDelegateMock("playerNotFreeForGameErrorMessage");
-        DelegateExpressions.registerJavaDelegateMock("planetNotAttackableErrorMessage");
+        DelegateExpressions.registerJavaDelegateMock("planetUnderAssaultBroadcastMessage");
+        DelegateExpressions.registerJavaDelegateMock("invalidCharacterActionErrorMessage");
         DelegateExpressions.registerJavaDelegateMock("addCharacterToAssaultTask");
+        DelegateExpressions.registerJavaDelegateMock("removeCharacterFromAssaultTask");
         DelegateExpressions.registerJavaDelegateMock("createGameOptionsTask");
         DelegateExpressions.registerJavaDelegateMock("noopTask");
     }
@@ -64,9 +64,6 @@ public class PlanetaryAssaultTest {
         DelegateExpressions.registerJavaDelegateMock("initiateAssaultTask").onExecutionSetVariables(ImmutableMap.of("battle", mock(Battle.class)));
         DelegateExpressions.registerJavaDelegateMock("addCharacterToAssaultTask").onExecutionSetVariables(ImmutableMap.of("gameFull", true));
 
-//        // only use if necessary - connect via http://localhost:8082
-//        org.h2.tools.Server.createWebServer("-web").start();
-
         final ProcessInstance processInstance = startProcess();
 
         processEngineRule.getRuntimeService().correlateMessage("Message_PlayerJoinsAssault", "test");
@@ -79,7 +76,8 @@ public class PlanetaryAssaultTest {
 //        taskService.complete(task.getId());
 
         verifyJavaDelegateMock("initiateAssaultTask").executed(times(1));
-        verifyJavaDelegateMock("assaultInitiatedSuccessMessage").executed(times(1));
+        verifyJavaDelegateMock("planetUnderAssaultBroadcastMessage").executed(times(1));
+        verifyJavaDelegateMock("invalidCharacterActionErrorMessage").executedNever();
         verifyJavaDelegateMock("addCharacterToAssaultTask").executed(times(1));
         verifyJavaDelegateMock("createGameOptionsTask").executed(times(1));
         assertThat(processInstance).isEnded();
@@ -88,32 +86,43 @@ public class PlanetaryAssaultTest {
     @Test
     @Deployment(resources = "bpmn/planetary_assault.bpmn")
     public void errorInitiatorNotFreeForGame() {
-        DelegateExpressions.registerJavaDelegateMock("initiateAssaultTask").onExecutionThrowBpmnError(new BpmnError("PlayerNotFreeForGame"));
+        DelegateExpressions.registerJavaDelegateMock("initiateAssaultTask").onExecutionThrowBpmnError(new BpmnError("invalidCharacterAction"));
 
         final ProcessInstance processInstance = startProcess();
 
         verifyJavaDelegateMock("initiateAssaultTask").executed(times(1));
-        verifyJavaDelegateMock("assaultInitiatedSuccessMessage").executedNever();
-        verifyJavaDelegateMock("playerNotFreeForGameErrorMessage").executed(times(1));
-        verifyJavaDelegateMock("planetNotAttackableErrorMessage").executedNever();
+        verifyJavaDelegateMock("planetUnderAssaultBroadcastMessage").executedNever();
+        verifyJavaDelegateMock("invalidCharacterActionErrorMessage").executed(times(1));
 
         assertThat(processInstance).isEnded();
     }
 
     @Test
     @Deployment(resources = "bpmn/planetary_assault.bpmn")
-    public void errorPlanetNotAttackable() {
-        DelegateExpressions.registerJavaDelegateMock("initiateAssaultTask").onExecutionThrowBpmnError(new BpmnError("PlanetNotAttackable"));
+    public void onlyAttackerLeaves() {
+        DelegateExpressions.registerJavaDelegateMock("removeCharacterFromAssaultTask").onExecutionSetVariables(ImmutableMap.of("assaultFactionHasRemainingPlayers", false, "winner", "defenders"));
 
         final ProcessInstance processInstance = startProcess();
 
+        processEngineRule.getRuntimeService().correlateMessage("Message_PlayerLeavesAssault", "test");
+
+
         verifyJavaDelegateMock("initiateAssaultTask").executed(times(1));
-        verifyJavaDelegateMock("assaultInitiatedSuccessMessage").executedNever();
-        verifyJavaDelegateMock("playerNotFreeForGameErrorMessage").executedNever();
-        verifyJavaDelegateMock("planetNotAttackableErrorMessage").executed(times(1));
+        verifyJavaDelegateMock("planetUnderAssaultBroadcastMessage").executed(times(1));
+        verifyJavaDelegateMock("addCharacterToAssaultTask").executedNever();
+        verifyJavaDelegateMock("removeCharacterFromAssaultTask").executed(times(1));
+        verifyJavaDelegateMock("invalidCharacterActionErrorMessage").executedNever();
+
+        // only use if necessary - connect via http://localhost:8082
+//        try {
+//            org.h2.tools.Server.createWebServer("-web").start();
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
 
         assertThat(processInstance).isEnded();
     }
+
 
     private ProcessInstance startProcess() {
         Map<String, Object> processVariables = ImmutableMap.of("initiator", mock(GwCharacter.class), "planet", mock(Planet.class));

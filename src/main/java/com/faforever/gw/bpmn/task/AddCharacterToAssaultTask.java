@@ -2,7 +2,6 @@ package com.faforever.gw.bpmn.task;
 
 import com.faforever.gw.model.*;
 import com.faforever.gw.model.repository.BattleRepository;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
@@ -14,13 +13,14 @@ import java.util.UUID;
 
 @Slf4j
 @Component
-@NoArgsConstructor
 public class AddCharacterToAssaultTask implements JavaDelegate {
-    private BattleRepository battleRepository;
+    private final BattleRepository battleRepository;
+    private final ValidationHelper validationHelper;
 
     @Inject
-    public AddCharacterToAssaultTask(BattleRepository battleRepository) {
+    public AddCharacterToAssaultTask(BattleRepository battleRepository, ValidationHelper validationHelper) {
         this.battleRepository = battleRepository;
+        this.validationHelper = validationHelper;
     }
 
     @Override
@@ -29,29 +29,24 @@ public class AddCharacterToAssaultTask implements JavaDelegate {
         log.debug("addCharacterToAssaultTask");
 
         Battle battle = battleRepository.getOne(UUID.fromString(execution.getProcessInstance().getBusinessKey()));
-        GwCharacter gwCharacter = (GwCharacter) execution.getVariable("character");
+        GwCharacter character = (GwCharacter) execution.getVariable("character");
         Planet planet = (Planet)execution.getVariable("planet");
 
-        BattleRole battleRole;
+        validationHelper.validateCharacterInBattle(character, battle, false);
+        validationHelper.validateCharacterFreeForGame(character);
 
-        if (gwCharacter.getFaction() == battle.getAttackingFaction()) {
+        BattleRole battleRole;
+        if (character.getFaction() == battle.getAttackingFaction()) {
             battleRole = BattleRole.ATTACKER;
-        } else if (gwCharacter.getFaction() == battle.getDefendingFaction()) {
-            // check if enough slots available
+        } else if (character.getFaction() == battle.getDefendingFaction()) {
             battleRole = BattleRole.DEFENDER;
         } else {
-            throw GwError.NO_SLOTS_FOR_FACTION.asBpmnError();
+            battleRole = null;
         }
 
-        long characterCount = battle.getParticipants().stream()
-                .filter(battleParticipant -> battleParticipant.getRole() == battleRole)
-                .count();
+        validationHelper.validateOpenSlotForCharacter(character, battle, battleRole);
 
-        if(characterCount >= (planet.getMap().getTotalSlots() / 2)){
-            throw GwError.NO_SLOTS_FOR_FACTION.asBpmnError();
-        }
-
-        BattleParticipant battleParticipant = new BattleParticipant(battle, gwCharacter, battleRole);
+        BattleParticipant battleParticipant = new BattleParticipant(battle, character, battleRole);
         battle.getParticipants().add(battleParticipant);
         battleRepository.save(battle);
 

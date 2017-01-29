@@ -1,10 +1,8 @@
 package com.faforever.gw.model;
 
-import com.faforever.gw.validation.ValidateCharacterFreeForBattle;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -12,7 +10,6 @@ import java.util.UUID;
 
 @Entity
 @Table(name="gw_battle_participant")
-@ValidateCharacterFreeForBattle
 @Getter
 @NoArgsConstructor
 public class BattleParticipant implements Serializable{

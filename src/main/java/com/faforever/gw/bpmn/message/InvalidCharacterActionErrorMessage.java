@@ -10,11 +10,11 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class PlanetNotAttackableErrorMessage implements JavaDelegate {
+public class InvalidCharacterActionErrorMessage implements JavaDelegate {
     @Override
     public void execute(DelegateExecution execution) throws Exception {
         Planet planet = (Planet)execution.getVariable("planet");
-        GwCharacter character = (GwCharacter)execution.getVariable("initator");
+        GwCharacter character = (GwCharacter)execution.getVariable("initiator");
         Battle battle = (Battle)execution.getVariable("battle");
 
         // TODO: Invoke response to frontend

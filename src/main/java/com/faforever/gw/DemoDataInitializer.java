@@ -26,8 +26,6 @@ public class DemoDataInitializer {
 
     @Transactional
     public void run() throws SQLException {
-        org.h2.tools.Server.createWebServer("-web").start();
-
         GwCharacter character = new GwCharacter();
         character.setId(UUID.fromString("a81dba16-e35c-11e6-bf01-fe55135034f3"));
         character.setName("BattleInitiator");
