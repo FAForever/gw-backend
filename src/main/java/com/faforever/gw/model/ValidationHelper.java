@@ -14,19 +14,6 @@ import java.util.EnumSet;
 public class ValidationHelper {
     private static final EnumSet<BattleStatus> OCCUPIED_BATTLE_STATUSSES = EnumSet.of(BattleStatus.INITIATED, BattleStatus.RUNNING);
 
-    private final BattleRepository battleRepository;
-    private final CharacterRepository characterRepository;
-    private final PlanetRepository planetRepository;
-    private final MapRepository mapRepository;
-
-    @Inject
-    public ValidationHelper(BattleRepository battleRepository, CharacterRepository characterRepository, PlanetRepository planetRepository, MapRepository mapRepository) {
-        this.battleRepository = battleRepository;
-        this.characterRepository = characterRepository;
-        this.planetRepository = planetRepository;
-        this.mapRepository = mapRepository;
-    }
-
     public void validateCharacterInBattle(GwCharacter character, Battle battle, boolean expect){
         if(character.getBattleParticipantList().stream()
                 .anyMatch(battleParticipant -> battleParticipant.getCharacter() == character) != expect){
