@@ -1,7 +1,7 @@
 package com.faforever.gw.bpmn;
 
-import com.faforever.gw.model.GwCharacter;
-import jersey.repackaged.com.google.common.collect.ImmutableMap;
+//import jersey.repackaged.com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.mock.Mocks;
@@ -15,7 +15,6 @@ import org.mockito.MockitoAnnotations;
 import java.util.Arrays;
 
 import static org.camunda.bpm.extension.mockito.DelegateExpressions.verifyJavaDelegateMock;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 
 

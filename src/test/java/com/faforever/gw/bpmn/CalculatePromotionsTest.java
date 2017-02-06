@@ -1,8 +1,8 @@
 package com.faforever.gw.bpmn;
 
-import com.faforever.gw.bpmn.task.InitiateAssaultTask;
 import com.faforever.gw.model.GwCharacter;
-import jersey.repackaged.com.google.common.collect.ImmutableMap;
+//import jersey.repackaged.com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.mock.Mocks;
