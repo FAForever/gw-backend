@@ -67,7 +67,7 @@
             };
 
             console.log('STOMP: Attempting connection');
-            stompClient.connect('', '', stompSuccessCallback, stompFailureCallback);
+            stompClient.connect({"X-Authorization": "brutus5000 was here"}, stompSuccessCallback, stompFailureCallback);
 
         }
 

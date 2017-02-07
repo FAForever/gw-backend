@@ -28,20 +28,17 @@ public class UserAuthenticationConverter extends DefaultUserAuthenticationConver
     @SuppressWarnings("unchecked")
     Map<String, Object> response = (Map<String, Object>) super.convertUserAuthentication(authentication);
     response.put(ID, user.getId());
-    response.put(NON_LOCKED, user.isAccountNonLocked());
 
     return response;
   }
 
   @Override
   public Authentication extractAuthentication(Map<String, ?> map) {
-    int id = (Integer) map.get(ID);
+    Long id = (Long)map.get(ID);
     String username = (String) map.get(USERNAME);
     boolean accountNonLocked = (Boolean) map.get(NON_LOCKED);
     Collection<? extends GrantedAuthority> authorities = getAuthorities(map);
-    UserDetails user = new User(id, username, "N/A", accountNonLocked, authorities);
-
-    return new UsernamePasswordAuthenticationToken(user, "N/A", authorities);
+    return new User(id, username, "N/A", authorities);
   }
 
   private Collection<? extends GrantedAuthority> getAuthorities(Map<String, ?> map) {
