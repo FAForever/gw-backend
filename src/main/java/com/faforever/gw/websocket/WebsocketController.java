@@ -65,7 +65,7 @@ public class WebsocketController {
         runtimeService.startProcessInstanceByMessage("Message_InitiateAssault", battleUUID.toString(), processVariables);
     }
 
-    public void broadcast(String channel, Object payload) {
+    public void send(String channel, Object payload) {
         template.convertAndSend(channel, payload);
     }
 

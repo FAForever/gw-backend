@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Galactic Ware STOMP test client</title>
     <script src="jquery-3.1.1.js"></script>
+    <script src="sockjs.js"></script>
     <script src="stomp.js"></script>
 
     <style>
@@ -46,6 +47,8 @@
             $("#activityLog").val("");
 
             console.log("connecting to " + $("#connectionString").val());
+//            var ws = new SockJS($("#connectionString").val());
+//            stompClient = Stomp.over(ws)
             stompClient = Stomp.client($("#connectionString").val(), "v11.stomp");
             var stompStatus = false;
 
@@ -67,7 +70,7 @@
             };
 
             console.log('STOMP: Attempting connection');
-            stompClient.connect({"X-Authorization": "brutus5000 was here"}, stompSuccessCallback, stompFailureCallback);
+            stompClient.connect({"X-Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0ODMxNDc0NTcsInVzZXJfaWQiOjY2NiwidXNlcl9uYW1lIjoiRG93bmxvcmQiLCJhdXRob3JpdGllcyI6WyJST0xFX1VTRVIiXSwianRpIjoiNmU4ZDJlYmQtODJhYS00ODMyLTgwOTQtYzJkZWI4ZDc2MjU5IiwiY2xpZW50X2lkIjoiM2JjODI4MmMtNzczMC0xMWU1LThiY2YtZmVmZjgxOWNkYzlmIiwic2NvcGUiOlsicmVhZF9hY2hpZXZlbWVudHMiLCJyZWFkX2V2ZW50cyIsInVwbG9hZF9tYXAiLCJ1cGxvYWRfbW9kIl19.KBlReNPxVmrXTdAVBKnahYMTf83lL3RWYE8YyMCJkwM"}, stompSuccessCallback, stompFailureCallback);
 
         }
 

@@ -4,32 +4,34 @@ import com.faforever.gw.model.Battle;
 import com.faforever.gw.model.Faction;
 import com.faforever.gw.model.GwCharacter;
 import com.faforever.gw.model.Planet;
-import com.faforever.gw.websocket.WebsocketController;
+import com.faforever.gw.services.messaging.MessagingService;
+import com.faforever.gw.services.messaging.WebsocketChannel;
+import com.faforever.gw.services.messaging.WebsocketMessage;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.springframework.stereotype.Component;
 
+import javax.inject.Inject;
 import java.util.UUID;
 
 @Slf4j
 @Getter
 @Component
-public class PlanetUnderAssaultBroadcastMessage implements JavaDelegate {
+public class PlanetUnderAssaultMessage implements JavaDelegate, WebsocketMessage {
     @Getter(AccessLevel.NONE)
-    private final WebsocketController websocketController;
+    private final MessagingService messagingService;
 
     private UUID planetId;
     private UUID battleId;
     private Faction attackingFaction;
     private Faction defendingFaction;
 
-    public PlanetUnderAssaultBroadcastMessage(WebsocketController websocketController) {
-        this.websocketController = websocketController;
+    @Inject
+    public PlanetUnderAssaultMessage(MessagingService messagingService) {
+        this.messagingService = messagingService;
     }
 
     @Override
@@ -43,7 +45,12 @@ public class PlanetUnderAssaultBroadcastMessage implements JavaDelegate {
         attackingFaction = character.getFaction();
         defendingFaction = planet.getCurrentOwner();
 
-        websocketController.broadcast("/planets/attacked", this);
+        log.debug("Sending PlanetUnderAssaultMessage (planetId: {}, battleId: {}, attackingFaction: {}, defendingFaction: {}", planetId, battleId, attackingFaction, defendingFaction);
+        messagingService.send(this);
     }
 
+    @Override
+    public WebsocketChannel getChannel() {
+        return WebsocketChannel.PLANETS_ATTACKED;
+    }
 }

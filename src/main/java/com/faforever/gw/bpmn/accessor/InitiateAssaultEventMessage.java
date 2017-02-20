@@ -27,13 +27,14 @@ public class InitiateAssaultEventMessage {
     }
 
     public void createAndSend(GwCharacter initiator, Planet planet){
+        log.debug("Received InitiateAssaultEventMessage");
         Map<String, Object> processVariables = new HashMap<>();
         processVariables.put("initiator", initiator);
         processVariables.put("planet", planet);
         processVariables.put("attackingFaction", initiator.getFaction());
         processVariables.put("defendingFaction", planet.getCurrentOwner());
 
-        log.info("Create and send message {0} - {1}", processVariables);
+        log.debug("-> added processVariables: ", processVariables);
         runtimeService.startProcessInstanceByMessage(MESSAGE_NAME, processVariables);
     }
 }

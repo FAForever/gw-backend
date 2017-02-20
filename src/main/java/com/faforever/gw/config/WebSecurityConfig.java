@@ -36,16 +36,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.and()
 			.authorizeRequests()
 				.antMatchers("/js/**", "/lib/**", "/images/**", "/css/**", "/index.html", "/").permitAll()
-				.antMatchers("/websocket").hasRole("ADMIN")
+				.antMatchers("/websocket").permitAll()//.hasRole("ADMIN")
 				.anyRequest().authenticated();
-				
+
 	}
 
 	@Autowired
 	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-		
+
 		auth.authenticationProvider(new AuthenticationProvider() {
-			
+
 			@Override
 			public boolean supports(Class<?> authentication) {
 				return UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication);

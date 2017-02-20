@@ -144,12 +144,12 @@
       <bpmn:intermediateThrowEvent id="IntermediateThrowEvent_Success_LeftAssault" name="character left assault">
         <bpmn:incoming>SequenceFlow_1tim9i2</bpmn:incoming>
         <bpmn:outgoing>SequenceFlow_1ddx0w9</bpmn:outgoing>
-        <bpmn:messageEventDefinition camunda:delegateExpression="${characterLeftAssaultBroadcastMessage}" />
+        <bpmn:messageEventDefinition camunda:delegateExpression="${battleParticipantLeftAssaultMessage}" />
       </bpmn:intermediateThrowEvent>
       <bpmn:intermediateThrowEvent id="IntermediateThrowEvent_JoinedAssault" name="character joined assault">
         <bpmn:incoming>SequenceFlow_0rbkusb</bpmn:incoming>
         <bpmn:outgoing>SequenceFlow_0wvhz73</bpmn:outgoing>
-        <bpmn:messageEventDefinition camunda:delegateExpression="${characterJoinedAssaultBroadcastMessage}" />
+        <bpmn:messageEventDefinition camunda:delegateExpression="${battleParticipantJoinedAssaultMessage}" />
       </bpmn:intermediateThrowEvent>
       <bpmn:intermediateCatchEvent id="IntermediateCatchEvent_PlayerJoins" name="player joins assault">
         <bpmn:incoming>SequenceFlow_1gdrrg0</bpmn:incoming>
@@ -164,7 +164,7 @@
     </bpmn:subProcess>
     <bpmn:endEvent id="EndEvent_Error_InvalidCharacterAction" name="error: invalid character action">
       <bpmn:incoming>SequenceFlow_1any1mr</bpmn:incoming>
-      <bpmn:messageEventDefinition camunda:delegateExpression="${invalidCharacterActionErrorMessage}" />
+      <bpmn:messageEventDefinition camunda:delegateExpression="${userErrorMessage}" />
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="SequenceFlow_0t0fx81" sourceRef="StartEvent_CharacterInitiatesAssault" targetRef="ServiceTask_InitateAssault" />
     <bpmn:sequenceFlow id="SequenceFlow_05ey27o" sourceRef="Task_SetupMatch" targetRef="ServiceTask_CreateGameOptions" />
@@ -316,7 +316,7 @@
     <bpmn:intermediateThrowEvent id="IntermediateThrowEvent_PlanetUnderAssault" name="planet under assault">
       <bpmn:incoming>SequenceFlow_1ieu0hq</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0i3umkz</bpmn:outgoing>
-      <bpmn:messageEventDefinition camunda:delegateExpression="${planetUnderAssaultBroadcastMessage}" />
+      <bpmn:messageEventDefinition camunda:delegateExpression="${planetUnderAssaultMessage}" />
     </bpmn:intermediateThrowEvent>
     <bpmn:textAnnotation id="TextAnnotation_08ftkq9">    <bpmn:text>set map, teams, factions and gw game mode</bpmn:text>
 </bpmn:textAnnotation>

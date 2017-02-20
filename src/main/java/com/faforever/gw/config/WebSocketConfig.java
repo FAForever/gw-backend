@@ -2,6 +2,7 @@ package com.faforever.gw.config;
 
 
 import com.faforever.gw.security.User;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -26,22 +27,18 @@ import java.util.Map;
 
 @Configuration
 @EnableWebSocketMessageBroker
+@Order(Ordered.HIGHEST_PRECEDENCE + 99)
 public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
-    @Order(Ordered.HIGHEST_PRECEDENCE + 99)
-    class AuthenticationInterceptorAdapter extends ChannelInterceptorAdapter {
+
+    private static class AuthenticationInterceptorAdapter extends ChannelInterceptorAdapter {
         @Override
         public Message<?> preSend(Message<?> message, MessageChannel channel) {
-            StompHeaderAccessor accessor =
-                    MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+            StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
 
             if (StompCommand.CONNECT.equals(accessor.getCommand())) {
-                try {
-                    String stringToken = accessor.getFirstNativeHeader("X-Authorization");
-                    Principal user = User.fromJwtToken(stringToken);
-                    accessor.setUser(user);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                String stringToken = accessor.getFirstNativeHeader("X-Authorization");
+                Principal user = User.fromJwtToken(stringToken);
+                accessor.setUser(user);
             }
 
             return message;
@@ -50,20 +47,23 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.setInterceptors(new AuthenticationInterceptorAdapter());
+        registration.setInterceptors(getAuthenticationInterceptorAdapter());
     }
 
+    @Bean
+    public AuthenticationInterceptorAdapter getAuthenticationInterceptorAdapter() {
+        return new AuthenticationInterceptorAdapter();
+    }
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.setApplicationDestinationPrefixes("/app");
+        config.setApplicationDestinationPrefixes("/action");
         config.enableSimpleBroker("/planets", "/battles");
         config.enableSimpleBroker("/queue/", "/topic/", "/exchange/");
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/websocket").setAllowedOrigins("*").withSockJS();
+        registry.addEndpoint("/websocket").setAllowedOrigins("*");//.withSockJS();
     }
-
 }

@@ -46,10 +46,12 @@ public class PlanetaryAssaultTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         DelegateExpressions.registerJavaDelegateMock("initiateAssaultTask");
-        DelegateExpressions.registerJavaDelegateMock("planetUnderAssaultBroadcastMessage");
-        DelegateExpressions.registerJavaDelegateMock("invalidCharacterActionErrorMessage");
+        DelegateExpressions.registerJavaDelegateMock("planetUnderAssaultMessage");
+        DelegateExpressions.registerJavaDelegateMock("userErrorMessage");
         DelegateExpressions.registerJavaDelegateMock("addCharacterToAssaultTask");
+        DelegateExpressions.registerJavaDelegateMock("battleParticipantJoinedAssaultMessage");
         DelegateExpressions.registerJavaDelegateMock("removeCharacterFromAssaultTask");
+        DelegateExpressions.registerJavaDelegateMock("battleParticipantLeftAssaultMessage");
         DelegateExpressions.registerJavaDelegateMock("createGameOptionsTask");
         DelegateExpressions.registerJavaDelegateMock("noopTask");
     }
@@ -77,10 +79,10 @@ public class PlanetaryAssaultTest {
 //        taskService.complete(task.getId());
 
         verifyJavaDelegateMock("initiateAssaultTask").executed(times(1));
-        verifyJavaDelegateMock("planetUnderAssaultBroadcastMessage").executed(times(1));
-        verifyJavaDelegateMock("invalidCharacterActionErrorMessage").executedNever();
+        verifyJavaDelegateMock("planetUnderAssaultMessage").executed(times(1));
+        verifyJavaDelegateMock("userErrorMessage").executedNever();
         verifyJavaDelegateMock("addCharacterToAssaultTask").executed(times(1));
-        verifyJavaDelegateMock("createGameOptionsTask").executed(times(1));
+//        verifyJavaDelegateMock("createGameOptionsTask").executed(times(1));
         assertThat(processInstance).isEnded();
     }
 
@@ -92,8 +94,8 @@ public class PlanetaryAssaultTest {
         final ProcessInstance processInstance = startProcess();
 
         verifyJavaDelegateMock("initiateAssaultTask").executed(times(1));
-        verifyJavaDelegateMock("planetUnderAssaultBroadcastMessage").executedNever();
-        verifyJavaDelegateMock("invalidCharacterActionErrorMessage").executed(times(1));
+        verifyJavaDelegateMock("planetUnderAssaultMessage").executedNever();
+        verifyJavaDelegateMock("userErrorMessage").executed(times(1));
 
         assertThat(processInstance).isEnded();
     }
@@ -109,10 +111,10 @@ public class PlanetaryAssaultTest {
 
 
         verifyJavaDelegateMock("initiateAssaultTask").executed(times(1));
-        verifyJavaDelegateMock("planetUnderAssaultBroadcastMessage").executed(times(1));
+        verifyJavaDelegateMock("planetUnderAssaultMessage").executed(times(1));
         verifyJavaDelegateMock("addCharacterToAssaultTask").executedNever();
         verifyJavaDelegateMock("removeCharacterFromAssaultTask").executed(times(1));
-        verifyJavaDelegateMock("invalidCharacterActionErrorMessage").executedNever();
+        verifyJavaDelegateMock("userErrorMessage").executedNever();
 
         // only use if necessary - connect via http://localhost:8082
 //        try {
