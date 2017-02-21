@@ -2,9 +2,8 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>Galactic Ware STOMP test client</title>
+    <title>Galactic War STOMP test client</title>
     <script src="jquery-3.1.1.js"></script>
-    <script src="sockjs.js"></script>
     <script src="stomp.js"></script>
 
     <style>
@@ -55,7 +54,8 @@
             var stompSuccessCallback = function (frame) {
                 stompStatus = true;
                 console.log('STOMP: Connection successful');
-                $("#connectionStatus").text("connected");
+                $("#connectButton").attr("disabled", "disabled");
+                $("#disconnectButton").removeAttr("disabled", "enabled");
                 subscribe();
             };
 
@@ -64,14 +64,22 @@
                 console.log('STOMP: ' + error);
 
                 subscriptions = []
-                setTimeout(connect, 10000);
-                console.log('STOMP: Reconecting in 10 seconds');
-                $("#connectionStatus").text("disconnected");
+                $("#connectButton").removeAttr("disabled");
+                $("#disconnectButton").attr("disabled", "disabled");
             };
 
             console.log('STOMP: Attempting connection');
-            stompClient.connect({"X-Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0ODMxNDc0NTcsInVzZXJfaWQiOjY2NiwidXNlcl9uYW1lIjoiRG93bmxvcmQiLCJhdXRob3JpdGllcyI6WyJST0xFX1VTRVIiXSwianRpIjoiNmU4ZDJlYmQtODJhYS00ODMyLTgwOTQtYzJkZWI4ZDc2MjU5IiwiY2xpZW50X2lkIjoiM2JjODI4MmMtNzczMC0xMWU1LThiY2YtZmVmZjgxOWNkYzlmIiwic2NvcGUiOlsicmVhZF9hY2hpZXZlbWVudHMiLCJyZWFkX2V2ZW50cyIsInVwbG9hZF9tYXAiLCJ1cGxvYWRfbW9kIl19.KBlReNPxVmrXTdAVBKnahYMTf83lL3RWYE8YyMCJkwM"}, stompSuccessCallback, stompFailureCallback);
+            stompClient.connect({"X-Authorization": $("#userToken").val()}, stompSuccessCallback, stompFailureCallback);
 
+        }
+
+        function disconnect() {
+            console.log("disconnecting");
+            stompClient.disconnect();
+            subscriptions = [];
+
+            $("#connectButton").removeAttr("disabled");
+            $("#disconnectButton").attr("disabled", "disabled");
         }
 
         function subscribe() {
@@ -117,7 +125,8 @@
 
 
         $(document).ready(function () {
-            $("#reconnectButton").on("click", connect);
+            $("#connectButton").on("click", connect);
+            $("#disconnectButton").on("click", disconnect);
             $("#resubscribeButton").on("click", subscribe);
             $("#resetSubscriptionLog").on("click", function () {
                 $("#subscribtionLog").val("");
@@ -151,14 +160,22 @@
             <h2>Connection</h2>
             <table>
                 <tr>
-                    <td>Connection string:</td>
-                    <td><input id="connectionString" value="ws://localhost:8080/websocket"/>
-                        <button id="reconnectButton">reconnect</button>
+                    <td>User:</td>
+                    <td>
+                        <select id="userToken">
+                            <option value="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjogMSwgInVzZXJfbmFtZSI6ICJVRUYgQWxwaGEiLCAiYXV0aG9yaXRpZXMiOlsiUk9MRV9VU0VSIl0sICJleHAiOiA0MTAyNDQ0NzQwfQ.qlA-HIEU9zQ7OA_eAqfYAG5MZmhe7TBqV9zVnJgV2wY">-1- UEF Alpha</option>
+                            <option value="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjogMiwgInVzZXJfbmFtZSI6ICJVRUYgQnJhdm8iLCAiYXV0aG9yaXRpZXMiOlsiUk9MRV9VU0VSIl0sICJleHAiOiA0MTAyNDQ0NzQwfQ.ZHwO6jvcHPd0fhBFSaJTQpt-S8Zmwa6unPW0qHkzLKw">-2- UEF Bravo</option>
+                            <option value="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjogMywgInVzZXJfbmFtZSI6ICJDeWJyYW4gQ2hhcmxpZSIsICJhdXRob3JpdGllcyI6WyJST0xFX1VTRVIiXSwgImV4cCI6IDQxMDI0NDQ3NDB9.qPE-UkG8tSdH4fMzD6RWkGHSYoH24SluvsPcfN9GX4A">-3- Cybran Charlie</option>
+                        </select>
                     </td>
                 </tr>
                 <tr>
-                    <td>Status:</td>
-                    <td id="connectionStatus">disconnected</td>
+                    <td>Connection string:</td>
+                    <td><input id="connectionString" value="ws://localhost:8080/websocket"/></td>
+                </tr>
+                <tr>
+                    <td>Connection:</td>
+                    <td><button id="connectButton">connect</button> <button id="disconnectButton" disabled>disconnect</button> </td>
                 </tr>
             </table>
             <h2>Actions</h2>
