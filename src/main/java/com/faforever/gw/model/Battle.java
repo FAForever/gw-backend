@@ -53,10 +53,10 @@ public class Battle implements Serializable {
     @Column(name="ended_at")
     private Timestamp endedAt;
 
-    @Column(name="attacking_faction", nullable = false, updatable = false, length = 1)
+    @Column(name="attacking_faction", nullable = true, updatable = false, length = 1)
     private Faction attackingFaction;
 
-    @Column(name="defending_faction", nullable = false, updatable = false, length = 1)
+    @Column(name="defending_faction", nullable = true, updatable = false, length = 1)
     private Faction defendingFaction;
 
     @Column(name="winning_faction", length = 1)

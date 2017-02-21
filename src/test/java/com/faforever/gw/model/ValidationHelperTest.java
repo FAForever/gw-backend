@@ -46,7 +46,7 @@ public class ValidationHelperTest {
         String stringToken = token.getEncoded();
         System.out.println(stringToken);
         ;
-//    public static User fromJwtToken(String stringToken) {
+//    public static User getUserFromJwtToken(String stringToken) {
 //        try {
 //            Jwt token = JwtHelper.decodeAndVerify(stringToken, new MacSigner("secret"));
 //            ObjectMapper objectMapper = new ObjectMapper();

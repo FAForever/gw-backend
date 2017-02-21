@@ -1,5 +1,6 @@
 package com.faforever.gw.bpmn.task;
 
+import com.faforever.gw.bpmn.accessors.PlanetaryAssaultAccessor;
 import com.faforever.gw.model.*;
 import com.faforever.gw.model.GwCharacter;
 import com.faforever.gw.model.repository.BattleRepository;
@@ -39,21 +40,24 @@ public class InitiateAssaultTask implements JavaDelegate {
     public void execute(DelegateExecution execution) {
         log.debug("validateAssault");
 
-        GwCharacter character = (GwCharacter)execution.getVariable("initiator");
-        Planet planet = (Planet)execution.getVariable("planet");
-        Faction attackingFaction = (Faction)execution.getVariable("attackingFaction");
-        Faction defendingFaction = (Faction)execution.getVariable("defendingFaction");
+        PlanetaryAssaultAccessor accessor = PlanetaryAssaultAccessor.of(execution.getVariables());
+
+        GwCharacter character = characterRepository.findOne(accessor.getInitiatorId());
+        Planet planet = planetRepository.findOne(accessor.getPlanetId());
+        Faction attackingFaction = accessor.getAttackingFaction();
+        Faction defendingFaction = accessor.getDefendingFaction();
 
         validationHelper.validateCharacterFreeForGame(character);
         validationHelper.validateAssaultOnPlanet(character, planet);
 
         Battle battle = new Battle(planet, attackingFaction, defendingFaction);
-        battle.setId(UUID.fromString(execution.getProcessInstance().getBusinessKey()));
+        battle.setId(accessor.getBattleId());
         BattleParticipant battleParticipant = new BattleParticipant(battle, character, BattleRole.ATTACKER);
         battle.getParticipants().add(battleParticipant);
 
         battleRepository.save(battle);
 
-        execution.setVariable("battle", battle);
+        log.debug("-> added processVariable `battle`: {}", battle.getId());
+        execution.setVariable("battle", battle.getId());
     }
 }

@@ -29,7 +29,7 @@ public enum WebsocketChannel {
     }
 
     public String toUserString(User user) {
-        return channelName.replace("{userId}", user.getId().toString());
+        return channelName.replace("{userId}", Integer.toString(user.getId()));
     }
 
     public String toFactionString(Faction faction) {

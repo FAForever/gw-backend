@@ -1,5 +1,6 @@
 package com.faforever.gw.security;
 
+import com.faforever.gw.model.GwCharacter;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,28 +23,13 @@ import java.util.List;
 @Setter
 public class User extends UsernamePasswordAuthenticationToken {
 
-  private final Long id;
+  private final int id;
+  private GwCharacter activeCharacter;
 
-  public User(Long id, Object principal, Object credentials, Collection<? extends GrantedAuthority> authorities) {
+  public User(int id, GwCharacter activeCharacter, Object principal, Object credentials, Collection<? extends GrantedAuthority> authorities) {
     super(principal, credentials, authorities);
     this.id = id;
+    this.activeCharacter = activeCharacter;
   }
 
-  public static User fromJwtToken(String stringToken) {
-    try {
-      Jwt token = JwtHelper.decodeAndVerify(stringToken, new MacSigner("secret"));
-      ObjectMapper objectMapper = new ObjectMapper();
-      JsonNode data = objectMapper.readTree(token.getClaims());
-
-      List<String> authorities = objectMapper.readerFor(new TypeReference<List<String>>(){}).readValue(data.get("authorities"));
-      List<SimpleGrantedAuthority> grantedAuthorities = new ArrayList<>();
-
-      authorities.forEach(role -> grantedAuthorities.add(new SimpleGrantedAuthority(role)));
-
-      return new User(data.get("user_id").asLong(), data.get("user_name").asText(), stringToken, grantedAuthorities);
-    }
-    catch(Exception e) {
-      throw new RuntimeException("user not authorized");
-    }
-  }
 }

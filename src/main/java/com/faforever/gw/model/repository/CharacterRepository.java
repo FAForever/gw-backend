@@ -8,5 +8,5 @@ import java.util.UUID;
 
 @Repository
 public interface CharacterRepository extends JpaRepository<GwCharacter, UUID> {
-
+    GwCharacter findByFafId(int fafId);
 }

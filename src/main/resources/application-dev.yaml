@@ -13,3 +13,6 @@ spring:
   h2:
     console:
       enabled: true
+logging:
+  level:
+    com.faforever.gw: debug

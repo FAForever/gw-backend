@@ -23,7 +23,7 @@ public enum BattleRole {
 
         @Override
         public BattleRole convertToEntityAttribute(String dbData) {
-            return BattleRole.fromString(dbData);
+            return BattleRole.fromDbKeyString(dbData);
         }
     }
 
@@ -47,7 +47,11 @@ public enum BattleRole {
     private final String name;
 
 
-    public static BattleRole fromString(String string) {
+    public static BattleRole fromDbKeyString(String string) {
         return fromDbKey.get(string);
+    }
+
+    public static BattleRole fromNameString(String string) {
+        return fromName.get(string);
     }
 }

@@ -1,8 +1,9 @@
 package com.faforever.gw.bpmn.message;
 
-import com.faforever.gw.model.Battle;
+import com.faforever.gw.bpmn.accessors.PlanetaryAssaultAccessor;
 import com.faforever.gw.model.Faction;
 import com.faforever.gw.model.GwCharacter;
+import com.faforever.gw.model.repository.CharacterRepository;
 import com.faforever.gw.services.messaging.MessagingService;
 import com.faforever.gw.services.messaging.WebsocketChannel;
 import com.faforever.gw.services.messaging.WebsocketMessage;
@@ -22,24 +23,28 @@ import java.util.UUID;
 public class BattleParticipantLeftAssaultMessage implements JavaDelegate, WebsocketMessage {
     @Getter(AccessLevel.NONE)
     private final MessagingService messagingService;
+    @Getter(AccessLevel.NONE)
+    private final CharacterRepository characterRepository;
 
     private UUID characterId;
     private UUID battleId;
     private Faction characterFaction;
 
     @Inject
-    public BattleParticipantLeftAssaultMessage(MessagingService messagingService) {
+    public BattleParticipantLeftAssaultMessage(MessagingService messagingService, CharacterRepository characterRepository) {
         this.messagingService = messagingService;
+        this.characterRepository = characterRepository;
     }
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {
-        GwCharacter character = (GwCharacter)execution.getVariable("character");
-        Battle battle = (Battle)execution.getVariable("battle");
+        PlanetaryAssaultAccessor accessor = PlanetaryAssaultAccessor.of(execution.getVariables());
 
+        GwCharacter character = characterRepository.findOne(accessor.getLastLeftCharacter());
         characterId = character.getId();
-        battleId = battle.getId();
         characterFaction = character.getFaction();
+
+        battleId = accessor.getBattleId();
 
         log.debug("Sending BattleParticipantLeftAssaultMessage (characterId: {}, battleId: {}, characterFaction: {}, defendingFaction: {}", characterId, battleId, characterFaction);
         messagingService.send(this);

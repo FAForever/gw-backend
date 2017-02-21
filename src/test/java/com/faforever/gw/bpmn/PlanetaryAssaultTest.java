@@ -1,18 +1,13 @@
 package com.faforever.gw.bpmn;
 
-import com.faforever.gw.bpmn.accessor.InitiateAssaultEventMessage;
-import com.faforever.gw.bpmn.task.InitiateAssaultTask;
+import com.faforever.gw.bpmn.services.PlanetaryAssaultService;
 import com.faforever.gw.model.Battle;
 import com.faforever.gw.model.GwCharacter;
 import com.faforever.gw.model.Planet;
 //import jersey.repackaged.com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap;
-import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.delegate.BpmnError;
-import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.mock.Mocks;
@@ -21,13 +16,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 import static org.camunda.bpm.engine.test.assertions.ProcessEngineAssertions.assertThat;
@@ -131,7 +122,7 @@ public class PlanetaryAssaultTest {
         Map<String, Object> processVariables = ImmutableMap.of("initiator", mock(GwCharacter.class), "planet", mock(Planet.class));
 
         return processEngineRule.getRuntimeService().startProcessInstanceByMessage(
-                InitiateAssaultEventMessage.MESSAGE_NAME, "test", processVariables
+                PlanetaryAssaultService.INITIATE_ASSAULT_MESSAGE, "test", processVariables
         );
     }
 }
