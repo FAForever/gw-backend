@@ -5,6 +5,7 @@ import com.faforever.gw.model.*;
 import com.faforever.gw.model.repository.BattleRepository;
 import com.faforever.gw.model.repository.CharacterRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.springframework.stereotype.Component;
@@ -27,7 +28,7 @@ public class RemoveCharacterFromAssaultTask implements JavaDelegate {
     }
 
     @Override
-    @Transactional
+    @Transactional(dontRollbackOn = BpmnError.class)
     public void execute(DelegateExecution execution) {
         log.debug("removeCharacterFromAssaultTask");
 
