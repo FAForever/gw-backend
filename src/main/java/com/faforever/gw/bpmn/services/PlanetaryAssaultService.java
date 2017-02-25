@@ -14,7 +14,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.delegate.BpmnError;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
 import org.springframework.context.ApplicationContext;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -30,6 +33,8 @@ public class PlanetaryAssaultService {
     private final RuntimeService runtimeService;
     private final MessagingService messagingService;
     private final PlanetRepository planetRepository;
+
+    public static final String UPDATE_OPEN_GAMES_SIGNAL = "Signal_UpdateOpenGames";
 
     public static final String INITIATE_ASSAULT_MESSAGE = "Message_InitiateAssault";
     public static final String PLAYER_JOINS_ASSAULT_MESSAGE = "Message_PlayerJoinsAssault";
@@ -51,15 +56,19 @@ public class PlanetaryAssaultService {
         GwCharacter character = user.getActiveCharacter();
         Planet planet = planetRepository.getOne(message.getPlanetId());
 
-        Map<String, Object> processVariables = new HashMap<>();
-        processVariables.put("initiator", character.getId());
-        processVariables.put("battle", battleUUID);
-        processVariables.put("planet", planet.getId());
-        processVariables.put("attackingFaction", character.getFaction());
-        processVariables.put("defendingFaction", planet.getCurrentOwner());
+        VariableMap variables = Variables.createVariables()
+                .putValue("initiator", character.getId())
+                .putValue("battle", battleUUID)
+                .putValue("planet", planet.getId())
+                .putValue("attackingFaction", character.getFaction())
+                .putValue("defendingFaction", planet.getCurrentOwner())
+                .putValue("attackerCount", 1)
+                .putValue("defenderCount", 0)
+                .putValue("waitingProgress", 0.0d)
+                .putValue("winner", "t.b.d.");
 
-        log.debug("-> added processVariables: {}", processVariables);
-        runtimeService.startProcessInstanceByMessage(INITIATE_ASSAULT_MESSAGE, battleUUID.toString(), processVariables);
+        log.debug("-> added processVariables: {}", variables);
+        runtimeService.startProcessInstanceByMessage(INITIATE_ASSAULT_MESSAGE, battleUUID.toString(), variables);
     }
 
     public void characterJoinsAssault(JoinAssaultMessage message, User user) {
@@ -100,5 +109,10 @@ public class PlanetaryAssaultService {
         errorMessage.setErrorCode(errorType.getErrorCode());
         errorMessage.setErrorMessage(errorType.getErrorMessage());
         messagingService.send(errorMessage);
+    }
+
+    @Scheduled(fixedDelay = 60000)
+    public void updateOpenGames() {
+        runtimeService.signalEventReceived(UPDATE_OPEN_GAMES_SIGNAL);
     }
 }

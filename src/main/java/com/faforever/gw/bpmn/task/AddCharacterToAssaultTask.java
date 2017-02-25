@@ -46,10 +46,16 @@ public class AddCharacterToAssaultTask implements JavaDelegate {
             validationHelper.validateCharacterFreeForGame(character);
 
             BattleRole battleRole;
+            String countVariable = "";
+            Integer newParticipantsOfFactionCount = 0;
             if (character.getFaction() == battle.getAttackingFaction()) {
                 battleRole = BattleRole.ATTACKER;
+                countVariable = "attackerCount";
+                newParticipantsOfFactionCount = accessor.getAttackerCount()+1;
             } else if (character.getFaction() == battle.getDefendingFaction()) {
                 battleRole = BattleRole.DEFENDER;
+                countVariable = "defenderCount";
+                newParticipantsOfFactionCount = accessor.getDefenderCount()+1;
             } else {
                 battleRole = null;
             }
@@ -58,6 +64,9 @@ public class AddCharacterToAssaultTask implements JavaDelegate {
             BattleParticipant battleParticipant = new BattleParticipant(battle, character, battleRole);
             battle.getParticipants().add(battleParticipant);
             battleRepository.save(battle);
+
+            execution.setVariable(countVariable, newParticipantsOfFactionCount);
+            log.debug("-> set {} = {}", countVariable, newParticipantsOfFactionCount);
 
             log.info("Character {} joined battle {}", character.getId(), battle.getId());
 

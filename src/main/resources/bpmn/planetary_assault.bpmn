@@ -30,20 +30,20 @@
         <bpmn:outgoing>SequenceFlow_10z7h58</bpmn:outgoing>
         <bpmn:outgoing>SequenceFlow_1hiat5s</bpmn:outgoing>
       </bpmn:exclusiveGateway>
-      <bpmn:endEvent id="EndEvent_MatchReady" name="match is ready">
-        <bpmn:incoming>SequenceFlow_1hiat5s</bpmn:incoming>
+      <bpmn:endEvent id="EndEvent_MatchStarting" name="match&#10;starting">
+        <bpmn:incoming>SequenceFlow_144evqe</bpmn:incoming>
       </bpmn:endEvent>
       <bpmn:sequenceFlow id="SequenceFlow_0t8x0h5" sourceRef="ExclusiveGateway_SetupMatch" targetRef="IntermediateCatchEvent_PlayerLeaves" />
       <bpmn:sequenceFlow id="SequenceFlow_0k13rbw" sourceRef="IntermediateCatchEvent_PlayerLeaves" targetRef="ServiceTask_RemovePlayersCharacterToAssault" />
-      <bpmn:exclusiveGateway id="ExclusiveGateway_AssaultFactionHasPlayersRemaining" name="assault faction has players remaining?" default="SequenceFlow_1hl2d99">
+      <bpmn:exclusiveGateway id="ExclusiveGateway_AssaultFactionHasPlayers" name="assault faction has players remaining?" default="SequenceFlow_1hl2d99">
         <bpmn:incoming>SequenceFlow_1ddx0w9</bpmn:incoming>
         <bpmn:outgoing>SequenceFlow_1hl2d99</bpmn:outgoing>
         <bpmn:outgoing>SequenceFlow_1o6z0ru</bpmn:outgoing>
       </bpmn:exclusiveGateway>
       <bpmn:sequenceFlow id="SequenceFlow_1tim9i2" sourceRef="ServiceTask_RemovePlayersCharacterToAssault" targetRef="IntermediateThrowEvent_Success_LeftAssault" />
-      <bpmn:sequenceFlow id="SequenceFlow_1hl2d99" name="yes" sourceRef="ExclusiveGateway_AssaultFactionHasPlayersRemaining" targetRef="ExclusiveGateway_SetupMatch" />
-      <bpmn:sequenceFlow id="SequenceFlow_1o6z0ru" name="no" sourceRef="ExclusiveGateway_AssaultFactionHasPlayersRemaining" targetRef="ExclusiveGateway_1a86k2c">
-        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${assaultFactionHasRemainingPlayers==false}</bpmn:conditionExpression>
+      <bpmn:sequenceFlow id="SequenceFlow_1hl2d99" name="yes" sourceRef="ExclusiveGateway_AssaultFactionHasPlayers" targetRef="ExclusiveGateway_SetupMatch" />
+      <bpmn:sequenceFlow id="SequenceFlow_1o6z0ru" name="no" sourceRef="ExclusiveGateway_AssaultFactionHasPlayers" targetRef="EndEvent_DefendersWon_NoMatch">
+        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${attackerCount == 0}</bpmn:conditionExpression>
       </bpmn:sequenceFlow>
       <bpmn:sequenceFlow id="SequenceFlow_12kkkio" sourceRef="ExclusiveGateway_SetupMatch" targetRef="IntermediateCatchEvent_UpdateOpenGames" />
       <bpmn:intermediateCatchEvent id="IntermediateCatchEvent_UpdateOpenGames" name="update open games">
@@ -59,38 +59,28 @@
           <bpmn:targetRef>DataStoreReference_AssaultParticipants</bpmn:targetRef>
         </bpmn:dataOutputAssociation>
       </bpmn:serviceTask>
-      <bpmn:serviceTask id="ServiceTask_CalculatePassiveAssaultProgress" name="calculate passive assault progress" camunda:delegateExpression="${noopTask}">
+      <bpmn:serviceTask id="ServiceTask_CalculatePassiveAssaultProgress" name="calculate passive assault progress" camunda:delegateExpression="${calculatePassiveAssaultProgressTask}">
         <bpmn:incoming>SequenceFlow_15hv618</bpmn:incoming>
         <bpmn:outgoing>SequenceFlow_1fu2bvw</bpmn:outgoing>
       </bpmn:serviceTask>
-      <bpmn:exclusiveGateway id="ExclusiveGateway_GameStatus" name="game&#10;status?" default="SequenceFlow_0i55tdb">
+      <bpmn:exclusiveGateway id="ExclusiveGateway_WaitingProgress" name="game waiting progress 100% ?" default="SequenceFlow_0i55tdb">
         <bpmn:incoming>SequenceFlow_1fu2bvw</bpmn:incoming>
         <bpmn:outgoing>SequenceFlow_1mn1ssi</bpmn:outgoing>
         <bpmn:outgoing>SequenceFlow_0i55tdb</bpmn:outgoing>
-        <bpmn:outgoing>SequenceFlow_00yynnn</bpmn:outgoing>
       </bpmn:exclusiveGateway>
-      <bpmn:sequenceFlow id="SequenceFlow_1fu2bvw" sourceRef="ServiceTask_CalculatePassiveAssaultProgress" targetRef="ExclusiveGateway_GameStatus" />
-      <bpmn:sequenceFlow id="SequenceFlow_1mn1ssi" name="attackers won" sourceRef="ExclusiveGateway_GameStatus" targetRef="EndEvent_AttackersWon_NoMatch">
-        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression"><![CDATA[${winner=="attackers"}]]></bpmn:conditionExpression>
+      <bpmn:sequenceFlow id="SequenceFlow_1fu2bvw" sourceRef="ServiceTask_CalculatePassiveAssaultProgress" targetRef="ExclusiveGateway_WaitingProgress" />
+      <bpmn:sequenceFlow id="SequenceFlow_1mn1ssi" name="yes" sourceRef="ExclusiveGateway_WaitingProgress" targetRef="ExclusiveGateway_0ltc7r2">
+        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression"><![CDATA[${waitingProgress>=0.9999}]]></bpmn:conditionExpression>
       </bpmn:sequenceFlow>
-      <bpmn:sequenceFlow id="SequenceFlow_0i55tdb" sourceRef="ExclusiveGateway_GameStatus" targetRef="ExclusiveGateway_SetupMatch" />
+      <bpmn:sequenceFlow id="SequenceFlow_0i55tdb" name="no" sourceRef="ExclusiveGateway_WaitingProgress" targetRef="ExclusiveGateway_SetupMatch" />
       <bpmn:endEvent id="EndEvent_AttackersWon_NoMatch" name="attackers won w/o match">
-        <bpmn:incoming>SequenceFlow_1mn1ssi</bpmn:incoming>
+        <bpmn:incoming>SequenceFlow_01f5pnp</bpmn:incoming>
         <bpmn:escalationEventDefinition escalationRef="Escalation_1kmsvke" />
       </bpmn:endEvent>
       <bpmn:endEvent id="EndEvent_DefendersWon_NoMatch" name="defenders won w/o match">
-        <bpmn:incoming>SequenceFlow_0oj00u7</bpmn:incoming>
+        <bpmn:incoming>SequenceFlow_1o6z0ru</bpmn:incoming>
         <bpmn:escalationEventDefinition escalationRef="Escalation_0jzrhra" />
       </bpmn:endEvent>
-      <bpmn:sequenceFlow id="SequenceFlow_00yynnn" name="defenders won&#10;&#10;&#10;" sourceRef="ExclusiveGateway_GameStatus" targetRef="ExclusiveGateway_1a86k2c">
-        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression"><![CDATA[{winner=="defenders"}]]></bpmn:conditionExpression>
-      </bpmn:sequenceFlow>
-      <bpmn:exclusiveGateway id="ExclusiveGateway_1a86k2c">
-        <bpmn:incoming>SequenceFlow_00yynnn</bpmn:incoming>
-        <bpmn:incoming>SequenceFlow_1o6z0ru</bpmn:incoming>
-        <bpmn:outgoing>SequenceFlow_0oj00u7</bpmn:outgoing>
-      </bpmn:exclusiveGateway>
-      <bpmn:sequenceFlow id="SequenceFlow_0oj00u7" sourceRef="ExclusiveGateway_1a86k2c" targetRef="EndEvent_DefendersWon_NoMatch" />
       <bpmn:dataStoreReference id="DataStoreReference_AssaultParticipants" name="assault participants" />
       <bpmn:serviceTask id="ServiceTask_AddPlayersCharacterToAssault" name="add player&#39;s character to assault" camunda:delegateExpression="${addCharacterToAssaultTask}">
         <bpmn:incoming>SequenceFlow_13kf4pu</bpmn:incoming>
@@ -112,7 +102,7 @@
       </bpmn:intermediateThrowEvent>
       <bpmn:sequenceFlow id="SequenceFlow_0rbkusb" sourceRef="ServiceTask_AddPlayersCharacterToAssault" targetRef="IntermediateThrowEvent_JoinedAssault" />
       <bpmn:sequenceFlow id="SequenceFlow_0wvhz73" sourceRef="IntermediateThrowEvent_JoinedAssault" targetRef="ExclusiveGateway_AllSlotsOccupied" />
-      <bpmn:sequenceFlow id="SequenceFlow_1hiat5s" name="yes" sourceRef="ExclusiveGateway_AllSlotsOccupied" targetRef="EndEvent_MatchReady">
+      <bpmn:sequenceFlow id="SequenceFlow_1hiat5s" name="yes" sourceRef="ExclusiveGateway_AllSlotsOccupied" targetRef="ExclusiveGateway_00jz1c2">
         <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${gameFull==true}</bpmn:conditionExpression>
       </bpmn:sequenceFlow>
       <bpmn:sequenceFlow id="SequenceFlow_043heqj" sourceRef="IntermediateThrowEvent_Error_AddCharacter" targetRef="ExclusiveGateway_SetupMatch" />
@@ -127,7 +117,7 @@
         <bpmn:messageEventDefinition camunda:delegateExpression="${userErrorMessage}" />
       </bpmn:intermediateThrowEvent>
       <bpmn:sequenceFlow id="SequenceFlow_1kqqy8o" sourceRef="IntermediateThrowEvent_Error_RemoveCharacter" targetRef="ExclusiveGateway_SetupMatch" />
-      <bpmn:sequenceFlow id="SequenceFlow_1ddx0w9" sourceRef="IntermediateThrowEvent_Success_LeftAssault" targetRef="ExclusiveGateway_AssaultFactionHasPlayersRemaining" />
+      <bpmn:sequenceFlow id="SequenceFlow_1ddx0w9" sourceRef="IntermediateThrowEvent_Success_LeftAssault" targetRef="ExclusiveGateway_AssaultFactionHasPlayers" />
       <bpmn:sequenceFlow id="SequenceFlow_086aaic" sourceRef="StartEvent_AssaultInitiated" targetRef="ExclusiveGateway_SetupMatch" />
       <bpmn:intermediateThrowEvent id="IntermediateThrowEvent_Success_LeftAssault" name="character left assault">
         <bpmn:incoming>SequenceFlow_1tim9i2</bpmn:incoming>
@@ -149,6 +139,21 @@
         <bpmn:outgoing>SequenceFlow_0k13rbw</bpmn:outgoing>
         <bpmn:messageEventDefinition messageRef="Message_05coxf7" />
       </bpmn:intermediateCatchEvent>
+      <bpmn:exclusiveGateway id="ExclusiveGateway_0ltc7r2" name="defenders&#10;in battle?" default="SequenceFlow_01dz8gr">
+        <bpmn:incoming>SequenceFlow_1mn1ssi</bpmn:incoming>
+        <bpmn:outgoing>SequenceFlow_01f5pnp</bpmn:outgoing>
+        <bpmn:outgoing>SequenceFlow_01dz8gr</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:sequenceFlow id="SequenceFlow_01f5pnp" name="no" sourceRef="ExclusiveGateway_0ltc7r2" targetRef="EndEvent_AttackersWon_NoMatch">
+        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${defenderCount == 0}</bpmn:conditionExpression>
+      </bpmn:sequenceFlow>
+      <bpmn:exclusiveGateway id="ExclusiveGateway_00jz1c2">
+        <bpmn:incoming>SequenceFlow_1hiat5s</bpmn:incoming>
+        <bpmn:incoming>SequenceFlow_01dz8gr</bpmn:incoming>
+        <bpmn:outgoing>SequenceFlow_144evqe</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:sequenceFlow id="SequenceFlow_144evqe" sourceRef="ExclusiveGateway_00jz1c2" targetRef="EndEvent_MatchStarting" />
+      <bpmn:sequenceFlow id="SequenceFlow_01dz8gr" name="yes" sourceRef="ExclusiveGateway_0ltc7r2" targetRef="ExclusiveGateway_00jz1c2" />
     </bpmn:subProcess>
     <bpmn:endEvent id="EndEvent_Error_InvalidCharacterAction" name="error: invalid character action">
       <bpmn:extensionElements>
@@ -390,10 +395,10 @@
           <dc:Bounds x="1085" y="353" width="89" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="EndEvent_18xbvpz_di" bpmnElement="EndEvent_MatchReady">
+      <bpmndi:BPMNShape id="EndEvent_18xbvpz_di" bpmnElement="EndEvent_MatchStarting">
         <dc:Bounds x="1436" y="310" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1418" y="346" width="72" height="12" />
+          <dc:Bounds x="1436" y="346" width="36" height="24" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_0t8x0h5_di" bpmnElement="SequenceFlow_0t8x0h5">
@@ -411,10 +416,10 @@
           <dc:Bounds x="765" y="554" width="0" height="0" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="ExclusiveGateway_0nxxadc_di" bpmnElement="ExclusiveGateway_AssaultFactionHasPlayersRemaining" isMarkerVisible="true">
-        <dc:Bounds x="1188" y="544" width="50" height="50" />
+      <bpmndi:BPMNShape id="ExclusiveGateway_0nxxadc_di" bpmnElement="ExclusiveGateway_AssaultFactionHasPlayers" isMarkerVisible="true">
+        <dc:Bounds x="1171" y="544" width="50" height="50" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1176" y="594" width="73" height="36" />
+          <dc:Bounds x="1159" y="594" width="73" height="36" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_1tim9i2_di" bpmnElement="SequenceFlow_1tim9i2">
@@ -425,22 +430,22 @@
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_1hl2d99_di" bpmnElement="SequenceFlow_1hl2d99">
-        <di:waypoint xsi:type="dc:Point" x="1213" y="544" />
-        <di:waypoint xsi:type="dc:Point" x="1213" y="349" />
-        <di:waypoint xsi:type="dc:Point" x="1379" y="349" />
-        <di:waypoint xsi:type="dc:Point" x="1379" y="311" />
-        <di:waypoint xsi:type="dc:Point" x="1364" y="311" />
-        <di:waypoint xsi:type="dc:Point" x="1364" y="168" />
+        <di:waypoint xsi:type="dc:Point" x="1196" y="544" />
+        <di:waypoint xsi:type="dc:Point" x="1196" y="349" />
+        <di:waypoint xsi:type="dc:Point" x="1218" y="349" />
+        <di:waypoint xsi:type="dc:Point" x="1218" y="311" />
+        <di:waypoint xsi:type="dc:Point" x="1198" y="311" />
+        <di:waypoint xsi:type="dc:Point" x="1198" y="168" />
         <di:waypoint xsi:type="dc:Point" x="614" y="168" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1219" y="484" width="18" height="12" />
+          <dc:Bounds x="1203" y="510" width="18" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_1o6z0ru_di" bpmnElement="SequenceFlow_1o6z0ru">
-        <di:waypoint xsi:type="dc:Point" x="1238" y="569" />
-        <di:waypoint xsi:type="dc:Point" x="1328" y="569" />
+        <di:waypoint xsi:type="dc:Point" x="1221" y="569" />
+        <di:waypoint xsi:type="dc:Point" x="1436" y="569" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1266" y="549" width="12" height="12" />
+          <dc:Bounds x="1248" y="549" width="12" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_12kkkio_di" bpmnElement="SequenceFlow_12kkkio">
@@ -470,34 +475,34 @@
       <bpmndi:BPMNShape id="ServiceTask_1tuw9lh_di" bpmnElement="ServiceTask_CalculatePassiveAssaultProgress">
         <dc:Bounds x="800" y="702" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="ExclusiveGateway_1hr5qna_di" bpmnElement="ExclusiveGateway_GameStatus" isMarkerVisible="true">
-        <dc:Bounds x="1188" y="717" width="50" height="50" />
+      <bpmndi:BPMNShape id="ExclusiveGateway_1hr5qna_di" bpmnElement="ExclusiveGateway_WaitingProgress" isMarkerVisible="true">
+        <dc:Bounds x="1105" y="717" width="50" height="50" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1170" y="694" width="36" height="24" />
+          <dc:Bounds x="1088" y="685" width="84" height="24" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_1fu2bvw_di" bpmnElement="SequenceFlow_1fu2bvw">
         <di:waypoint xsi:type="dc:Point" x="900" y="742" />
-        <di:waypoint xsi:type="dc:Point" x="1188" y="742" />
+        <di:waypoint xsi:type="dc:Point" x="1105" y="742" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1044" y="727" width="0" height="0" />
+          <dc:Bounds x="1003" y="727" width="0" height="0" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_1mn1ssi_di" bpmnElement="SequenceFlow_1mn1ssi">
-        <di:waypoint xsi:type="dc:Point" x="1238" y="742" />
-        <di:waypoint xsi:type="dc:Point" x="1436" y="742" />
+        <di:waypoint xsi:type="dc:Point" x="1155" y="742" />
+        <di:waypoint xsi:type="dc:Point" x="1264" y="742" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1308" y="722" width="69" height="12" />
+          <dc:Bounds x="1164" y="722" width="18" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_0i55tdb_di" bpmnElement="SequenceFlow_0i55tdb">
-        <di:waypoint xsi:type="dc:Point" x="1213" y="767" />
-        <di:waypoint xsi:type="dc:Point" x="1213" y="823" />
+        <di:waypoint xsi:type="dc:Point" x="1130" y="767" />
+        <di:waypoint xsi:type="dc:Point" x="1130" y="823" />
         <di:waypoint xsi:type="dc:Point" x="1522" y="823" />
         <di:waypoint xsi:type="dc:Point" x="1522" y="168" />
         <di:waypoint xsi:type="dc:Point" x="614" y="168" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1368" y="808" width="0" height="0" />
+          <dc:Bounds x="1136" y="785" width="12" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="EndEvent_0qv2fx7_di" bpmnElement="EndEvent_AttackersWon_NoMatch">
@@ -512,28 +517,6 @@
           <dc:Bounds x="1416" y="587" width="75" height="24" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="SequenceFlow_00yynnn_di" bpmnElement="SequenceFlow_00yynnn">
-        <di:waypoint xsi:type="dc:Point" x="1213" y="717" />
-        <di:waypoint xsi:type="dc:Point" x="1213" y="678" />
-        <di:waypoint xsi:type="dc:Point" x="1355" y="678" />
-        <di:waypoint xsi:type="dc:Point" x="1353" y="593" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1273" y="656" width="72" height="12" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="ExclusiveGateway_1a86k2c_di" bpmnElement="ExclusiveGateway_1a86k2c" isMarkerVisible="true">
-        <dc:Bounds x="1328" y="544" width="50" height="50" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1353" y="594" width="0" height="0" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="SequenceFlow_0oj00u7_di" bpmnElement="SequenceFlow_0oj00u7">
-        <di:waypoint xsi:type="dc:Point" x="1378" y="569" />
-        <di:waypoint xsi:type="dc:Point" x="1436" y="569" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1407" y="554" width="0" height="0" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_05ey27o_di" bpmnElement="SequenceFlow_05ey27o">
         <di:waypoint xsi:type="dc:Point" x="1562" y="447" />
         <di:waypoint xsi:type="dc:Point" x="1691" y="447" />
@@ -868,11 +851,9 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_1hiat5s_di" bpmnElement="SequenceFlow_1hiat5s">
         <di:waypoint xsi:type="dc:Point" x="1155" y="328" />
-        <di:waypoint xsi:type="dc:Point" x="1296" y="328" />
-        <di:waypoint xsi:type="dc:Point" x="1296" y="328" />
-        <di:waypoint xsi:type="dc:Point" x="1436" y="328" />
+        <di:waypoint xsi:type="dc:Point" x="1264" y="328" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1180" y="310" width="18" height="12" />
+          <dc:Bounds x="1157" y="308" width="18" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_043heqj_di" bpmnElement="SequenceFlow_043heqj">
@@ -892,27 +873,27 @@
       <bpmndi:BPMNEdge id="SequenceFlow_0yd0iv8_di" bpmnElement="SequenceFlow_0yd0iv8">
         <di:waypoint xsi:type="dc:Point" x="883" y="511" />
         <di:waypoint xsi:type="dc:Point" x="883" y="459" />
-        <di:waypoint xsi:type="dc:Point" x="954" y="459" />
+        <di:waypoint xsi:type="dc:Point" x="937" y="459" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="898" y="485" width="0" height="0" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="IntermediateThrowEvent_0hqur9q_di" bpmnElement="IntermediateThrowEvent_Error_RemoveCharacter">
-        <dc:Bounds x="954" y="441" width="36" height="36" />
+        <dc:Bounds x="937" y="441" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="932" y="479" width="79" height="24" />
+          <dc:Bounds x="915" y="479" width="79" height="24" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_1kqqy8o_di" bpmnElement="SequenceFlow_1kqqy8o">
-        <di:waypoint xsi:type="dc:Point" x="972" y="441" />
-        <di:waypoint xsi:type="dc:Point" x="972" y="348" />
-        <di:waypoint xsi:type="dc:Point" x="952" y="348" />
-        <di:waypoint xsi:type="dc:Point" x="952" y="311" />
-        <di:waypoint xsi:type="dc:Point" x="974" y="311" />
-        <di:waypoint xsi:type="dc:Point" x="974" y="168" />
+        <di:waypoint xsi:type="dc:Point" x="955" y="441" />
+        <di:waypoint xsi:type="dc:Point" x="955" y="348" />
+        <di:waypoint xsi:type="dc:Point" x="975" y="348" />
+        <di:waypoint xsi:type="dc:Point" x="975" y="311" />
+        <di:waypoint xsi:type="dc:Point" x="956" y="311" />
+        <di:waypoint xsi:type="dc:Point" x="956" y="168" />
         <di:waypoint xsi:type="dc:Point" x="614" y="168" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="967" y="330" width="0" height="0" />
+          <dc:Bounds x="990" y="329.5" width="0" height="0" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_1ay41r5_di" bpmnElement="SequenceFlow_1ay41r5">
@@ -946,9 +927,9 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_1ddx0w9_di" bpmnElement="SequenceFlow_1ddx0w9">
         <di:waypoint xsi:type="dc:Point" x="1051" y="569" />
-        <di:waypoint xsi:type="dc:Point" x="1188" y="569" />
+        <di:waypoint xsi:type="dc:Point" x="1171" y="569" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1122" y="554" width="0" height="0" />
+          <dc:Bounds x="1111" y="554" width="0" height="0" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="BoundaryEvent_07iwzjd_di" bpmnElement="BoundaryEvent_Error_InitiateAssault">
@@ -1002,6 +983,43 @@
           <dc:Bounds x="678" y="587" width="68" height="24" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_0ltc7r2_di" bpmnElement="ExclusiveGateway_0ltc7r2" isMarkerVisible="true">
+        <dc:Bounds x="1264" y="717" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1264" y="767" width="49" height="24" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_01f5pnp_di" bpmnElement="SequenceFlow_01f5pnp">
+        <di:waypoint xsi:type="dc:Point" x="1314" y="742" />
+        <di:waypoint xsi:type="dc:Point" x="1436" y="742" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1363" y="722" width="12" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ExclusiveGateway_00jz1c2_di" bpmnElement="ExclusiveGateway_00jz1c2" isMarkerVisible="true">
+        <dc:Bounds x="1264" y="303" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1289" y="353" width="0" height="0" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_144evqe_di" bpmnElement="SequenceFlow_144evqe">
+        <di:waypoint xsi:type="dc:Point" x="1314" y="328" />
+        <di:waypoint xsi:type="dc:Point" x="1436" y="328" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1375" y="313" width="0" height="0" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_01dz8gr_di" bpmnElement="SequenceFlow_01dz8gr">
+        <di:waypoint xsi:type="dc:Point" x="1289" y="717" />
+        <di:waypoint xsi:type="dc:Point" x="1289" y="586" />
+        <di:waypoint xsi:type="dc:Point" x="1305" y="586" />
+        <di:waypoint xsi:type="dc:Point" x="1305" y="550" />
+        <di:waypoint xsi:type="dc:Point" x="1289" y="550" />
+        <di:waypoint xsi:type="dc:Point" x="1289" y="353" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1292" y="689" width="18" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
 </bpmn:definitions>

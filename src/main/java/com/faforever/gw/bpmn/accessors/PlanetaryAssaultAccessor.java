@@ -45,24 +45,25 @@ public class PlanetaryAssaultAccessor {
         return (boolean) processVariables.get("gameFull");
     }
 
-    public boolean hasAssaultFactionRemainingPlayers() {
-        return (boolean) processVariables.get("assaultFactionHasRemainingPlayers");
-    }
+    public Integer getAttackerCount() {return (Integer)processVariables.get("attackerCount");}
+    public Integer getDefenderCount() {return (Integer)processVariables.get("defenderCount");}
+
+    public Double getWaitingProgress() { return (Double) processVariables.get("waitingProgress"); }
 
     public BattleRole getWinner() {
-        return BattleRole.fromNameString((String)processVariables.get("winner"));
+        return BattleRole.fromNameString((String) processVariables.get("winner"));
     }
 
     public UUID getErrorCharacter() {
-        return (UUID)processVariables.get("errorCharacter");
+        return (UUID) processVariables.get("errorCharacter");
     }
 
     public String getErrorCode() {
-        return (String)processVariables.get("errorCode");
+        return (String) processVariables.get("errorCode");
     }
 
     public String getErrorMessage() {
-        return (String)processVariables.get("errorMessage");
+        return (String) processVariables.get("errorMessage");
     }
 
     public static PlanetaryAssaultAccessor of(Map<String, Object> processVariables) {

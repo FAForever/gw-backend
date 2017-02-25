@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd" xmlns:biodi="http://bpmn.io/schema/dmn/biodi/1.0" xmlns:camunda="http://camunda.org/schema/1.0/dmn" id="definitions_1hemuax" name="definitions" namespace="http://camunda.org/schema/1.0/dmn">
+  <decision id="faction_influence_factor" name="Faction influence factor">
+    <extensionElements>
+      <biodi:bounds x="21" y="24" width="180" height="80" />
+    </extensionElements>
+    <decisionTable id="decisionTable">
+      <input id="input1" label="map slots" camunda:inputVariable="">
+        <inputExpression id="inputExpression1" typeRef="integer">        <text>map_slots</text>
+</inputExpression>
+      </input>
+      <input id="InputClause_18nftak" label="faction player count" camunda:inputVariable="faction_player_count">
+        <inputExpression id="LiteralExpression_150nuv2" typeRef="integer">        <text>faction_player_count</text>
+</inputExpression>
+      </input>
+      <output id="output1" label="progress factor" name="progress_factor" typeRef="double" />
+      <rule id="row-884080788-1">
+        <inputEntry id="UnaryTests_1eg2bcc">        <text></text>
+</inputEntry>
+        <inputEntry id="UnaryTests_0wpi6xv">        <text>0</text>
+</inputEntry>
+        <outputEntry id="LiteralExpression_0k0f1er">        <text>0</text>
+</outputEntry>
+      </rule>
+      <rule id="row-884080788-2">
+        <inputEntry id="UnaryTests_0vy2dm6">        <text>2</text>
+</inputEntry>
+        <inputEntry id="UnaryTests_0bq6kau">        <text>1</text>
+</inputEntry>
+        <outputEntry id="LiteralExpression_0l112h7">        <text>2</text>
+</outputEntry>
+      </rule>
+      <rule id="row-884080788-3">
+        <inputEntry id="UnaryTests_0d9zeil">        <text>4</text>
+</inputEntry>
+        <inputEntry id="UnaryTests_0h9v2dn">        <text>1</text>
+</inputEntry>
+        <outputEntry id="LiteralExpression_10tm5xa">        <text>2.7</text>
+</outputEntry>
+      </rule>
+      <rule id="row-884080788-4">
+        <inputEntry id="UnaryTests_1hen2a1">        <text>4</text>
+</inputEntry>
+        <inputEntry id="UnaryTests_01nbgck">        <text>2</text>
+</inputEntry>
+        <outputEntry id="LiteralExpression_1oydjjv">        <text>5.5</text>
+</outputEntry>
+      </rule>
+      <rule id="row-884080788-5">
+        <inputEntry id="UnaryTests_0cfsvrk">        <text>6</text>
+</inputEntry>
+        <inputEntry id="UnaryTests_0fyg3oj">        <text>1</text>
+</inputEntry>
+        <outputEntry id="LiteralExpression_0em8hb5">        <text>3</text>
+</outputEntry>
+      </rule>
+      <rule id="row-884080788-6">
+        <inputEntry id="UnaryTests_18c58ox">        <text>6</text>
+</inputEntry>
+        <inputEntry id="UnaryTests_1vfbqqd">        <text>2</text>
+</inputEntry>
+        <outputEntry id="LiteralExpression_1umjimb">        <text>6</text>
+</outputEntry>
+      </rule>
+      <rule id="row-884080788-7">
+        <inputEntry id="UnaryTests_0unfcna">        <text>6</text>
+</inputEntry>
+        <inputEntry id="UnaryTests_0yefx2j">        <text>3</text>
+</inputEntry>
+        <outputEntry id="LiteralExpression_01819fw">        <text>12</text>
+</outputEntry>
+      </rule>
+      <rule id="row-884080788-8">
+        <inputEntry id="UnaryTests_05rq8xq">        <text>8</text>
+</inputEntry>
+        <inputEntry id="UnaryTests_1i0bzg1">        <text>1</text>
+</inputEntry>
+        <outputEntry id="LiteralExpression_000zfd9">        <text>2.65</text>
+</outputEntry>
+      </rule>
+      <rule id="row-884080788-9">
+        <inputEntry id="UnaryTests_0v5s9c4">        <text>8</text>
+</inputEntry>
+        <inputEntry id="UnaryTests_0l1nsik">        <text>2</text>
+</inputEntry>
+        <outputEntry id="LiteralExpression_0r0sdt0">        <text>5.3</text>
+</outputEntry>
+      </rule>
+      <rule id="row-884080788-10">
+        <inputEntry id="UnaryTests_1tb8ggr">        <text>8</text>
+</inputEntry>
+        <inputEntry id="UnaryTests_18jl8c9">        <text>3</text>
+</inputEntry>
+        <outputEntry id="LiteralExpression_1685smp">        <text>11</text>
+</outputEntry>
+      </rule>
+      <rule id="row-884080788-11">
+        <inputEntry id="UnaryTests_156bnmj">        <text>8</text>
+</inputEntry>
+        <inputEntry id="UnaryTests_0vhuaem">        <text>4</text>
+</inputEntry>
+        <outputEntry id="LiteralExpression_19vpcb6">        <text>16.5</text>
+</outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>

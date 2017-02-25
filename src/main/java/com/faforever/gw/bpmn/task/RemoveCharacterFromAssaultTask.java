@@ -4,6 +4,7 @@ import com.faforever.gw.bpmn.accessors.PlanetaryAssaultAccessor;
 import com.faforever.gw.model.*;
 import com.faforever.gw.model.repository.BattleRepository;
 import com.faforever.gw.model.repository.CharacterRepository;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -43,16 +44,27 @@ public class RemoveCharacterFromAssaultTask implements JavaDelegate {
             battle.getParticipants().removeIf(battleParticipant -> battleParticipant.getCharacter() == character);
             battleRepository.save(battle);
 
-            long attackerCount = battle.getParticipants().stream()
-                    .filter(battleParticipant -> battleParticipant.getRole() == BattleRole.ATTACKER)
-                    .count();
+            String countVariable = "";
+            Integer newParticipantsOfFactionCount = 0;
+            Boolean noMoreAttackersRemaining = false;
+            if (character.getFaction() == battle.getAttackingFaction()) {
+                countVariable = "attackerCount";
+                newParticipantsOfFactionCount = accessor.getAttackerCount()-1;
+                noMoreAttackersRemaining = (newParticipantsOfFactionCount == 0);
+            } else if (character.getFaction() == battle.getDefendingFaction()) {
+                countVariable = "defenderCount";
+                newParticipantsOfFactionCount = accessor.getDefenderCount()-1;
+            }
 
-            execution.setVariable("assaultFactionHasRemainingPlayers", attackerCount > 0);
+            execution.setVariable(countVariable, newParticipantsOfFactionCount);
+            log.debug("-> set {} = {}", countVariable, newParticipantsOfFactionCount);
+
             execution.setVariable("gameFull", false);
+            log.debug("-> set gameFull = false");
 
             log.info("Character {} left battle {}", character.getId(), battle.getId());
 
-            if (attackerCount == 0) {
+            if (noMoreAttackersRemaining) {
                 log.info("Battle {} won by defenders (all attackers left)", battle.getId());
                 execution.setVariable("winner", BattleRole.DEFENDER.getName());
             }
