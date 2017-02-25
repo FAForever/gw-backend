@@ -1,12 +1,11 @@
 package com.faforever.gw.websocket;
 
+import org.springframework.stereotype.Component;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * 
- * @author Sergi Almar
- */
+@Component
 public class ParticipantRepository {
 
 	private Map<String, LoginEvent> activeSessions = new ConcurrentHashMap<>();

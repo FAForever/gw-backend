@@ -15,9 +15,9 @@ public enum WebsocketChannel {
     BATTLES_PARTICIPANT_LEFT("/battles/participant_left", Type.PUBLIC),
     CHARACTERS_PROMOTIONS("/characters/promotions", Type.PUBLIC),
     FACTION_CHAT_MESSAGE("/faction/{factionId]/chat_message", Type.FACTION),
-    USER_ERROR("/user/{userId}/error", Type.PRIVATE),
-    USER_INCOME("/user/{userId}/income", Type.PRIVATE),
-    USER_XP("/user/{userId}/xp", Type.PRIVATE);
+    USER_ERROR("/direct/error", Type.PRIVATE),
+    USER_INCOME("/direct/income", Type.PRIVATE),
+    USER_XP("/direct/xp", Type.PRIVATE);
 
     private final String channelName;
     private final Type type;
@@ -29,7 +29,7 @@ public enum WebsocketChannel {
     }
 
     public String toUserString(User user) {
-        return channelName.replace("{userId}", Integer.toString(user.getId()));
+        return channelName.replace("{userId}", user.getName());
     }
 
     public String toFactionString(Faction faction) {

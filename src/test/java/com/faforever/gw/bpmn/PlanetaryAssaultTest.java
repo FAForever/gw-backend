@@ -20,6 +20,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.UUID;
 
 import static org.camunda.bpm.engine.test.assertions.ProcessEngineAssertions.assertThat;
 import static org.camunda.bpm.extension.mockito.DelegateExpressions.verifyJavaDelegateMock;
@@ -55,7 +56,7 @@ public class PlanetaryAssaultTest {
     @Test
     @Deployment(resources = "bpmn/planetary_assault.bpmn")
     public void success() throws Exception {
-        DelegateExpressions.registerJavaDelegateMock("initiateAssaultTask").onExecutionSetVariables(ImmutableMap.of("battle", mock(Battle.class)));
+        DelegateExpressions.registerJavaDelegateMock("initiateAssaultTask").onExecutionSetVariables(ImmutableMap.of("battle", UUID.randomUUID(), "initiator", UUID.randomUUID()));
         DelegateExpressions.registerJavaDelegateMock("addCharacterToAssaultTask").onExecutionSetVariables(ImmutableMap.of("gameFull", true));
 
         final ProcessInstance processInstance = startProcess();

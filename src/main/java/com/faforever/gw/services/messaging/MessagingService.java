@@ -31,7 +31,7 @@ public class MessagingService {
             case PRIVATE:
                 message.getRecipients().forEach(user -> {
                     log.trace("Sending private message (user: {})", user.getName());
-                    websocketController.send(channel.toUserString(user), message);
+                    websocketController.sendToUser(user.getName(), channel.getChannelName(), message);
                 });
         }
     }

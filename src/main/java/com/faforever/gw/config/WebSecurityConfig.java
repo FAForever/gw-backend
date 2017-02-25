@@ -33,6 +33,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http
+				.headers().frameOptions().disable().and()
 			.csrf().disable()
 			.formLogin()
 				.loginPage("/index.html")
@@ -47,7 +48,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers("/h2-console").permitAll()
 				.antMatchers("/js/**", "/lib/**", "/images/**", "/css/**", "/index.html", "/").permitAll()
 				.antMatchers("/websocket").permitAll()//.hasRole("ADMIN")
-				.anyRequest().authenticated();
+				.anyRequest().permitAll();
 
 	}
 

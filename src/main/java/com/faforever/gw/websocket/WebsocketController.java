@@ -18,6 +18,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.stereotype.Controller;
 
@@ -66,7 +67,7 @@ public class WebsocketController {
     }
 
     @MessageMapping("/test")
-    @SendTo("/planets/attacked")
+    @SendToUser("/direct/error")
     public Greeting test(InitiateAssaultMessage message) {
         return new Greeting("Hello!");
     }
@@ -81,6 +82,10 @@ public class WebsocketController {
 
     public void send(String channel, Object payload) {
         template.convertAndSend(channel, payload);
+    }
+
+    public void sendToUser(String user, String channel, Object payload) {
+        template.convertAndSendToUser(user, channel, payload);
     }
 
     @MessageMapping("/chat.message")

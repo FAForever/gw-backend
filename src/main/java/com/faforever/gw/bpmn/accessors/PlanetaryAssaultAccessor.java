@@ -53,6 +53,18 @@ public class PlanetaryAssaultAccessor {
         return BattleRole.fromNameString((String)processVariables.get("winner"));
     }
 
+    public UUID getErrorCharacter() {
+        return (UUID)processVariables.get("errorCharacter");
+    }
+
+    public String getErrorCode() {
+        return (String)processVariables.get("errorCode");
+    }
+
+    public String getErrorMessage() {
+        return (String)processVariables.get("errorMessage");
+    }
+
     public static PlanetaryAssaultAccessor of(Map<String, Object> processVariables) {
         return new PlanetaryAssaultAccessor(processVariables);
     }

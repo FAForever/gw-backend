@@ -1,11 +1,15 @@
 package com.faforever.gw.websocket;
 
+import com.faforever.gw.security.User;
+import com.faforever.gw.security.GwUserRegistry;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionConnectEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
+import javax.inject.Inject;
 import java.util.Optional;
 
 /**
@@ -15,28 +19,31 @@ import java.util.Optional;
  * 
  * @author Sergi Almar
  */
+@Component
 public class WebsocketEventListener {
-
-	private ParticipantRepository participantRepository;
-
-	private SimpMessagingTemplate messagingTemplate;
+	private final GwUserRegistry gwUserRegistry;
+	private final ParticipantRepository participantRepository;
+	private final SimpMessagingTemplate messagingTemplate;
 
 	private String loginDestination;
-
 	private String logoutDestination;
 
-	public WebsocketEventListener(SimpMessagingTemplate messagingTemplate, ParticipantRepository participantRepository) {
+	@Inject
+	public WebsocketEventListener(GwUserRegistry gwUserRegistry, SimpMessagingTemplate messagingTemplate, ParticipantRepository participantRepository) {
+		this.gwUserRegistry = gwUserRegistry;
 		this.messagingTemplate = messagingTemplate;
 		this.participantRepository = participantRepository;
 	}
 		
 	@EventListener
 	private void handleSessionConnected(SessionConnectEvent event) {
+		gwUserRegistry.addConnection((User)event.getUser());
+
 		SimpMessageHeaderAccessor headers = SimpMessageHeaderAccessor.wrap(event.getMessage());
 		String username = headers.getUser().getName();
 
 		LoginEvent loginEvent = new LoginEvent(username);
-		messagingTemplate.convertAndSend(loginDestination, loginEvent);
+//		messagingTemplate.convertAndSend(loginDestination, loginEvent);
 		
 		// We store the session as we need to be idempotent in the disconnect event processing
 		participantRepository.add(headers.getSessionId(), loginEvent);
@@ -44,7 +51,8 @@ public class WebsocketEventListener {
 	
 	@EventListener
 	private void handleSessionDisconnect(SessionDisconnectEvent event) {
-		
+		gwUserRegistry.removeConnection((User)event.getUser());
+
 		Optional.ofNullable(participantRepository.getParticipant(event.getSessionId()))
 				.ifPresent(login -> {
 					messagingTemplate.convertAndSend(logoutDestination, new LogoutEvent(login.getUsername()));

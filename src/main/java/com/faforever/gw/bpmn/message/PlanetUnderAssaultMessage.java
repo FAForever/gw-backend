@@ -14,6 +14,8 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
@@ -22,6 +24,7 @@ import java.util.UUID;
 @Slf4j
 @Getter
 @Component
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class PlanetUnderAssaultMessage implements JavaDelegate, WebsocketMessage {
     @Getter(AccessLevel.NONE)
     private final MessagingService messagingService;

@@ -1,5 +1,6 @@
 package com.faforever.gw.model;
 
+import com.faforever.gw.bpmn.services.GwErrorService;
 import com.faforever.gw.bpmn.task.InitiateAssaultTask;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,7 +21,7 @@ public class ValidationHelperTest {
 
     @Before
     public void setUp() throws Exception {
-        validationHelper = new ValidationHelper();
+        validationHelper = new ValidationHelper(mock(GwErrorService.class));
     }
 
     @Test

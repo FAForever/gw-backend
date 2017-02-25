@@ -1,10 +1,11 @@
-package com.faforever.gw.model;
+package com.faforever.gw.bpmn.services;
 
 import lombok.AllArgsConstructor;
-import org.camunda.bpm.engine.delegate.BpmnError;
+import lombok.Getter;
 
+@Getter
 @AllArgsConstructor
-public enum GwError {
+public enum GwErrorType {
     CHARACTER_NOT_FREE_FOR_BATTLE("1001", "Character not free for game"),
     CHARACTER_ALREADY_IN_BATTLE("1002", "Character is already participating in this battle"),
     CHARACTER_NOT_IN_BATTLE("1003", "Character is not participant in this battle"),
@@ -15,8 +16,4 @@ public enum GwError {
 
     private final String errorCode;
     private final String errorMessage;
-
-    public BpmnError asBpmnError(){
-        return new BpmnError(errorCode, errorMessage);
-    }
 }

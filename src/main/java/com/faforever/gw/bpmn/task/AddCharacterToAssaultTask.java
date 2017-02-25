@@ -41,24 +41,28 @@ public class AddCharacterToAssaultTask implements JavaDelegate {
         Planet planet = planetRepository.getOne(accessor.getPlanetId());
         GwCharacter character = characterRepository.getOne(accessor.getLastJoinedCharacter());
 
-        validationHelper.validateCharacterInBattle(character, battle, false);
-        validationHelper.validateCharacterFreeForGame(character);
+        try {
+            validationHelper.validateCharacterInBattle(character, battle, false);
+            validationHelper.validateCharacterFreeForGame(character);
 
-        BattleRole battleRole;
-        if (character.getFaction() == battle.getAttackingFaction()) {
-            battleRole = BattleRole.ATTACKER;
-        } else if (character.getFaction() == battle.getDefendingFaction()) {
-            battleRole = BattleRole.DEFENDER;
-        } else {
-            battleRole = null;
+            BattleRole battleRole;
+            if (character.getFaction() == battle.getAttackingFaction()) {
+                battleRole = BattleRole.ATTACKER;
+            } else if (character.getFaction() == battle.getDefendingFaction()) {
+                battleRole = BattleRole.DEFENDER;
+            } else {
+                battleRole = null;
+            }
+
+            validationHelper.validateOpenSlotForCharacter(character, battle, battleRole);
+            BattleParticipant battleParticipant = new BattleParticipant(battle, character, battleRole);
+            battle.getParticipants().add(battleParticipant);
+            battleRepository.save(battle);
+
+            execution.setVariable("gameFull", battle.getParticipants().size() == planet.getMap().getTotalSlots());
+        } catch (BpmnError e) {
+            execution.setVariable("errorCharacter",character.getId());
+            throw e;
         }
-
-        validationHelper.validateOpenSlotForCharacter(character, battle, battleRole);
-
-        BattleParticipant battleParticipant = new BattleParticipant(battle, character, battleRole);
-        battle.getParticipants().add(battleParticipant);
-        battleRepository.save(battle);
-
-        execution.setVariable("gameFull", battle.getParticipants().size() == planet.getMap().getTotalSlots());
     }
 }

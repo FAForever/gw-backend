@@ -17,7 +17,6 @@
         <bpmn:incoming>SequenceFlow_0i55tdb</bpmn:incoming>
         <bpmn:incoming>SequenceFlow_10z7h58</bpmn:incoming>
         <bpmn:incoming>SequenceFlow_043heqj</bpmn:incoming>
-        <bpmn:incoming>SequenceFlow_0qcnio7</bpmn:incoming>
         <bpmn:incoming>SequenceFlow_1kqqy8o</bpmn:incoming>
         <bpmn:incoming>SequenceFlow_086aaic</bpmn:incoming>
         <bpmn:outgoing>SequenceFlow_1gdrrg0</bpmn:outgoing>
@@ -100,26 +99,16 @@
           <bpmn:targetRef>DataStoreReference_AssaultParticipants</bpmn:targetRef>
         </bpmn:dataOutputAssociation>
       </bpmn:serviceTask>
-      <bpmn:boundaryEvent id="BoundaryEvent_0yx8gip" attachedToRef="ServiceTask_AddPlayersCharacterToAssault">
+      <bpmn:boundaryEvent id="BoundaryEvent_Error_AddPlayer" attachedToRef="ServiceTask_AddPlayersCharacterToAssault">
         <bpmn:outgoing>SequenceFlow_0podf1z</bpmn:outgoing>
-        <bpmn:errorEventDefinition />
+        <bpmn:errorEventDefinition errorRef="Error_1hmln4n" camunda:errorCodeVariable="errorCode" camunda:errorMessageVariable="errorMessage" />
       </bpmn:boundaryEvent>
-      <bpmn:sequenceFlow id="SequenceFlow_0podf1z" sourceRef="BoundaryEvent_0yx8gip" targetRef="IntermediateThrowEvent_Error_JoinPlayerNotFreeForGame" />
-      <bpmn:boundaryEvent id="BoundaryEvent_16e9j9i" attachedToRef="ServiceTask_AddPlayersCharacterToAssault">
-        <bpmn:outgoing>SequenceFlow_1hgydsh</bpmn:outgoing>
-        <bpmn:errorEventDefinition />
-      </bpmn:boundaryEvent>
-      <bpmn:sequenceFlow id="SequenceFlow_1hgydsh" sourceRef="BoundaryEvent_16e9j9i" targetRef="IntermediateThrowEvent_Error_NoSlotOpen" />
+      <bpmn:sequenceFlow id="SequenceFlow_0podf1z" sourceRef="BoundaryEvent_Error_AddPlayer" targetRef="IntermediateThrowEvent_Error_JoinPlayerNotFreeForGame" />
       <bpmn:sequenceFlow id="SequenceFlow_10z7h58" name="no" sourceRef="ExclusiveGateway_AllSlotsOccupied" targetRef="ExclusiveGateway_SetupMatch" />
-      <bpmn:intermediateThrowEvent id="IntermediateThrowEvent_Error_JoinPlayerNotFreeForGame" name="error:&#10;player not free for game">
+      <bpmn:intermediateThrowEvent id="IntermediateThrowEvent_Error_JoinPlayerNotFreeForGame" name="error: invalid character action">
         <bpmn:incoming>SequenceFlow_0podf1z</bpmn:incoming>
         <bpmn:outgoing>SequenceFlow_043heqj</bpmn:outgoing>
-        <bpmn:messageEventDefinition />
-      </bpmn:intermediateThrowEvent>
-      <bpmn:intermediateThrowEvent id="IntermediateThrowEvent_Error_NoSlotOpen" name="error:&#10;no slot open">
-        <bpmn:incoming>SequenceFlow_1hgydsh</bpmn:incoming>
-        <bpmn:outgoing>SequenceFlow_0qcnio7</bpmn:outgoing>
-        <bpmn:messageEventDefinition />
+        <bpmn:messageEventDefinition camunda:delegateExpression="${userErrorMessage}" />
       </bpmn:intermediateThrowEvent>
       <bpmn:sequenceFlow id="SequenceFlow_0rbkusb" sourceRef="ServiceTask_AddPlayersCharacterToAssault" targetRef="IntermediateThrowEvent_JoinedAssault" />
       <bpmn:sequenceFlow id="SequenceFlow_0wvhz73" sourceRef="IntermediateThrowEvent_JoinedAssault" targetRef="ExclusiveGateway_AllSlotsOccupied" />
@@ -127,7 +116,6 @@
         <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${gameFull==true}</bpmn:conditionExpression>
       </bpmn:sequenceFlow>
       <bpmn:sequenceFlow id="SequenceFlow_043heqj" sourceRef="IntermediateThrowEvent_Error_JoinPlayerNotFreeForGame" targetRef="ExclusiveGateway_SetupMatch" />
-      <bpmn:sequenceFlow id="SequenceFlow_0qcnio7" sourceRef="IntermediateThrowEvent_Error_NoSlotOpen" targetRef="ExclusiveGateway_SetupMatch" />
       <bpmn:boundaryEvent id="BoundaryEvent_0anwk3g" attachedToRef="ServiceTask_RemovePlayersCharacterToAssault">
         <bpmn:outgoing>SequenceFlow_0yd0iv8</bpmn:outgoing>
         <bpmn:errorEventDefinition />
@@ -163,6 +151,11 @@
       </bpmn:intermediateCatchEvent>
     </bpmn:subProcess>
     <bpmn:endEvent id="EndEvent_Error_InvalidCharacterAction" name="error: invalid character action">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="errorCharacter">#{initiator}</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow_1any1mr</bpmn:incoming>
       <bpmn:messageEventDefinition camunda:delegateExpression="${userErrorMessage}" />
     </bpmn:endEvent>
@@ -308,11 +301,11 @@
       <bpmn:outgoing>SequenceFlow_0ku2oh1</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="SequenceFlow_1ieu0hq" sourceRef="ServiceTask_InitateAssault" targetRef="IntermediateThrowEvent_PlanetUnderAssault" />
-    <bpmn:boundaryEvent id="BoundaryEvent_Error_InitiatePlayerNotFreeForGame" attachedToRef="ServiceTask_InitateAssault">
+    <bpmn:boundaryEvent id="BoundaryEvent_Error_InitiateAssault" attachedToRef="ServiceTask_InitateAssault">
       <bpmn:outgoing>SequenceFlow_1any1mr</bpmn:outgoing>
       <bpmn:errorEventDefinition errorRef="Error_1hmln4n" camunda:errorCodeVariable="errorCode" camunda:errorMessageVariable="errorMessage" />
     </bpmn:boundaryEvent>
-    <bpmn:sequenceFlow id="SequenceFlow_1any1mr" sourceRef="BoundaryEvent_Error_InitiatePlayerNotFreeForGame" targetRef="EndEvent_Error_InvalidCharacterAction" />
+    <bpmn:sequenceFlow id="SequenceFlow_1any1mr" sourceRef="BoundaryEvent_Error_InitiateAssault" targetRef="EndEvent_Error_InvalidCharacterAction" />
     <bpmn:intermediateThrowEvent id="IntermediateThrowEvent_PlanetUnderAssault" name="planet under assault">
       <bpmn:incoming>SequenceFlow_1ieu0hq</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0i3umkz</bpmn:outgoing>
@@ -563,7 +556,7 @@
       <bpmndi:BPMNShape id="BoundaryEvent_0cemed0_di" bpmnElement="BoundaryEvent_AttackersWon_NoMatch">
         <dc:Bounds x="1544" y="765" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1871" y="791" width="89" height="24" />
+          <dc:Bounds x="1880" y="791" width="72" height="24" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_0fg1u36_di" bpmnElement="SequenceFlow_0fg1u36">
@@ -828,30 +821,17 @@
       <bpmndi:BPMNShape id="ServiceTask_1tw2btn_di" bpmnElement="ServiceTask_AddPlayersCharacterToAssault">
         <dc:Bounds x="800" y="288" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="BoundaryEvent_1xhfgi9_di" bpmnElement="BoundaryEvent_0yx8gip">
-        <dc:Bounds x="824" y="270" width="36" height="36" />
+      <bpmndi:BPMNShape id="BoundaryEvent_1xhfgi9_di" bpmnElement="BoundaryEvent_Error_AddPlayer">
+        <dc:Bounds x="852" y="270" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="842" y="306" width="0" height="0" />
+          <dc:Bounds x="870" y="306" width="0" height="0" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_0podf1z_di" bpmnElement="SequenceFlow_0podf1z">
-        <di:waypoint xsi:type="dc:Point" x="842" y="270" />
-        <di:waypoint xsi:type="dc:Point" x="842" y="239" />
+        <di:waypoint xsi:type="dc:Point" x="870" y="270" />
+        <di:waypoint xsi:type="dc:Point" x="870" y="239" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="857" y="255" width="0" height="0" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="BoundaryEvent_0fw91lu_di" bpmnElement="BoundaryEvent_16e9j9i">
-        <dc:Bounds x="863" y="270" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="881" y="306" width="0" height="0" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="SequenceFlow_1hgydsh_di" bpmnElement="SequenceFlow_1hgydsh">
-        <di:waypoint xsi:type="dc:Point" x="881" y="270" />
-        <di:waypoint xsi:type="dc:Point" x="881" y="239" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="896" y="255" width="0" height="0" />
+          <dc:Bounds x="885" y="254.5" width="0" height="0" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_10z7h58_di" bpmnElement="SequenceFlow_10z7h58">
@@ -863,15 +843,9 @@
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="IntermediateThrowEvent_1gps0wu_di" bpmnElement="IntermediateThrowEvent_Error_JoinPlayerNotFreeForGame">
-        <dc:Bounds x="824" y="203" width="36" height="36" />
+        <dc:Bounds x="852" y="203" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="749" y="209" width="73" height="36" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="IntermediateThrowEvent_1r4goy1_di" bpmnElement="IntermediateThrowEvent_Error_NoSlotOpen">
-        <dc:Bounds x="863" y="203" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="902" y="209" width="59" height="24" />
+          <dc:Bounds x="765" y="209" width="79" height="24" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="DataOutputAssociation_0om8nxs_di" bpmnElement="DataOutputAssociation_0om8nxs">
@@ -902,19 +876,11 @@
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_043heqj_di" bpmnElement="SequenceFlow_043heqj">
-        <di:waypoint xsi:type="dc:Point" x="842" y="203" />
-        <di:waypoint xsi:type="dc:Point" x="842" y="168" />
+        <di:waypoint xsi:type="dc:Point" x="870" y="203" />
+        <di:waypoint xsi:type="dc:Point" x="870" y="168" />
         <di:waypoint xsi:type="dc:Point" x="614" y="168" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="857" y="186" width="0" height="0" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="SequenceFlow_0qcnio7_di" bpmnElement="SequenceFlow_0qcnio7">
-        <di:waypoint xsi:type="dc:Point" x="878" y="204" />
-        <di:waypoint xsi:type="dc:Point" x="878" y="168" />
-        <di:waypoint xsi:type="dc:Point" x="614" y="168" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="893" y="186" width="0" height="0" />
+          <dc:Bounds x="885" y="185.5" width="0" height="0" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="BoundaryEvent_15yu8if_di" bpmnElement="BoundaryEvent_0anwk3g">
@@ -985,7 +951,7 @@
           <dc:Bounds x="1122" y="554" width="0" height="0" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="BoundaryEvent_07iwzjd_di" bpmnElement="BoundaryEvent_Error_InitiatePlayerNotFreeForGame">
+      <bpmndi:BPMNShape id="BoundaryEvent_07iwzjd_di" bpmnElement="BoundaryEvent_Error_InitiateAssault">
         <dc:Bounds x="193" y="474" width="36" height="36" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="401" y="490" width="0" height="0" />
