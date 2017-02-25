@@ -50,7 +50,10 @@ public class RemoveCharacterFromAssaultTask implements JavaDelegate {
             execution.setVariable("assaultFactionHasRemainingPlayers", attackerCount > 0);
             execution.setVariable("gameFull", false);
 
+            log.info("Character {} left battle {}", character.getId(), battle.getId());
+
             if (attackerCount == 0) {
+                log.info("Battle {} won by defenders (all attackers left)", battle.getId());
                 execution.setVariable("winner", BattleRole.DEFENDER.getName());
             }
         } catch (BpmnError e) {

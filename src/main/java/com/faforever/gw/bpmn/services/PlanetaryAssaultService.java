@@ -45,13 +45,12 @@ public class PlanetaryAssaultService {
 
     @Transactional(dontRollbackOn = BpmnError.class)
     public void characterInitiatesAssault(InitiateAssaultMessage message, User user) {
-        log.debug("characterInitiatesAssault");
+        log.debug("characterInitiatesAssault by user {}", user.getId());
         UUID battleUUID = UUID.fromString("56774dc6-c4d5-401c-9b2c-c7742318aea4");
 
         GwCharacter character = user.getActiveCharacter();
         Planet planet = planetRepository.getOne(message.getPlanetId());
 
-        log.debug("Received InitiateAssaultEventMessage");
         Map<String, Object> processVariables = new HashMap<>();
         processVariables.put("initiator", character.getId());
         processVariables.put("battle", battleUUID);
@@ -64,7 +63,7 @@ public class PlanetaryAssaultService {
     }
 
     public void characterJoinsAssault(JoinAssaultMessage message, User user) {
-        log.debug("characterJoinsAssault");
+        log.debug("characterJoinsAssault for battle {}", message.getBattleId());
 
         UUID characterId = user.getActiveCharacter().getId();
         Map<String, Object> processVariables = ImmutableMap.of("lastJoinedCharacter", characterId);
@@ -80,7 +79,7 @@ public class PlanetaryAssaultService {
     }
 
     public void characterLeavesAssault(JoinAssaultMessage message, User user) {
-        log.debug("characterLeavesAssault");
+        log.debug("characterLeavesAssault for battle {}", message.getBattleId().toString());
 
         UUID characterId = user.getActiveCharacter().getId();
         Map<String, Object> processVariables = ImmutableMap.of("lastLeftCharacter", characterId);

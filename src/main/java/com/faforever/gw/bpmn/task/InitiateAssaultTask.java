@@ -42,6 +42,8 @@ public class InitiateAssaultTask implements JavaDelegate {
 
         PlanetaryAssaultAccessor accessor = PlanetaryAssaultAccessor.of(execution.getVariables());
 
+        log.info("Battle {} initiated by character {}", accessor.getBattleId(), accessor.getInitiatorId());
+
         GwCharacter character = characterRepository.findOne(accessor.getInitiatorId());
         Planet planet = planetRepository.findOne(accessor.getPlanetId());
         Faction attackingFaction = accessor.getAttackingFaction();

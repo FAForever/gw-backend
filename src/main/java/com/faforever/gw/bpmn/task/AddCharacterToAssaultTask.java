@@ -59,7 +59,12 @@ public class AddCharacterToAssaultTask implements JavaDelegate {
             battle.getParticipants().add(battleParticipant);
             battleRepository.save(battle);
 
-            execution.setVariable("gameFull", battle.getParticipants().size() == planet.getMap().getTotalSlots());
+            log.info("Character {} joined battle {}", character.getId(), battle.getId());
+
+            if(battle.getParticipants().size() == planet.getMap().getTotalSlots()){
+                log.info("Battle {} is full", battle.getId());
+                execution.setVariable("gameFull", true);
+            }
         } catch (BpmnError e) {
             execution.setVariable("errorCharacter",character.getId());
             throw e;

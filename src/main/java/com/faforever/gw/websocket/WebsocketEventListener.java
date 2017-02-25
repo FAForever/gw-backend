@@ -55,7 +55,7 @@ public class WebsocketEventListener {
 
 		Optional.ofNullable(participantRepository.getParticipant(event.getSessionId()))
 				.ifPresent(login -> {
-					messagingTemplate.convertAndSend(logoutDestination, new LogoutEvent(login.getUsername()));
+//					messagingTemplate.convertAndSend(logoutDestination, new LogoutEvent(login.getUsername()));
 					participantRepository.removeParticipant(event.getSessionId());
 				});
 	}
