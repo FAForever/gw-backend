@@ -1,16 +1,20 @@
 package com.faforever.gw.bpmn.services;
 
+import com.faforever.gw.bpmn.message.UserErrorMessage;
 import com.faforever.gw.model.GwCharacter;
 import com.faforever.gw.model.Planet;
 import com.faforever.gw.model.repository.CharacterRepository;
 import com.faforever.gw.model.repository.PlanetRepository;
 import com.faforever.gw.security.User;
+import com.faforever.gw.services.messaging.MessagingService;
 import com.faforever.gw.websocket.incoming.InitiateAssaultMessage;
 import com.faforever.gw.websocket.incoming.JoinAssaultMessage;
 import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
+import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.delegate.BpmnError;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -22,8 +26,9 @@ import java.util.UUID;
 @Slf4j
 @Service
 public class PlanetaryAssaultService {
+    private final ApplicationContext applicationContext;
     private final RuntimeService runtimeService;
-    private final CharacterRepository characterRepository;
+    private final MessagingService messagingService;
     private final PlanetRepository planetRepository;
 
     public static final String INITIATE_ASSAULT_MESSAGE = "Message_InitiateAssault";
@@ -31,9 +36,10 @@ public class PlanetaryAssaultService {
     public static final String PLAYER_LEAVES_ASSAULT_MESSAGE = "Message_PlayerLeavesAssault";
 
     @Inject
-    public PlanetaryAssaultService(RuntimeService runtimeService, CharacterRepository characterRepository, PlanetRepository planetRepository) {
+    public PlanetaryAssaultService(ApplicationContext applicationContext, RuntimeService runtimeService, MessagingService messagingService, PlanetRepository planetRepository) {
+        this.applicationContext = applicationContext;
         this.runtimeService = runtimeService;
-        this.characterRepository = characterRepository;
+        this.messagingService = messagingService;
         this.planetRepository = planetRepository;
     }
 
@@ -64,7 +70,13 @@ public class PlanetaryAssaultService {
         Map<String, Object> processVariables = ImmutableMap.of("lastJoinedCharacter", characterId);
 
         log.debug("-> set lastJoinedCharacter: {}", characterId);
-        runtimeService.correlateMessage(PLAYER_JOINS_ASSAULT_MESSAGE, message.getBattleId().toString(), processVariables);
+
+        try {
+            runtimeService.correlateMessage(PLAYER_JOINS_ASSAULT_MESSAGE, message.getBattleId().toString(), processVariables);
+        } catch (MismatchingMessageCorrelationException e) {
+            log.error("Battle {} is no active bpmn instance", message.getBattleId());
+            sendErrorToUser(user, GwErrorType.BATTLE_INVALID);
+        }
     }
 
     public void characterLeavesAssault(JoinAssaultMessage message, User user) {
@@ -74,6 +86,20 @@ public class PlanetaryAssaultService {
         Map<String, Object> processVariables = ImmutableMap.of("lastLeftCharacter", characterId);
 
         log.debug("-> set lastLeftCharacter: {}", characterId);
-        runtimeService.correlateMessage(PLAYER_LEAVES_ASSAULT_MESSAGE, message.getBattleId().toString(), processVariables);
+
+        try {
+            runtimeService.correlateMessage(PLAYER_LEAVES_ASSAULT_MESSAGE, message.getBattleId().toString(), processVariables);
+        } catch (MismatchingMessageCorrelationException e) {
+            log.error("Battle {} is no active bpmn instance", message.getBattleId());
+            sendErrorToUser(user, GwErrorType.BATTLE_INVALID);
+        }
+    }
+
+    private void sendErrorToUser(User user, GwErrorType errorType) {
+        UserErrorMessage errorMessage = applicationContext.getBean(UserErrorMessage.class);
+        errorMessage.setErrorCharacter(user.getActiveCharacter().getId());
+        errorMessage.setErrorCode(errorType.getErrorCode());
+        errorMessage.setErrorMessage(errorType.getErrorMessage());
+        messagingService.send(errorMessage);
     }
 }

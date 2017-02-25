@@ -78,16 +78,6 @@ public class WebsocketController {
         return participantRepository.getActiveSessions().values();
     }
 
-
-
-    public void send(String channel, Object payload) {
-        template.convertAndSend(channel, payload);
-    }
-
-    public void sendToUser(String user, String channel, Object payload) {
-        template.convertAndSendToUser(user, channel, payload);
-    }
-
     @MessageMapping("/chat.message")
     public ChatMessage filterMessage(@Payload ChatMessage message, Principal principal) {
         message.setUsername(principal.getName());

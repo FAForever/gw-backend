@@ -37,20 +37,25 @@ public class RemoveCharacterFromAssaultTask implements JavaDelegate {
         Battle battle = battleRepository.getOne(accessor.getBattleId());
         GwCharacter character = characterRepository.getOne(accessor.getLastLeftCharacter());
 
-        validationHelper.validateCharacterInBattle(character, battle, true);
+        try {
+            validationHelper.validateCharacterInBattle(character, battle, true);
 
-        battle.getParticipants().removeIf(battleParticipant -> battleParticipant.getCharacter() == character);
-        battleRepository.save(battle);
+            battle.getParticipants().removeIf(battleParticipant -> battleParticipant.getCharacter() == character);
+            battleRepository.save(battle);
 
-        long attackerCount = battle.getParticipants().stream()
-                .filter(battleParticipant -> battleParticipant.getRole() == BattleRole.ATTACKER)
-                .count();
+            long attackerCount = battle.getParticipants().stream()
+                    .filter(battleParticipant -> battleParticipant.getRole() == BattleRole.ATTACKER)
+                    .count();
 
-        execution.setVariable("assaultFactionHasRemainingPlayers", attackerCount > 0);
-        execution.setVariable("gameFull", false);
+            execution.setVariable("assaultFactionHasRemainingPlayers", attackerCount > 0);
+            execution.setVariable("gameFull", false);
 
-        if (attackerCount == 0) {
-            execution.setVariable("winner", BattleRole.DEFENDER.getName());
+            if (attackerCount == 0) {
+                execution.setVariable("winner", BattleRole.DEFENDER.getName());
+            }
+        } catch (BpmnError e) {
+            execution.setVariable("errorCharacter", character.getId());
+            throw e;
         }
     }
 }

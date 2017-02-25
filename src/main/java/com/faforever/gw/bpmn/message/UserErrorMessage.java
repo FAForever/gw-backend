@@ -8,11 +8,13 @@ import com.faforever.gw.services.messaging.WebsocketChannel;
 import com.faforever.gw.services.messaging.WebsocketMessage;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
+import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
@@ -22,19 +24,20 @@ import java.util.List;
 import java.util.UUID;
 
 @Slf4j
-@Getter
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class UserErrorMessage implements JavaDelegate, WebsocketMessage {
-    @Getter(AccessLevel.NONE)
     private final MessagingService messagingService;
-    @Getter(AccessLevel.NONE)
     private final GwUserRegistry gwUserRegistry;
 
-    @Getter(AccessLevel.NONE)
+    @Setter
     private UUID errorCharacter;
 
+    @Setter
+    @Getter
     private String errorCode;
+    @Getter
+    @Setter
     private String errorMessage;
 
 
