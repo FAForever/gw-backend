@@ -36,6 +36,9 @@ public class ProcessGameResultTask implements JavaDelegate {
         PlanetaryAssaultAccessor accessor = PlanetaryAssaultAccessor.of(execution.getVariables());
         GameResult gameResult = accessor.getGameResult();
 
+        execution.setVariable("winner", gameResult.getWinner().getName());
+        log.debug("-> set variable winner = {}", gameResult.getWinner());
+
         Battle battle = battleRepository.getOne(gameResult.getBattle());
         Map<UUID, GameCharacterResult> results = gameResult.getCharacterResults();
 

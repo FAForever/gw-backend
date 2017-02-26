@@ -10,6 +10,7 @@ import java.util.UUID;
 @Data
 public class GameResult implements Serializable {
     UUID battle;
+    Faction winner;
     java.util.Map<UUID, GameCharacterResult> characterResults;
     Collection<Pair<UUID, UUID>> characterKills;
 }
