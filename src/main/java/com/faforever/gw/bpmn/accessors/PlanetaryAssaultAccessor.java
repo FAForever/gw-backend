@@ -2,6 +2,7 @@ package com.faforever.gw.bpmn.accessors;
 
 import com.faforever.gw.model.BattleRole;
 import com.faforever.gw.model.Faction;
+import com.faforever.gw.model.GameResult;
 
 import java.util.Map;
 import java.util.UUID;
@@ -49,6 +50,8 @@ public class PlanetaryAssaultAccessor {
     public Integer getDefenderCount() {return (Integer)processVariables.get("defenderCount");}
 
     public Double getWaitingProgress() { return (Double) processVariables.get("waitingProgress"); }
+
+    public GameResult getGameResult() { return (GameResult)processVariables.get("gameResult"); }
 
     public BattleRole getWinner() {
         return BattleRole.fromNameString((String) processVariables.get("winner"));

@@ -34,7 +34,7 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
     public void configureMessageBroker(MessageBrokerRegistry config) {
         config.setApplicationDestinationPrefixes("/action");
         // only append new channels - don't call enableSimpleBroker twice - the second call overwrites the first
-        config.enableSimpleBroker("/planets", "/battles", "/direct");
+        config.enableSimpleBroker("/planets", "/battles", "/direct", "/debug");
 //        config.enableSimpleBroker("/queue/", "/topic/", "/exchange/");
     }
 

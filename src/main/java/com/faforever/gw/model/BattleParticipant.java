@@ -2,6 +2,8 @@ package com.faforever.gw.model;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -11,6 +13,7 @@ import java.util.UUID;
 @Entity
 @Table(name="gw_battle_participant")
 @Getter
+@Setter
 @NoArgsConstructor
 public class BattleParticipant implements Serializable{
     @Id

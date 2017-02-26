@@ -1,6 +1,7 @@
 package com.faforever.gw.bpmn.services;
 
 import com.faforever.gw.bpmn.message.UserErrorMessage;
+import com.faforever.gw.model.GameResult;
 import com.faforever.gw.model.GwCharacter;
 import com.faforever.gw.model.Planet;
 import com.faforever.gw.model.repository.CharacterRepository;
@@ -39,6 +40,7 @@ public class PlanetaryAssaultService {
     public static final String INITIATE_ASSAULT_MESSAGE = "Message_InitiateAssault";
     public static final String PLAYER_JOINS_ASSAULT_MESSAGE = "Message_PlayerJoinsAssault";
     public static final String PLAYER_LEAVES_ASSAULT_MESSAGE = "Message_PlayerLeavesAssault";
+    public static final String GAME_RESULT_MESSAGE = "Message_GameResult";
 
     @Inject
     public PlanetaryAssaultService(ApplicationContext applicationContext, RuntimeService runtimeService, MessagingService messagingService, PlanetRepository planetRepository) {
@@ -49,8 +51,8 @@ public class PlanetaryAssaultService {
     }
 
     @Transactional(dontRollbackOn = BpmnError.class)
-    public void characterInitiatesAssault(InitiateAssaultMessage message, User user) {
-        log.debug("characterInitiatesAssault by user {}", user.getId());
+    public void onCharacterInitiatesAssault(InitiateAssaultMessage message, User user) {
+        log.debug("onCharacterInitiatesAssault by user {}", user.getId());
         UUID battleUUID = UUID.randomUUID();
 
         GwCharacter character = user.getActiveCharacter();
@@ -72,32 +74,34 @@ public class PlanetaryAssaultService {
         runtimeService.startProcessInstanceByMessage(INITIATE_ASSAULT_MESSAGE, battleUUID.toString(), variables);
     }
 
-    public void characterJoinsAssault(JoinAssaultMessage message, User user) {
-        log.debug("characterJoinsAssault for battle {}", message.getBattleId());
+    public void onCharacterJoinsAssault(JoinAssaultMessage message, User user) {
+        log.debug("onCharacterJoinsAssault for battle {}", message.getBattleId());
 
         UUID characterId = user.getActiveCharacter().getId();
-        Map<String, Object> processVariables = ImmutableMap.of("lastJoinedCharacter", characterId);
+        VariableMap variables = Variables.createVariables()
+                .putValue("lastJoinedCharacter", characterId);
 
         log.debug("-> set lastJoinedCharacter: {}", characterId);
 
         try {
-            runtimeService.correlateMessage(PLAYER_JOINS_ASSAULT_MESSAGE, message.getBattleId().toString(), processVariables);
+            runtimeService.correlateMessage(PLAYER_JOINS_ASSAULT_MESSAGE, message.getBattleId().toString(), variables);
         } catch (MismatchingMessageCorrelationException e) {
             log.error("Battle {} is no active bpmn instance", message.getBattleId());
             sendErrorToUser(user, GwErrorType.BATTLE_INVALID);
         }
     }
 
-    public void characterLeavesAssault(JoinAssaultMessage message, User user) {
-        log.debug("characterLeavesAssault for battle {}", message.getBattleId().toString());
+    public void onCharacterLeavesAssault(JoinAssaultMessage message, User user) {
+        log.debug("onCharacterLeavesAssault for battle {}", message.getBattleId().toString());
 
         UUID characterId = user.getActiveCharacter().getId();
-        Map<String, Object> processVariables = ImmutableMap.of("lastLeftCharacter", characterId);
+        VariableMap variables = Variables.createVariables()
+                .putValue("lastLeftCharacter", characterId);
 
         log.debug("-> set lastLeftCharacter: {}", characterId);
 
         try {
-            runtimeService.correlateMessage(PLAYER_LEAVES_ASSAULT_MESSAGE, message.getBattleId().toString(), processVariables);
+            runtimeService.correlateMessage(PLAYER_LEAVES_ASSAULT_MESSAGE, message.getBattleId().toString(), variables);
         } catch (MismatchingMessageCorrelationException e) {
             log.error("Battle {} is no active bpmn instance", message.getBattleId());
             sendErrorToUser(user, GwErrorType.BATTLE_INVALID);
@@ -112,8 +116,18 @@ public class PlanetaryAssaultService {
         messagingService.send(errorMessage);
     }
 
-    @Scheduled(fixedDelay = 60000)
+    @Scheduled(fixedDelay = 1000)
     public void updateOpenGames() {
         runtimeService.signalEventReceived(UPDATE_OPEN_GAMES_SIGNAL);
+    }
+
+    @Transactional(dontRollbackOn = BpmnError.class)
+    public void onGameResult(GameResult gameResult){
+        UUID battleId = gameResult.getBattle();
+
+        VariableMap variables = Variables.createVariables()
+                .putValue("gameResult", gameResult);
+
+        runtimeService.correlateMessage(GAME_RESULT_MESSAGE, battleId.toString(), variables);
     }
 }

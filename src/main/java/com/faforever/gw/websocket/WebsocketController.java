@@ -2,7 +2,10 @@ package com.faforever.gw.websocket;
 
 import com.faforever.gw.bpmn.services.PlanetaryAssaultService;
 import com.faforever.gw.data.domain.ChatMessage;
-import com.faforever.gw.model.GwCharacter;
+import com.faforever.gw.model.BattleParticipantResult;
+import com.faforever.gw.model.BattleRole;
+import com.faforever.gw.model.GameCharacterResult;
+import com.faforever.gw.model.GameResult;
 import com.faforever.gw.model.repository.BattleRepository;
 import com.faforever.gw.model.repository.CharacterRepository;
 import com.faforever.gw.model.repository.PlanetRepository;
@@ -11,23 +14,20 @@ import com.faforever.gw.websocket.incoming.InitiateAssaultMessage;
 import com.faforever.gw.websocket.incoming.JoinAssaultMessage;
 //import jersey.repackaged.com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap;
+import javafx.util.Pair;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.RuntimeService;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.stereotype.Controller;
 
 import javax.inject.Inject;
-import javax.transaction.Transactional;
 import java.security.Principal;
-import java.util.Collection;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 @Controller
@@ -52,18 +52,40 @@ public class WebsocketController {
     @MessageMapping("/initiateAssault")
     public void initiateAssault(InitiateAssaultMessage message, User user) throws Exception {
         log.trace("received /initiateAssault, message: {}, user: {}", message, user);
-        planetaryAssaultService.characterInitiatesAssault(message, user);
+        planetaryAssaultService.onCharacterInitiatesAssault(message, user);
     }
 
     @MessageMapping("/joinAssault")
     public void joinAssault(JoinAssaultMessage message, User user) throws Exception {
         log.trace("received /joinAssault, message: {}, user: {}", message, user);
-        planetaryAssaultService.characterJoinsAssault(message, user);
+        planetaryAssaultService.onCharacterJoinsAssault(message, user);
     }
+
     @MessageMapping("/leaveAssault")
     public void leaveAssault(JoinAssaultMessage message, User user) throws Exception {
         log.trace("received /joinAssault, message: {}, user: {}", message, user);
-        planetaryAssaultService.characterLeavesAssault(message, user);
+        planetaryAssaultService.onCharacterLeavesAssault(message, user);
+    }
+
+    @MessageMapping("/debug/fakeGameResult")
+    public void fakeGameResult(JoinAssaultMessage message, User user){
+        log.trace("received /debug/fakeGameResult, message: {}, user: {}", message, user);
+
+        GameResult gameResult = new GameResult();
+        gameResult.setBattle(message.getBattleId());
+
+        Map<UUID, GameCharacterResult> characterResults = new HashMap();
+        characterResults.put(UUID.fromString("a1111111-e35c-11e6-bf01-fe55135034f3"),new GameCharacterResult(UUID.fromString("a1111111-e35c-11e6-bf01-fe55135034f3"), BattleRole.ATTACKER, BattleParticipantResult.VICTORY));
+        characterResults.put(UUID.fromString("a2222222-e35c-11e6-bf01-fe55135034f3"),new GameCharacterResult(UUID.fromString("a2222222-e35c-11e6-bf01-fe55135034f3"), BattleRole.ATTACKER, BattleParticipantResult.DEATH));
+        characterResults.put(UUID.fromString("a3333333-e4e2-11e6-bf01-fe55135034f3"),new GameCharacterResult(UUID.fromString("a3333333-e4e2-11e6-bf01-fe55135034f3"), BattleRole.DEFENDER, BattleParticipantResult.RECALL));
+        characterResults.put(UUID.fromString("a4444444-e4e2-11e6-bf01-fe55135034f3"),new GameCharacterResult(UUID.fromString("a4444444-e4e2-11e6-bf01-fe55135034f3"), BattleRole.DEFENDER, BattleParticipantResult.DEATH));
+        gameResult.setCharacterResults(characterResults);
+
+        Collection<Pair<UUID,UUID>> killList = new ArrayList<>();
+        killList.add(new Pair<UUID, UUID>(UUID.fromString("a1111111-e35c-11e6-bf01-fe55135034f3"),UUID.fromString("a4444444-e4e2-11e6-bf01-fe55135034f3")));
+        gameResult.setCharacterKills(killList);
+
+        planetaryAssaultService.onGameResult(gameResult);
     }
 
     @MessageMapping("/test")

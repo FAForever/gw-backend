@@ -66,6 +66,9 @@
                 subscriptions = []
                 $("#connectButton").removeAttr("disabled");
                 $("#disconnectButton").attr("disabled", "disabled");
+                $("#disconnectButton").attr("disabled", "disabled");
+                $("#joinAssaultBattle").empty();
+                $("#leaveAssaultBattle").empty();
             };
 
             console.log('STOMP: Attempting connection');
@@ -80,6 +83,8 @@
 
             $("#connectButton").removeAttr("disabled");
             $("#disconnectButton").attr("disabled", "disabled");
+            $("#joinAssaultBattle").empty();
+            $("#leaveAssaultBattle").empty();
         }
 
         function subscribe() {
