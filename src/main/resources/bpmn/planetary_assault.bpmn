@@ -40,7 +40,7 @@
         <bpmn:outgoing>SequenceFlow_1hl2d99</bpmn:outgoing>
         <bpmn:outgoing>SequenceFlow_1o6z0ru</bpmn:outgoing>
       </bpmn:exclusiveGateway>
-      <bpmn:sequenceFlow id="SequenceFlow_1tim9i2" sourceRef="ServiceTask_RemovePlayersCharacterToAssault" targetRef="IntermediateThrowEvent_Success_LeftAssault" />
+      <bpmn:sequenceFlow id="SequenceFlow_1tim9i2" sourceRef="ServiceTask_RemovePlayersCharacterToAssault" targetRef="IntermediateThrowEvent_LeftAssault" />
       <bpmn:sequenceFlow id="SequenceFlow_1hl2d99" name="yes" sourceRef="ExclusiveGateway_AssaultFactionHasPlayers" targetRef="ExclusiveGateway_SetupMatch" />
       <bpmn:sequenceFlow id="SequenceFlow_1o6z0ru" name="no" sourceRef="ExclusiveGateway_AssaultFactionHasPlayers" targetRef="Task_1vstppt">
         <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${attackerCount == 0}</bpmn:conditionExpression>
@@ -51,7 +51,7 @@
         <bpmn:outgoing>SequenceFlow_15hv618</bpmn:outgoing>
         <bpmn:signalEventDefinition signalRef="Signal_1kiau5a" />
       </bpmn:intermediateCatchEvent>
-      <bpmn:sequenceFlow id="SequenceFlow_15hv618" sourceRef="IntermediateCatchEvent_UpdateOpenGames" targetRef="ServiceTask_CalculatePassiveAssaultProgress" />
+      <bpmn:sequenceFlow id="SequenceFlow_15hv618" sourceRef="IntermediateCatchEvent_UpdateOpenGames" targetRef="ServiceTask_CalculateWaitingProgress" />
       <bpmn:serviceTask id="ServiceTask_RemovePlayersCharacterToAssault" name="remove character from assault" camunda:delegateExpression="${removeCharacterFromAssaultTask}">
         <bpmn:incoming>SequenceFlow_0k13rbw</bpmn:incoming>
         <bpmn:outgoing>SequenceFlow_1tim9i2</bpmn:outgoing>
@@ -59,16 +59,16 @@
           <bpmn:targetRef>DataStoreReference_AssaultParticipants</bpmn:targetRef>
         </bpmn:dataOutputAssociation>
       </bpmn:serviceTask>
-      <bpmn:serviceTask id="ServiceTask_CalculatePassiveAssaultProgress" name="calculate passive assault progress" camunda:delegateExpression="${calculatePassiveAssaultProgressTask}">
+      <bpmn:serviceTask id="ServiceTask_CalculateWaitingProgress" name="calculate waiting progress" camunda:delegateExpression="${calculateWaitingProgressTask}">
         <bpmn:incoming>SequenceFlow_15hv618</bpmn:incoming>
         <bpmn:outgoing>SequenceFlow_1fu2bvw</bpmn:outgoing>
       </bpmn:serviceTask>
       <bpmn:exclusiveGateway id="ExclusiveGateway_WaitingProgress" name="game waiting progress 100% ?" default="SequenceFlow_0i55tdb">
-        <bpmn:incoming>SequenceFlow_1fu2bvw</bpmn:incoming>
+        <bpmn:incoming>SequenceFlow_1uidmte</bpmn:incoming>
         <bpmn:outgoing>SequenceFlow_1mn1ssi</bpmn:outgoing>
         <bpmn:outgoing>SequenceFlow_0i55tdb</bpmn:outgoing>
       </bpmn:exclusiveGateway>
-      <bpmn:sequenceFlow id="SequenceFlow_1fu2bvw" sourceRef="ServiceTask_CalculatePassiveAssaultProgress" targetRef="ExclusiveGateway_WaitingProgress" />
+      <bpmn:sequenceFlow id="SequenceFlow_1fu2bvw" sourceRef="ServiceTask_CalculateWaitingProgress" targetRef="IntermediateThrowEvent_UpdateWaitingProgress" />
       <bpmn:sequenceFlow id="SequenceFlow_1mn1ssi" name="yes" sourceRef="ExclusiveGateway_WaitingProgress" targetRef="ExclusiveGateway_0ltc7r2">
         <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression"><![CDATA[${waitingProgress>=0.9999}]]></bpmn:conditionExpression>
       </bpmn:sequenceFlow>
@@ -122,9 +122,9 @@
         <bpmn:messageEventDefinition camunda:delegateExpression="${userErrorMessage}" />
       </bpmn:intermediateThrowEvent>
       <bpmn:sequenceFlow id="SequenceFlow_1kqqy8o" sourceRef="IntermediateThrowEvent_Error_RemoveCharacter" targetRef="ExclusiveGateway_SetupMatch" />
-      <bpmn:sequenceFlow id="SequenceFlow_1ddx0w9" sourceRef="IntermediateThrowEvent_Success_LeftAssault" targetRef="ExclusiveGateway_AssaultFactionHasPlayers" />
+      <bpmn:sequenceFlow id="SequenceFlow_1ddx0w9" sourceRef="IntermediateThrowEvent_LeftAssault" targetRef="ExclusiveGateway_AssaultFactionHasPlayers" />
       <bpmn:sequenceFlow id="SequenceFlow_086aaic" sourceRef="StartEvent_AssaultInitiated" targetRef="ExclusiveGateway_SetupMatch" />
-      <bpmn:intermediateThrowEvent id="IntermediateThrowEvent_Success_LeftAssault" name="character left assault">
+      <bpmn:intermediateThrowEvent id="IntermediateThrowEvent_LeftAssault" name="character left assault">
         <bpmn:incoming>SequenceFlow_1tim9i2</bpmn:incoming>
         <bpmn:outgoing>SequenceFlow_1ddx0w9</bpmn:outgoing>
         <bpmn:messageEventDefinition camunda:delegateExpression="${battleParticipantLeftAssaultMessage}" />
@@ -179,6 +179,12 @@
         <bpmn:incoming>SequenceFlow_01f5pnp</bpmn:incoming>
         <bpmn:outgoing>SequenceFlow_13sgv8p</bpmn:outgoing>
       </bpmn:serviceTask>
+      <bpmn:sequenceFlow id="SequenceFlow_1uidmte" sourceRef="IntermediateThrowEvent_UpdateWaitingProgress" targetRef="ExclusiveGateway_WaitingProgress" />
+      <bpmn:intermediateThrowEvent id="IntermediateThrowEvent_UpdateWaitingProgress" name="waiting progress update">
+        <bpmn:incoming>SequenceFlow_1fu2bvw</bpmn:incoming>
+        <bpmn:outgoing>SequenceFlow_1uidmte</bpmn:outgoing>
+        <bpmn:messageEventDefinition camunda:delegateExpression="${battleUpdateWaitingProgressMessage}" />
+      </bpmn:intermediateThrowEvent>
     </bpmn:subProcess>
     <bpmn:endEvent id="EndEvent_Error_InvalidCharacterAction" name="error: invalid character action">
       <bpmn:extensionElements>
@@ -485,7 +491,7 @@
       <bpmndi:BPMNShape id="ServiceTask_00xnox7_di" bpmnElement="ServiceTask_RemovePlayersCharacterToAssault">
         <dc:Bounds x="800" y="529" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="ServiceTask_1tuw9lh_di" bpmnElement="ServiceTask_CalculatePassiveAssaultProgress">
+      <bpmndi:BPMNShape id="ServiceTask_1tuw9lh_di" bpmnElement="ServiceTask_CalculateWaitingProgress">
         <dc:Bounds x="800" y="702" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="ExclusiveGateway_1hr5qna_di" bpmnElement="ExclusiveGateway_WaitingProgress" isMarkerVisible="true">
@@ -496,9 +502,9 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_1fu2bvw_di" bpmnElement="SequenceFlow_1fu2bvw">
         <di:waypoint xsi:type="dc:Point" x="900" y="742" />
-        <di:waypoint xsi:type="dc:Point" x="1105" y="742" />
+        <di:waypoint xsi:type="dc:Point" x="1015" y="742" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1003" y="727" width="0" height="0" />
+          <dc:Bounds x="958" y="727" width="0" height="0" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_1mn1ssi_di" bpmnElement="SequenceFlow_1mn1ssi">
@@ -552,7 +558,7 @@
       <bpmndi:BPMNShape id="BoundaryEvent_0cemed0_di" bpmnElement="BoundaryEvent_AttackersWon_NoMatch">
         <dc:Bounds x="1608" y="765" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1935" y="791" width="89" height="24" />
+          <dc:Bounds x="1944" y="791" width="72" height="24" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_0fg1u36_di" bpmnElement="SequenceFlow_0fg1u36">
@@ -940,7 +946,7 @@
           <dc:Bounds x="300" y="470" width="63" height="24" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="IntermediateThrowEvent_1ildr1e_di" bpmnElement="IntermediateThrowEvent_Success_LeftAssault">
+      <bpmndi:BPMNShape id="IntermediateThrowEvent_1ildr1e_di" bpmnElement="IntermediateThrowEvent_LeftAssault">
         <dc:Bounds x="1015" y="551" width="36" height="36" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="999" y="587" width="67" height="24" />
@@ -1032,6 +1038,19 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="ServiceTask_1km3vi7_di" bpmnElement="Task_1gisjkt">
         <dc:Bounds x="1354" y="702" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1uidmte_di" bpmnElement="SequenceFlow_1uidmte">
+        <di:waypoint xsi:type="dc:Point" x="1051" y="742" />
+        <di:waypoint xsi:type="dc:Point" x="1105" y="742" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1078" y="727" width="0" height="0" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="IntermediateThrowEvent_0j2mhz2_di" bpmnElement="IntermediateThrowEvent_UpdateWaitingProgress">
+        <dc:Bounds x="1015" y="724" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="991" y="760" width="83" height="24" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

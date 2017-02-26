@@ -11,6 +11,7 @@ public enum WebsocketChannel {
     PLANETS_ATTACKED("/planets/attacked", Type.PUBLIC),
     PLANETS_CONQUERED("/planets/conquered", Type.PUBLIC),
     PLANETS_DEFENDED("/planets/defended", Type.PUBLIC),
+    BATTLE_WAITING_PROGRESS("/battles/waiting_progress", Type.PUBLIC),
     BATTLES_PARTICIPANT_JOINED("/battles/participant_joined", Type.PUBLIC),
     BATTLES_PARTICIPANT_LEFT("/battles/participant_left", Type.PUBLIC),
     CHARACTERS_PROMOTIONS("/characters/promotions", Type.PUBLIC),

@@ -19,11 +19,11 @@ import javax.transaction.Transactional;
 
 @Slf4j
 @Component
-public class CalculatePassiveAssaultProgressTask implements JavaDelegate{
+public class CalculateWaitingProgressTask implements JavaDelegate{
     private final ProcessEngine processEngine;
     private final BattleRepository battleRepository;
 
-    public CalculatePassiveAssaultProgressTask(ProcessEngine processEngine, BattleRepository battleRepository) {
+    public CalculateWaitingProgressTask(ProcessEngine processEngine, BattleRepository battleRepository) {
         this.processEngine = processEngine;
         this.battleRepository = battleRepository;
     }
