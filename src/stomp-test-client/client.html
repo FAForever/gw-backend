@@ -116,6 +116,19 @@
         function onMessageReceived(message) {
             var logEntry = "Channel: " + message.headers["destination"] + "\nContent: " + message.body;
 
+            var data = JSON.parse(message.body);
+
+            if(message.headers["destination"] == "/planets/attacked"){
+                var option = new Option(data.battleId, '{"battleId":"'+data.battleId+'"}');
+                $("#joinAssaultBattle").append(option);
+                option = new Option(data.battleId, '{"battleId":"'+data.battleId+'"}');
+                $("#leaveAssaultBattle").append(option);
+            }
+            else if(message.headers["destination"] == "/planets/defended" || message.headers["destination"] == "/planets/conquered"){
+                $("#joinAssaultBattle option:contains('"+data.battleId+"')").remove();
+                $("#leaveAssaultBattle option:contains('"+data.battleId+"')").remove();
+            }
+
             var textArea = $("#subscribtionLog");
             textArea.val(function (index, value) {
                 return value + logEntry + "\n\n";
@@ -140,10 +153,10 @@
                 stompClient.send("/action/initiateAssault", {}, $("#initateAssaultValue").val());
             });
             $("#joinAssaultSend").on("click", function () {
-                stompClient.send("/action/joinAssault", {}, $("#joinAssaultValue").val());
+                stompClient.send("/action/joinAssault", {}, $("#joinAssaultBattle").val());
             });
             $("#leaveAssaultSend").on("click", function () {
-                stompClient.send("/action/leaveAssault", {}, $("#leaveAssaultValue").val());
+                stompClient.send("/action/leaveAssault", {}, $("#leaveAssaultBattle").val());
             });
             $("#genericActionSend").on("click", function () {
                 stompClient.send($("#genericAction").val(), {}, $("#genericActionValue").val());
@@ -191,13 +204,15 @@
                 </tr>
                 <tr>
                     <td>/action/joinAssault</td>
-                    <td><input id="joinAssaultValue" value='{"battleId":"56774dc6-c4d5-401c-9b2c-c7742318aea4"}'/>
+                    <td>
+                        <select id="joinAssaultBattle" style="width:250px"></select>
                         <button id="joinAssaultSend">send</button>
                     </td>
                 </tr>
                 <tr>
                     <td>/action/leaveAssault</td>
-                    <td><input id="leaveAssaultValue" value='{"battleId":"56774dc6-c4d5-401c-9b2c-c7742318aea4"}'/>
+                    <td>
+                        <select id="leaveAssaultBattle" style="width:250px"></select>
                         <button id="leaveAssaultSend">send</button>
                     </td>
                 </tr>

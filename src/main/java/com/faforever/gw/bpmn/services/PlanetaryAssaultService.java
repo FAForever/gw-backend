@@ -51,7 +51,7 @@ public class PlanetaryAssaultService {
     @Transactional(dontRollbackOn = BpmnError.class)
     public void characterInitiatesAssault(InitiateAssaultMessage message, User user) {
         log.debug("characterInitiatesAssault by user {}", user.getId());
-        UUID battleUUID = UUID.fromString("56774dc6-c4d5-401c-9b2c-c7742318aea4");
+        UUID battleUUID = UUID.randomUUID();
 
         GwCharacter character = user.getActiveCharacter();
         Planet planet = planetRepository.getOne(message.getPlanetId());
