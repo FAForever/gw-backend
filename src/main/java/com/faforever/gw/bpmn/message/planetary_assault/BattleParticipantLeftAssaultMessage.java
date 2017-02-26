@@ -1,4 +1,4 @@
-package com.faforever.gw.bpmn.message;
+package com.faforever.gw.bpmn.message.planetary_assault;
 
 import com.faforever.gw.bpmn.accessors.PlanetaryAssaultAccessor;
 import com.faforever.gw.model.Faction;
@@ -23,31 +23,38 @@ import java.util.UUID;
 @Getter
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class BattleUpdateWaitingProgressMessage implements JavaDelegate, WebsocketMessage {
+public class BattleParticipantLeftAssaultMessage implements JavaDelegate, WebsocketMessage {
     @Getter(AccessLevel.NONE)
     private final MessagingService messagingService;
+    @Getter(AccessLevel.NONE)
+    private final CharacterRepository characterRepository;
 
+    private UUID characterId;
     private UUID battleId;
-    private Double waitingProgress;
+    private Faction characterFaction;
 
     @Inject
-    public BattleUpdateWaitingProgressMessage(MessagingService messagingService, CharacterRepository characterRepository) {
+    public BattleParticipantLeftAssaultMessage(MessagingService messagingService, CharacterRepository characterRepository) {
         this.messagingService = messagingService;
+        this.characterRepository = characterRepository;
     }
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {
         PlanetaryAssaultAccessor accessor = PlanetaryAssaultAccessor.of(execution.getVariables());
 
-        battleId = accessor.getBattleId();
-        waitingProgress = accessor.getWaitingProgress();
+        GwCharacter character = characterRepository.findOne(accessor.getLastLeftCharacter());
+        characterId = character.getId();
+        characterFaction = character.getFaction();
 
-        log.debug("Sending BattleUpdateWaitingProgressMessage (battleId: {}, waitingProgress: {}", battleId, waitingProgress);
+        battleId = accessor.getBattleId();
+
+        log.debug("Sending BattleParticipantLeftAssaultMessage (characterId: {}, battleId: {}, characterFaction: {}, defendingFaction: {}", characterId, battleId, characterFaction);
         messagingService.send(this);
     }
 
     @Override
     public WebsocketChannel getChannel() {
-        return WebsocketChannel.BATTLE_WAITING_PROGRESS;
+        return WebsocketChannel.BATTLES_PARTICIPANT_LEFT;
     }
 }

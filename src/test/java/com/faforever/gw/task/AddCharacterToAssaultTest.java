@@ -1,6 +1,6 @@
 package com.faforever.gw.task;
 
-import com.faforever.gw.bpmn.task.InitiateAssaultTask;
+import com.faforever.gw.bpmn.task.planetary_assault.InitiateAssaultTask;
 import com.faforever.gw.model.GwCharacter;
 import com.faforever.gw.model.Planet;
 import com.faforever.gw.model.ValidationHelper;

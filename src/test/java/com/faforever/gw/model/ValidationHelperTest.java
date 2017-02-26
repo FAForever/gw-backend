@@ -1,7 +1,6 @@
 package com.faforever.gw.model;
 
 import com.faforever.gw.bpmn.services.GwErrorService;
-import com.faforever.gw.bpmn.task.InitiateAssaultTask;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

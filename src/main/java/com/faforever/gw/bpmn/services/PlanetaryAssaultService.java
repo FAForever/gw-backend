@@ -1,16 +1,14 @@
 package com.faforever.gw.bpmn.services;
 
-import com.faforever.gw.bpmn.message.UserErrorMessage;
+import com.faforever.gw.bpmn.message.generic.UserErrorMessage;
 import com.faforever.gw.model.GameResult;
 import com.faforever.gw.model.GwCharacter;
 import com.faforever.gw.model.Planet;
-import com.faforever.gw.model.repository.CharacterRepository;
 import com.faforever.gw.model.repository.PlanetRepository;
 import com.faforever.gw.security.User;
 import com.faforever.gw.services.messaging.MessagingService;
 import com.faforever.gw.websocket.incoming.InitiateAssaultMessage;
 import com.faforever.gw.websocket.incoming.JoinAssaultMessage;
-import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
 import org.camunda.bpm.engine.RuntimeService;
@@ -23,8 +21,6 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 @Slf4j

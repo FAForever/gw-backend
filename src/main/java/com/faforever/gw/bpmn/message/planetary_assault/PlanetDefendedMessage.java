@@ -1,11 +1,7 @@
-package com.faforever.gw.bpmn.message;
+package com.faforever.gw.bpmn.message.planetary_assault;
 
 import com.faforever.gw.bpmn.accessors.PlanetaryAssaultAccessor;
 import com.faforever.gw.model.Faction;
-import com.faforever.gw.model.GwCharacter;
-import com.faforever.gw.model.Planet;
-import com.faforever.gw.model.repository.CharacterRepository;
-import com.faforever.gw.model.repository.PlanetRepository;
 import com.faforever.gw.services.messaging.MessagingService;
 import com.faforever.gw.services.messaging.WebsocketChannel;
 import com.faforever.gw.services.messaging.WebsocketMessage;
@@ -25,13 +21,9 @@ import java.util.UUID;
 @Getter
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class PlanetUnderAssaultMessage implements JavaDelegate, WebsocketMessage {
+public class PlanetDefendedMessage implements JavaDelegate, WebsocketMessage {
     @Getter(AccessLevel.NONE)
     private final MessagingService messagingService;
-    @Getter(AccessLevel.NONE)
-    private final PlanetRepository planetRepository;
-    @Getter(AccessLevel.NONE)
-    private final CharacterRepository characterRepository;
 
     private UUID planetId;
     private UUID battleId;
@@ -39,10 +31,8 @@ public class PlanetUnderAssaultMessage implements JavaDelegate, WebsocketMessage
     private Faction defendingFaction;
 
     @Inject
-    public PlanetUnderAssaultMessage(MessagingService messagingService, PlanetRepository planetRepository, CharacterRepository characterRepository) {
+    public PlanetDefendedMessage(MessagingService messagingService) {
         this.messagingService = messagingService;
-        this.planetRepository = planetRepository;
-        this.characterRepository = characterRepository;
     }
 
     @Override
@@ -54,12 +44,13 @@ public class PlanetUnderAssaultMessage implements JavaDelegate, WebsocketMessage
         attackingFaction = accessor.getAttackingFaction();
         defendingFaction = accessor.getDefendingFaction();
 
-        log.debug("Sending PlanetUnderAssaultMessage (planetId: {}, battleId: {}, attackingFaction: {}, defendingFaction: {}", planetId, battleId, attackingFaction, defendingFaction);
+        log.debug("Sending PlanetDefendedMessage (planetId: {}, battleId: {}, attackingFaction: {}, defendingFaction: {}",
+                planetId, battleId, attackingFaction, defendingFaction);
         messagingService.send(this);
     }
 
     @Override
     public WebsocketChannel getChannel() {
-        return WebsocketChannel.PLANETS_ATTACKED;
+        return WebsocketChannel.PLANETS_DEFENDED;
     }
 }

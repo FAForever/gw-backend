@@ -1,4 +1,4 @@
-package com.faforever.gw.bpmn.message;
+package com.faforever.gw.bpmn.message.generic;
 
 import com.faforever.gw.bpmn.accessors.PlanetaryAssaultAccessor;
 import com.faforever.gw.security.User;

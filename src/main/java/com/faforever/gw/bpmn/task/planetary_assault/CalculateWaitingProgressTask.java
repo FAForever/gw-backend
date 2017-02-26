@@ -1,4 +1,4 @@
-package com.faforever.gw.bpmn.task;
+package com.faforever.gw.bpmn.task.planetary_assault;
 
 import com.faforever.gw.bpmn.accessors.PlanetaryAssaultAccessor;
 import com.faforever.gw.model.Battle;

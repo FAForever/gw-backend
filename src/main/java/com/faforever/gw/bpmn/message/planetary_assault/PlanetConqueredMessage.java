@@ -1,4 +1,4 @@
-package com.faforever.gw.bpmn.message;
+package com.faforever.gw.bpmn.message.planetary_assault;
 
 import com.faforever.gw.bpmn.accessors.PlanetaryAssaultAccessor;
 import com.faforever.gw.model.Faction;

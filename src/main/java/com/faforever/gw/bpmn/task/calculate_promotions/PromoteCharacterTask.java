@@ -1,4 +1,4 @@
-package com.faforever.gw.bpmn.task;
+package com.faforever.gw.bpmn.task.calculate_promotions;
 
 
 import lombok.extern.slf4j.Slf4j;
