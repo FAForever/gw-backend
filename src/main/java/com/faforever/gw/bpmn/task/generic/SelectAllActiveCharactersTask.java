@@ -1,27 +1,39 @@
 package com.faforever.gw.bpmn.task.generic;
 
 
+import com.faforever.gw.model.GwCharacter;
+import com.faforever.gw.model.repository.CharacterRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Component
 public class SelectAllActiveCharactersTask implements JavaDelegate {
-    @Override
-    public void execute(DelegateExecution execution) throws Exception {
-        log.info("select all active characters tasks");
+    private final CharacterRepository characterRepository;
 
-//        execution.setVariable("activeCharacters", Arrays.asList(new Character("alfons"), new Character("bernd"), new Character("christian")));
+    @Inject
+    public SelectAllActiveCharactersTask(CharacterRepository characterRepository) {
+        this.characterRepository = characterRepository;
     }
 
-    public List<Object> getChars() {
-        return Arrays.asList("dieter", "erich", "franz");
+    @Override
+    public void execute(DelegateExecution execution) throws Exception {
+        log.debug("selectAllActiveCharactersTask");
+
+        List<GwCharacter> activeCharacters = characterRepository.findActiveCharacters();
+
+        List<UUID> activeCharacterIds = new ArrayList<>();
+        activeCharacters.stream().forEach(gwCharacter -> activeCharacterIds.add(gwCharacter.getId()));
+
+        execution.setVariable("activeCharacters", activeCharacterIds);
+        log.debug("-> set activeCharacters = {}", activeCharacterIds);
     }
 }

@@ -10,12 +10,11 @@ public class RegularIncomeAccessor {
 
     public Collection<UUID> getActiveCharacters()  { return (Collection<UUID>)processVariables.getOrDefault("activeCharacters", Collections.EMPTY_LIST); }
 
-    /***
-     * !! only to be used in subprocess !!
-     * Returns a single character of the current subprocess
-     * @return UUID of GwCharacter
-     */
-    public UUID getCharacter() { return (UUID)processVariables.get("character");}
+    public UUID getCharacter_Local() { return (UUID)processVariables.get("character");}
+
+    public Long getCreditsDelta_Local() { return (Long)processVariables.get("creditsDelta");}
+
+    public Long getCreditsTotal_Local() { return (Long)processVariables.get("creditsTotal");}
 
     private RegularIncomeAccessor(Map<String, Object> processVariables) {
         this.processVariables = processVariables;

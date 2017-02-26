@@ -1,6 +1,5 @@
 package com.faforever.gw.bpmn;
 
-//import jersey.repackaged.com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -28,6 +27,7 @@ public class RegularIncomeTest {
         MockitoAnnotations.initMocks(this);
         DelegateExpressions.registerJavaDelegateMock("selectAllActiveCharactersTask").onExecutionSetVariables(ImmutableMap.of("activeCharacters", Arrays.asList("GwCharacter.class", "GwCharacter.class")));
         DelegateExpressions.registerJavaDelegateMock("giveRegularIncomeTask");
+        DelegateExpressions.registerJavaDelegateMock("regularIncomeMessage");
     }
 
     @After
@@ -42,6 +42,7 @@ public class RegularIncomeTest {
 
         verifyJavaDelegateMock("selectAllActiveCharactersTask").executed(times(1));
         verifyJavaDelegateMock("giveRegularIncomeTask").executed(times(2));
+        verifyJavaDelegateMock("regularIncomeMessage").executed(times(2));
     }
 
     private void startProcess() {
