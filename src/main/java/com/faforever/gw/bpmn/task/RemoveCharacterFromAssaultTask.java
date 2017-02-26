@@ -46,11 +46,11 @@ public class RemoveCharacterFromAssaultTask implements JavaDelegate {
 
             String countVariable = "";
             Integer newParticipantsOfFactionCount = 0;
-            Boolean noMoreAttackersRemaining = false;
+            Boolean noMoreAttackerRemaining = false;
             if (character.getFaction() == battle.getAttackingFaction()) {
                 countVariable = "attackerCount";
                 newParticipantsOfFactionCount = accessor.getAttackerCount()-1;
-                noMoreAttackersRemaining = (newParticipantsOfFactionCount == 0);
+                noMoreAttackerRemaining = (newParticipantsOfFactionCount == 0);
             } else if (character.getFaction() == battle.getDefendingFaction()) {
                 countVariable = "defenderCount";
                 newParticipantsOfFactionCount = accessor.getDefenderCount()-1;
@@ -64,8 +64,8 @@ public class RemoveCharacterFromAssaultTask implements JavaDelegate {
 
             log.info("Character {} left battle {}", character.getId(), battle.getId());
 
-            if (noMoreAttackersRemaining) {
-                log.info("Battle {} won by defenders (all attackers left)", battle.getId());
+            if (noMoreAttackerRemaining) {
+                log.info("Battle {} won by defender (all attacker left)", battle.getId());
                 execution.setVariable("winner", BattleRole.DEFENDER.getName());
             }
         } catch (BpmnError e) {

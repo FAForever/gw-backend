@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -28,7 +29,7 @@ public class CalculatePassiveAssaultProgressTask implements JavaDelegate{
     }
 
     @Override
-    @Transactional
+    @Transactional(dontRollbackOn = BpmnError.class)
     public void execute(DelegateExecution execution) throws Exception {
         log.debug("calculatePassiveAssaultProgressTask for battle {}", execution.getProcessInstance().getBusinessKey());
 

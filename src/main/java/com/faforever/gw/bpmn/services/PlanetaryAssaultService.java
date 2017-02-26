@@ -64,6 +64,7 @@ public class PlanetaryAssaultService {
                 .putValue("defendingFaction", planet.getCurrentOwner())
                 .putValue("attackerCount", 1)
                 .putValue("defenderCount", 0)
+                .putValue("gameFull", false)
                 .putValue("waitingProgress", 0.0d)
                 .putValue("winner", "t.b.d.");
 

@@ -5,6 +5,9 @@ import com.faforever.gw.model.repository.BattleRepository;
 import com.faforever.gw.model.repository.CharacterRepository;
 import com.faforever.gw.model.repository.MapRepository;
 import com.faforever.gw.model.repository.PlanetRepository;
+import org.springframework.security.jwt.Jwt;
+import org.springframework.security.jwt.JwtHelper;
+import org.springframework.security.jwt.crypto.sign.MacSigner;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
@@ -31,6 +34,8 @@ public class DemoDataInitializer {
 
     @Transactional
     public void run() throws SQLException {
+        generateUserTokaen();
+
         GwCharacter character = new GwCharacter();
         character.setId(UUID.fromString("a1111111-e35c-11e6-bf01-fe55135034f3"));
         character.setFafId(1);
@@ -52,12 +57,26 @@ public class DemoDataInitializer {
         character.setFaction(Faction.CYBRAN);
         characterRepository.save(character);
 
+        character = new GwCharacter();
+        character.setId(UUID.fromString("a4444444-e4e2-11e6-bf01-fe55135034f3"));
+        character.setFafId(4);
+        character.setName("Cybran Delta");
+        character.setFaction(Faction.CYBRAN);
+        characterRepository.save(character);
+
+        character = new GwCharacter();
+        character.setId(UUID.fromString("a5555555-e4e2-11e6-bf01-fe55135034f3"));
+        character.setFafId(5);
+        character.setName("Aeon Echo");
+        character.setFaction(Faction.AEON);
+        characterRepository.save(character);
+
         Map map = new Map();
         map.setGround(Ground.SOIL);
         map.setFafMapId(1);
         map.setFafMapVersion(1);
         map.setSize(10);
-        map.setTotalSlots(2);
+        map.setTotalSlots(4);
         mapRepository.save(map);
 
         Planet planet = new Planet();
@@ -80,5 +99,34 @@ public class DemoDataInitializer {
         initBattle.setStatus(BattleStatus.FINISHED);
 
         battleRepository.save(initBattle);
+    }
+
+    private void generateUserTokaen() {
+        MacSigner macSigner = new MacSigner("secret");
+        // {"expires":4102358400, "authorities": [], "user_id": 1, "user_name": "UEF Alpha"}
+        // {"expires":4102358400, "authorities": [], "user_id": 2, "user_name": "UEF Bravo"}
+        // {"expires":4102358400, "authorities": [], "user_id": 3, "user_name": "Cybran Charlie"}
+        // {"expires":4102358400, "authorities": [], "user_id": 4, "user_name": "Cybran Delta"}
+        // {"expires":4102358400, "authorities": [], "user_id": 5, "user_name": "Aeon Echo"}
+
+        System.out.println("-1- UEF Alpha");
+        Jwt token = JwtHelper.encode("{\"expires\":4102358400, \"authorities\": [], \"user_id\": 1, \"user_name\": \"UEF Alpha\"}", macSigner);
+        System.out.println(token.getEncoded());
+
+        System.out.println("-2- UEF Bravo");
+        token = JwtHelper.encode("{\"expires\":4102358400, \"authorities\": [], \"user_id\": 2, \"user_name\": \"UEF Bravo\"}", macSigner);
+        System.out.println(token.getEncoded());
+
+        System.out.println("-3- Cybran Charlie");
+        token = JwtHelper.encode("{\"expires\":4102358400, \"authorities\": [], \"user_id\": 3, \"user_name\": \"Cybran Charlie\"}", macSigner);
+        System.out.println(token.getEncoded());
+
+        System.out.println("-4- Cybran Delta");
+        token = JwtHelper.encode("{\"expires\":4102358400, \"authorities\": [], \"user_id\": 4, \"user_name\": \"Cybran Delta\"}", macSigner);
+        System.out.println(token.getEncoded());
+
+        System.out.println("-5- Aeon Echo");
+        token = JwtHelper.encode("{\"expires\":4102358400, \"authorities\": [], \"user_id\": 5, \"user_name\": \"Aeon Echo\"}", macSigner);
+        System.out.println(token.getEncoded());
     }
 }
