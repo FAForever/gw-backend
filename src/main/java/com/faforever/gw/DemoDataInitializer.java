@@ -1,10 +1,7 @@
 package com.faforever.gw;
 
 import com.faforever.gw.model.*;
-import com.faforever.gw.model.repository.BattleRepository;
-import com.faforever.gw.model.repository.CharacterRepository;
-import com.faforever.gw.model.repository.MapRepository;
-import com.faforever.gw.model.repository.PlanetRepository;
+import com.faforever.gw.model.repository.*;
 import org.springframework.security.jwt.Jwt;
 import org.springframework.security.jwt.JwtHelper;
 import org.springframework.security.jwt.crypto.sign.MacSigner;
@@ -23,24 +20,55 @@ public class DemoDataInitializer {
     private final PlanetRepository planetRepository;
     private final MapRepository mapRepository;
     private final BattleRepository battleRepository;
+    private final RankRepository rankRepository;
 
     @Inject
-    public DemoDataInitializer(CharacterRepository characterRepository, PlanetRepository planetRepository, MapRepository mapRepository, BattleRepository battleRepository) {
+    public DemoDataInitializer(CharacterRepository characterRepository, PlanetRepository planetRepository, MapRepository mapRepository, BattleRepository battleRepository, RankRepository rankRepository) {
         this.characterRepository = characterRepository;
         this.planetRepository = planetRepository;
         this.mapRepository = mapRepository;
         this.battleRepository = battleRepository;
+        this.rankRepository = rankRepository;
     }
 
     @Transactional
     public void run() throws SQLException {
-        generateUserTokaen();
+        generateUserToken();
+
+        Rank rank1 = new Rank();
+        rank1.setLevel(1);
+        rank1.setXpMin(0L);
+        rank1.setUefTitle("UNoob");
+        rank1.setCybranTitle("CNoob");
+        rank1.setAeonTitle("ANoob");
+        rank1.setSeraphimTitle("SNoob");
+        rankRepository.save(rank1);
+
+        Rank rank2 = new Rank();
+        rank2.setLevel(2);
+        rank2.setXpMin(1000L);
+        rank2.setUefTitle("UExperienced");
+        rank2.setCybranTitle("CExperienced");
+        rank2.setAeonTitle("AExperienced");
+        rank2.setSeraphimTitle("SExperienced");
+        rankRepository.save(rank2);
+
+        Rank rank3 = new Rank();
+        rank3.setLevel(3);
+        rank3.setXpMin(10000L);
+        rank3.setUefTitle("UPro");
+        rank3.setCybranTitle("CPro");
+        rank3.setAeonTitle("APro");
+        rank3.setSeraphimTitle("SPro");
+        rankRepository.save(rank3);
 
         GwCharacter character = new GwCharacter();
         character.setId(UUID.fromString("a1111111-e35c-11e6-bf01-fe55135034f3"));
         character.setFafId(1);
         character.setName("UEF Alpha");
         character.setFaction(Faction.UEF);
+        character.setXp(999L);
+        character.setRank(rank1);
         characterRepository.save(character);
 
         character = new GwCharacter();
@@ -48,6 +76,8 @@ public class DemoDataInitializer {
         character.setFafId(2);
         character.setName("UEF Bravo");
         character.setFaction(Faction.UEF);
+        character.setXp(25000L);
+        character.setRank(rank3);
         characterRepository.save(character);
 
         character = new GwCharacter();
@@ -55,6 +85,8 @@ public class DemoDataInitializer {
         character.setFafId(3);
         character.setName("Cybran Charlie");
         character.setFaction(Faction.CYBRAN);
+        character.setXp(0L);
+        character.setRank(rank1);
         characterRepository.save(character);
 
         character = new GwCharacter();
@@ -62,6 +94,8 @@ public class DemoDataInitializer {
         character.setFafId(4);
         character.setName("Cybran Delta");
         character.setFaction(Faction.CYBRAN);
+        character.setXp(1000L);
+        character.setRank(rank2);
         characterRepository.save(character);
 
         character = new GwCharacter();
@@ -69,6 +103,8 @@ public class DemoDataInitializer {
         character.setFafId(5);
         character.setName("Aeon Echo");
         character.setFaction(Faction.AEON);
+        character.setXp(900L);
+        character.setRank(rank1);
         characterRepository.save(character);
 
         Map map = new Map();
@@ -101,7 +137,7 @@ public class DemoDataInitializer {
         battleRepository.save(initBattle);
     }
 
-    private void generateUserTokaen() {
+    private void generateUserToken() {
         MacSigner macSigner = new MacSigner("secret");
         // {"expires":4102358400, "authorities": [], "user_id": 1, "user_name": "UEF Alpha"}
         // {"expires":4102358400, "authorities": [], "user_id": 2, "user_name": "UEF Bravo"}

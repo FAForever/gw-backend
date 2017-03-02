@@ -34,6 +34,9 @@ public class GwCharacter implements Serializable {
     @Column(name = "faction", nullable = false, updatable = false, length = 1)
     private Faction faction;
 
+    @Column(name = "xp", nullable = false, updatable = false)
+    private Long xp;
+
     @OneToMany(mappedBy = "character")
     private List<BattleParticipant> battleParticipantList = new ArrayList<>();
 
@@ -43,4 +46,12 @@ public class GwCharacter implements Serializable {
 
     @OneToMany(mappedBy = "killer")
     private Set<GwCharacter> killedBy;
+
+    @ManyToOne
+    @JoinColumn(name = "fk_rank")
+    private Rank rank;
+
+    public String getTitle() {
+        return rank.getTitle(getFaction());
+    }
 }

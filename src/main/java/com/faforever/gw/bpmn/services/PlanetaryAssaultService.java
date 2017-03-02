@@ -112,7 +112,7 @@ public class PlanetaryAssaultService {
         messagingService.send(errorMessage);
     }
 
-    @Scheduled(fixedDelay = 60000)
+    @Scheduled(fixedDelay = 1000)
     public void updateOpenGames() {
         runtimeService.signalEventReceived(UPDATE_OPEN_GAMES_SIGNAL);
     }

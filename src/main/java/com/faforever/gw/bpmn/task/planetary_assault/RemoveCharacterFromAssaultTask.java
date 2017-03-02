@@ -61,7 +61,7 @@ public class RemoveCharacterFromAssaultTask implements JavaDelegate {
 
             if (noMoreAttackerRemaining) {
                 log.info("Battle {} won by defender (all attacker left)", battle.getId());
-                accessor.setWinner(accessor.getDefendingFaction());
+                accessor.setWinner(BattleRole.DEFENDER);
             }
         } catch (BpmnError e) {
             accessor.setErrorCharacter(character.getId());

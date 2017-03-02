@@ -36,7 +36,8 @@ public class ProcessGameResultTask implements JavaDelegate {
 
         GameResult gameResult = accessor.getGameResult();
 
-        accessor.setWinner(gameResult.getWinner());
+        BattleRole winner = gameResult.getWinner() == accessor.getAttackingFaction() ? BattleRole.ATTACKER : BattleRole.DEFENDER;
+        accessor.setWinner(winner);
 
         Battle battle = battleRepository.getOne(gameResult.getBattle());
         Map<UUID, GameCharacterResult> results = gameResult.getCharacterResults();

@@ -91,7 +91,7 @@ public class PlanetaryAssaultAccessor extends BaseAccessor {
         return BattleRole.fromNameString((String) get("winner"));
     }
 
-    public PlanetaryAssaultAccessor setWinner(Faction winner) {
+    public PlanetaryAssaultAccessor setWinner(BattleRole winner) {
         set("winner", winner.getName());
         return this;
     }

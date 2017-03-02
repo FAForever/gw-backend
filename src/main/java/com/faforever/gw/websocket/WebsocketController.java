@@ -2,10 +2,7 @@ package com.faforever.gw.websocket;
 
 import com.faforever.gw.bpmn.services.PlanetaryAssaultService;
 import com.faforever.gw.data.domain.ChatMessage;
-import com.faforever.gw.model.BattleParticipantResult;
-import com.faforever.gw.model.BattleRole;
-import com.faforever.gw.model.GameCharacterResult;
-import com.faforever.gw.model.GameResult;
+import com.faforever.gw.model.*;
 import com.faforever.gw.model.repository.BattleRepository;
 import com.faforever.gw.model.repository.CharacterRepository;
 import com.faforever.gw.model.repository.PlanetRepository;
@@ -28,6 +25,7 @@ import org.springframework.stereotype.Controller;
 import javax.inject.Inject;
 import java.security.Principal;
 import java.util.*;
+import java.util.Map;
 
 @Slf4j
 @Controller
@@ -73,6 +71,7 @@ public class WebsocketController {
 
         GameResult gameResult = new GameResult();
         gameResult.setBattle(message.getBattleId());
+        gameResult.setWinner(Faction.UEF);
 
         Map<UUID, GameCharacterResult> characterResults = new HashMap();
         characterResults.put(UUID.fromString("a1111111-e35c-11e6-bf01-fe55135034f3"),new GameCharacterResult(UUID.fromString("a1111111-e35c-11e6-bf01-fe55135034f3"), BattleRole.ATTACKER, BattleParticipantResult.VICTORY));
