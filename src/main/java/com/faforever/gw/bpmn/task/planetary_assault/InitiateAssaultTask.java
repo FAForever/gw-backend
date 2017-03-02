@@ -38,9 +38,8 @@ public class InitiateAssaultTask implements JavaDelegate {
     @Override
     @Transactional(dontRollbackOn = BpmnError.class)
     public void execute(DelegateExecution execution) {
-        log.debug("validateAssault");
-
-        PlanetaryAssaultAccessor accessor = PlanetaryAssaultAccessor.of(execution.getVariables());
+        PlanetaryAssaultAccessor accessor = PlanetaryAssaultAccessor.of(execution);
+        log.debug("validateAssault for battle {}", accessor.getBusinessKey());
 
         log.info("Battle {} initiated by character {}", accessor.getBattleId(), accessor.getInitiatorId());
 
@@ -59,7 +58,6 @@ public class InitiateAssaultTask implements JavaDelegate {
 
         battleRepository.save(battle);
 
-        log.debug("-> added processVariable `battle`: {}", battle.getId());
-        execution.setVariable("battle", battle.getId());
+        accessor.setBattleId(battle.getId());
     }
 }

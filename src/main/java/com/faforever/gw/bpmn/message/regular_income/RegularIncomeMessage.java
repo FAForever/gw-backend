@@ -45,7 +45,7 @@ public class RegularIncomeMessage implements JavaDelegate, WebsocketMessage {
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {
-        RegularIncomeAccessor accessor = RegularIncomeAccessor.of(execution.getVariables());
+        RegularIncomeAccessor accessor = RegularIncomeAccessor.of(execution);
 
         character = accessor.getCharacter_Local();
         creditsDelta = accessor.getCreditsDelta_Local();

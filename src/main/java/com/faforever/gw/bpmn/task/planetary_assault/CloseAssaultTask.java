@@ -27,11 +27,8 @@ public class CloseAssaultTask implements JavaDelegate {
     @Override
     @Transactional(dontRollbackOn = BpmnError.class)
     public void execute(DelegateExecution execution) {
-        log.debug("closeAssaultTask for battle {}", execution.getProcessInstance().getBusinessKey());
-
-        PlanetaryAssaultAccessor accessor = PlanetaryAssaultAccessor.of(execution.getVariables());
-
-        log.info("Battle {} initiated by character {}", accessor.getBattleId(), accessor.getInitiatorId());
+        PlanetaryAssaultAccessor accessor = PlanetaryAssaultAccessor.of(execution);
+        log.debug("closeAssaultTask for battle {}", accessor.getBusinessKey());
 
         Battle battle = battleRepository.getOne(accessor.getBattleId());
         battle.setEndedAt(Timestamp.from(Instant.now()));

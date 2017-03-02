@@ -49,7 +49,7 @@ public class UserErrorMessage implements JavaDelegate, WebsocketMessage {
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {
-        PlanetaryAssaultAccessor accessor = PlanetaryAssaultAccessor.of(execution.getVariables());
+        PlanetaryAssaultAccessor accessor = PlanetaryAssaultAccessor.of(execution);
 
         errorCode = accessor.getErrorCode();
         errorMessage = accessor.getErrorMessage();

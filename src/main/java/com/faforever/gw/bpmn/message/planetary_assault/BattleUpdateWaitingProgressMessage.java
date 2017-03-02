@@ -37,7 +37,7 @@ public class BattleUpdateWaitingProgressMessage implements JavaDelegate, Websock
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {
-        PlanetaryAssaultAccessor accessor = PlanetaryAssaultAccessor.of(execution.getVariables());
+        PlanetaryAssaultAccessor accessor = PlanetaryAssaultAccessor.of(execution);
 
         battleId = accessor.getBattleId();
         waitingProgress = accessor.getWaitingProgress();

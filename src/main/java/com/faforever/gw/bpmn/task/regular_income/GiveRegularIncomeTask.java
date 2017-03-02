@@ -14,16 +14,13 @@ public class GiveRegularIncomeTask implements JavaDelegate {
     public void execute(DelegateExecution execution) throws Exception {
         log.trace("giveRegularIncomeTask");
 
-        RegularIncomeAccessor accessor = RegularIncomeAccessor.of(execution.getVariables());
+        RegularIncomeAccessor accessor = RegularIncomeAccessor.of(execution);
 
         // TODO: Implement
         Long creditsTotal = 100L;
         Long creditsDelta = 10L;
 
-        execution.setVariable("creditsTotal", 100L);
-        execution.setVariable("creditsDelta", 10L);
-
-        log.debug("character {} receives {} credits, new total: {}", accessor.getCharacter_Local(), creditsDelta, creditsTotal);
-
+        accessor.setCreditsTotal(100L)
+                .setCreditsDelta(10L);
     }
 }

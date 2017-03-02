@@ -31,9 +31,8 @@ public class CalculateWaitingProgressTask implements JavaDelegate{
     @Override
     @Transactional(dontRollbackOn = BpmnError.class)
     public void execute(DelegateExecution execution) throws Exception {
-        log.debug("calculatePassiveAssaultProgressTask for battle {}", execution.getProcessInstance().getBusinessKey());
-
-        PlanetaryAssaultAccessor accessor = PlanetaryAssaultAccessor.of(execution.getVariables());
+        PlanetaryAssaultAccessor accessor = PlanetaryAssaultAccessor.of(execution);
+        log.debug("calculatePassiveAssaultProgressTask for battle {}", accessor.getBusinessKey());
 
         Battle battle = battleRepository.getOne(accessor.getBattleId());
         Integer mapSlots = battle.getPlanet().getMap().getTotalSlots();
@@ -64,7 +63,6 @@ public class CalculateWaitingProgressTask implements JavaDelegate{
         Double waitingProgressDelta = (attackerCount*attackerProgress + defenderCount*defenderProgress) / progressNormalizer;
 
         double newWaitingProgress = accessor.getWaitingProgress() + waitingProgressDelta;
-        log.debug("-> set new waitingProgress = {}", newWaitingProgress);
-        execution.setVariable("waitingProgress", newWaitingProgress);
+        accessor.setWaitingProgress(newWaitingProgress);
     }
 }

@@ -31,9 +31,9 @@ public class RemoveCharacterFromAssaultTask implements JavaDelegate {
     @Override
     @Transactional(dontRollbackOn = BpmnError.class)
     public void execute(DelegateExecution execution) {
-        log.debug("removeCharacterFromAssaultTask");
+        PlanetaryAssaultAccessor accessor = PlanetaryAssaultAccessor.of(execution);
+        log.debug("removeCharacterFromAssaultTask for battle {}", accessor.getBusinessKey());
 
-        PlanetaryAssaultAccessor accessor = PlanetaryAssaultAccessor.of(execution.getVariables());
 
         Battle battle = battleRepository.getOne(accessor.getBattleId());
         GwCharacter character = characterRepository.getOne(accessor.getLastLeftCharacter());
@@ -44,32 +44,27 @@ public class RemoveCharacterFromAssaultTask implements JavaDelegate {
             battle.getParticipants().removeIf(battleParticipant -> battleParticipant.getCharacter() == character);
             battleRepository.save(battle);
 
-            String countVariable = "";
             Integer newParticipantsOfFactionCount = 0;
             Boolean noMoreAttackerRemaining = false;
             if (character.getFaction() == battle.getAttackingFaction()) {
-                countVariable = "attackerCount";
-                newParticipantsOfFactionCount = accessor.getAttackerCount()-1;
+                newParticipantsOfFactionCount = accessor.getAttackerCount() - 1;
+                accessor.setParticipantCount(BattleRole.ATTACKER, newParticipantsOfFactionCount);
                 noMoreAttackerRemaining = (newParticipantsOfFactionCount == 0);
             } else if (character.getFaction() == battle.getDefendingFaction()) {
-                countVariable = "defenderCount";
-                newParticipantsOfFactionCount = accessor.getDefenderCount()-1;
+                newParticipantsOfFactionCount = accessor.getDefenderCount() - 1;
+                accessor.setParticipantCount(BattleRole.DEFENDER, newParticipantsOfFactionCount);
             }
 
-            execution.setVariable(countVariable, newParticipantsOfFactionCount);
-            log.debug("-> set {} = {}", countVariable, newParticipantsOfFactionCount);
-
-            execution.setVariable("gameFull", false);
-            log.debug("-> set gameFull = false");
+            accessor.setGameFull(false);
 
             log.info("Character {} left battle {}", character.getId(), battle.getId());
 
             if (noMoreAttackerRemaining) {
                 log.info("Battle {} won by defender (all attacker left)", battle.getId());
-                execution.setVariable("winner", BattleRole.DEFENDER.getName());
+                accessor.setWinner(accessor.getDefendingFaction());
             }
         } catch (BpmnError e) {
-            execution.setVariable("errorCharacter", character.getId());
+            accessor.setErrorCharacter(character.getId());
             throw e;
         }
     }

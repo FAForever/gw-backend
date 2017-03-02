@@ -31,13 +31,12 @@ public class ProcessGameResultTask implements JavaDelegate {
     @Override
     @Transactional(dontRollbackOn = BpmnError.class)
     public void execute(DelegateExecution execution) throws Exception {
-        log.debug("processGameResultTask for battle {}", execution.getProcessInstance().getBusinessKey());
+        PlanetaryAssaultAccessor accessor = PlanetaryAssaultAccessor.of(execution);
+        log.debug("processGameResultTask for battle {}", accessor.getBusinessKey());
 
-        PlanetaryAssaultAccessor accessor = PlanetaryAssaultAccessor.of(execution.getVariables());
         GameResult gameResult = accessor.getGameResult();
 
-        execution.setVariable("winner", gameResult.getWinner().getName());
-        log.debug("-> set variable winner = {}", gameResult.getWinner());
+        accessor.setWinner(gameResult.getWinner());
 
         Battle battle = battleRepository.getOne(gameResult.getBattle());
         Map<UUID, GameCharacterResult> results = gameResult.getCharacterResults();

@@ -33,9 +33,8 @@ public class AddCharacterToAssaultTask implements JavaDelegate {
     @Override
     @Transactional(dontRollbackOn = BpmnError.class)
     public void execute(DelegateExecution execution) {
-        log.debug("addCharacterToAssaultTask");
-
-        PlanetaryAssaultAccessor accessor = PlanetaryAssaultAccessor.of(execution.getVariables());
+        PlanetaryAssaultAccessor accessor = PlanetaryAssaultAccessor.of(execution);
+        log.debug("addCharacterToAssaultTask for battle {}", accessor.getBusinessKey());
 
         Battle battle = battleRepository.getOne(accessor.getBattleId());
         Planet planet = planetRepository.getOne(accessor.getPlanetId());
@@ -50,11 +49,9 @@ public class AddCharacterToAssaultTask implements JavaDelegate {
             Integer newParticipantsOfFactionCount = 0;
             if (character.getFaction() == battle.getAttackingFaction()) {
                 battleRole = BattleRole.ATTACKER;
-                countVariable = "attackerCount";
                 newParticipantsOfFactionCount = accessor.getAttackerCount()+1;
             } else if (character.getFaction() == battle.getDefendingFaction()) {
                 battleRole = BattleRole.DEFENDER;
-                countVariable = "defenderCount";
                 newParticipantsOfFactionCount = accessor.getDefenderCount()+1;
             } else {
                 battleRole = null;
@@ -65,17 +62,16 @@ public class AddCharacterToAssaultTask implements JavaDelegate {
             battle.getParticipants().add(battleParticipant);
             battleRepository.save(battle);
 
-            execution.setVariable(countVariable, newParticipantsOfFactionCount);
-            log.debug("-> set {} = {}", countVariable, newParticipantsOfFactionCount);
+            accessor.setParticipantCount(battleRole, newParticipantsOfFactionCount);
 
             log.info("Character {} joined battle {}", character.getId(), battle.getId());
 
             if(battle.getParticipants().size() == planet.getMap().getTotalSlots()){
                 log.info("Battle {} is full", battle.getId());
-                execution.setVariable("gameFull", true);
+                accessor.setGameFull(true);
             }
         } catch (BpmnError e) {
-            execution.setVariable("errorCharacter",character.getId());
+            accessor.setErrorCharacter(character.getId());
             throw e;
         }
     }

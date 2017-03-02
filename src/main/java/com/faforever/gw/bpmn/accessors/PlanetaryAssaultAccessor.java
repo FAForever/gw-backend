@@ -3,73 +3,117 @@ package com.faforever.gw.bpmn.accessors;
 import com.faforever.gw.model.BattleRole;
 import com.faforever.gw.model.Faction;
 import com.faforever.gw.model.GameResult;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.h2.table.Plan;
 
 import java.util.Map;
 import java.util.UUID;
 
-public class PlanetaryAssaultAccessor {
-    private final Map<String, Object> processVariables;
-
-    private PlanetaryAssaultAccessor(Map<String, Object> processVariables) {
-        this.processVariables = processVariables;
+public class PlanetaryAssaultAccessor extends BaseAccessor {
+    private PlanetaryAssaultAccessor(DelegateExecution processContext) {
+        super(processContext);
     }
 
     public UUID getInitiatorId() {
-        return (UUID) processVariables.get("initiator");
+        return (UUID) get("initiator");
     }
 
     public UUID getBattleId() {
-        return (UUID) processVariables.get("battle");
+        return (UUID) get("battle");
+    }
+
+    public PlanetaryAssaultAccessor setBattleId(UUID battleId) {
+        set("battle", battleId);
+        return this;
     }
 
     public UUID getPlanetId() {
-        return (UUID) processVariables.get("planet");
+        return (UUID) get("planet");
     }
 
     public Faction getAttackingFaction() {
-        return (Faction) processVariables.get("attackingFaction");
+        return (Faction) get("attackingFaction");
     }
 
     public Faction getDefendingFaction() {
-        return (Faction) processVariables.get("defendingFaction");
+        return (Faction) get("defendingFaction");
     }
 
     public UUID getLastJoinedCharacter() {
-        return (UUID) processVariables.get("lastJoinedCharacter");
+        return (UUID) get("lastJoinedCharacter");
     }
 
     public UUID getLastLeftCharacter() {
-        return (UUID) processVariables.get("lastLeftCharacter");
+        return (UUID) get("lastLeftCharacter");
     }
 
     public boolean isGameFull() {
-        return (boolean) processVariables.get("gameFull");
+        return (boolean) get("gameFull");
     }
 
-    public Integer getAttackerCount() {return (Integer)processVariables.get("attackerCount");}
-    public Integer getDefenderCount() {return (Integer)processVariables.get("defenderCount");}
+    public PlanetaryAssaultAccessor setGameFull(boolean gameFull) {
+        set("gameFull", gameFull);
+        return this;
+    }
 
-    public Double getWaitingProgress() { return (Double) processVariables.get("waitingProgress"); }
+    public Integer getAttackerCount() {
+        return (Integer) get("attackerCount");
+    }
 
-    public GameResult getGameResult() { return (GameResult)processVariables.get("gameResult"); }
+    public Integer getDefenderCount() {
+        return (Integer) get("defenderCount");
+    }
+
+    public PlanetaryAssaultAccessor setParticipantCount(BattleRole team, Integer count) {
+        if (team == BattleRole.ATTACKER) {
+            set("attackerCount", count);
+        } else {
+            set("defenderCount", count);
+        }
+
+        return this;
+    }
+
+    public Double getWaitingProgress() {
+        return (Double) get("waitingProgress");
+    }
+
+    public PlanetaryAssaultAccessor setWaitingProgress(Double progress){
+        set("waitingProgress", progress);
+        return this;
+    }
+
+    public GameResult getGameResult() {
+        return (GameResult) get("gameResult");
+    }
 
     public BattleRole getWinner() {
-        return BattleRole.fromNameString((String) processVariables.get("winner"));
+        return BattleRole.fromNameString((String) get("winner"));
+    }
+
+    public PlanetaryAssaultAccessor setWinner(Faction winner) {
+        set("winner", winner.getName());
+        return this;
     }
 
     public UUID getErrorCharacter() {
-        return (UUID) processVariables.get("errorCharacter");
+        return (UUID) get("errorCharacter");
+    }
+
+    public PlanetaryAssaultAccessor setErrorCharacter(UUID errorCharacter) {
+        set("errorCharacter", errorCharacter);
+        return this;
     }
 
     public String getErrorCode() {
-        return (String) processVariables.get("errorCode");
+        return (String) get("errorCode");
     }
 
     public String getErrorMessage() {
-        return (String) processVariables.get("errorMessage");
+        return (String) get("errorMessage");
     }
 
-    public static PlanetaryAssaultAccessor of(Map<String, Object> processVariables) {
-        return new PlanetaryAssaultAccessor(processVariables);
+    public static PlanetaryAssaultAccessor of(DelegateExecution processContext) {
+        return new PlanetaryAssaultAccessor(processContext);
     }
 }

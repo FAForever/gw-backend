@@ -39,7 +39,7 @@ public class PlanetConqueredMessage implements JavaDelegate, WebsocketMessage {
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {
-        PlanetaryAssaultAccessor accessor = PlanetaryAssaultAccessor.of(execution.getVariables());
+        PlanetaryAssaultAccessor accessor = PlanetaryAssaultAccessor.of(execution);
 
         planetId = accessor.getPlanetId();
         battleId = accessor.getBattleId();
