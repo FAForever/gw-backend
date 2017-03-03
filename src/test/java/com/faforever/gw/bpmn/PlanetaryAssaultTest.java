@@ -22,6 +22,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.MockitoAnnotations;
 
+import java.sql.SQLException;
 import java.util.*;
 
 import static org.camunda.bpm.engine.test.assertions.ProcessEngineAssertions.assertThat;
@@ -44,6 +45,7 @@ public class PlanetaryAssaultTest {
                         .putValue("battle", UUID.randomUUID())
         );
         DelegateExpressions.registerJavaDelegateMock("planetUnderAssaultMessage");
+        DelegateExpressions.registerJavaDelegateMock("userAckMessage");
         DelegateExpressions.registerJavaDelegateMock("userErrorMessage");
         DelegateExpressions.registerJavaDelegateMock("addCharacterToAssaultTask");
         DelegateExpressions.registerJavaDelegateMock("battleParticipantJoinedAssaultMessage");
@@ -112,6 +114,7 @@ public class PlanetaryAssaultTest {
 
         verifyJavaDelegateMock("initiateAssaultTask").executed(times(1));
         verifyJavaDelegateMock("planetUnderAssaultMessage").executedNever();
+        verifyJavaDelegateMock("userAckMessage").executedNever();
         verifyJavaDelegateMock("userErrorMessage").executed(times(1));
 
         assertThat(processInstance).isEnded();
@@ -123,11 +126,13 @@ public class PlanetaryAssaultTest {
         DelegateExpressions.registerJavaDelegateMock("addCharacterToAssaultTask").onExecutionThrowBpmnError("2002", "Character not free for game");
 
         final ProcessInstance processInstance = startProcess();
-        processEngineRule.getRuntimeService().correlateMessage("Message_PlayerJoinsAssault", "test");
-
         verifyJavaDelegateMock("initiateAssaultTask").executed(times(1));
         verifyJavaDelegateMock("planetUnderAssaultMessage").executed(times(1));;
+        verifyJavaDelegateMock("userAckMessage").executed(times(1));
+
+        processEngineRule.getRuntimeService().correlateMessage("Message_PlayerJoinsAssault", "test");
         verifyJavaDelegateMock("addCharacterToAssaultTask").executed(times(1));;
+        verifyJavaDelegateMock("userAckMessage").executed(times(1));
         verifyJavaDelegateMock("userErrorMessage").executed(times(1));
         verifyJavaDelegateMock("battleParticipantJoinedAssaultMessage").executedNever();
 
@@ -140,11 +145,13 @@ public class PlanetaryAssaultTest {
         DelegateExpressions.registerJavaDelegateMock("removeCharacterFromAssaultTask").onExecutionThrowBpmnError("2002", "Character not free for game");
 
         final ProcessInstance processInstance = startProcess();
-        processEngineRule.getRuntimeService().correlateMessage("Message_PlayerLeavesAssault", "test");
-
         verifyJavaDelegateMock("initiateAssaultTask").executed(times(1));
         verifyJavaDelegateMock("planetUnderAssaultMessage").executed(times(1));;
+        verifyJavaDelegateMock("userAckMessage").executed(times(1));
+
+        processEngineRule.getRuntimeService().correlateMessage("Message_PlayerLeavesAssault", "test");
         verifyJavaDelegateMock("removeCharacterFromAssaultTask").executed(times(1));;
+        verifyJavaDelegateMock("userAckMessage").executed(times(1));
         verifyJavaDelegateMock("userErrorMessage").executed(times(1));
         verifyJavaDelegateMock("battleParticipantLeftAssaultMessage").executedNever();
 
@@ -159,13 +166,16 @@ public class PlanetaryAssaultTest {
         );
 
         final ProcessInstance processInstance = startProcess();
-        processEngineRule.getRuntimeService().signalEventReceived("Signal_UpdateOpenGames");
-        processEngineRule.getRuntimeService().correlateMessage("Message_PlayerLeavesAssault", "test");
-
         verifyJavaDelegateMock("initiateAssaultTask").executed(times(1));
         verifyJavaDelegateMock("planetUnderAssaultMessage").executed(times(1));
-        verifyJavaDelegateMock("addCharacterToAssaultTask").executedNever();
+        verifyJavaDelegateMock("userAckMessage").executed(times(1));
+
+        processEngineRule.getRuntimeService().signalEventReceived("Signal_UpdateOpenGames");
         verifyJavaDelegateMock("calculateWaitingProgressTask").executed(times(1));
+
+        processEngineRule.getRuntimeService().correlateMessage("Message_PlayerLeavesAssault", "test");
+        verifyJavaDelegateMock("userAckMessage").executed(times(2));
+        verifyJavaDelegateMock("addCharacterToAssaultTask").executedNever();
         verifyJavaDelegateMock("battleUpdateWaitingProgressMessage").executed(times(1));
         verifyJavaDelegateMock("removeCharacterFromAssaultTask").executed(times(1));
         verifyJavaDelegateMock("battleParticipantLeftAssaultMessage").executed(times(1));
@@ -180,27 +190,32 @@ public class PlanetaryAssaultTest {
 
     @Test
     @Deployment(resources = "bpmn/planetary_assault.bpmn")
-    public void secondAttackerJoinsAndTimerRunsOut() {
+    public void secondAttackerJoinsAndTimerRunsOut() throws Exception {
         DelegateExpressions.registerJavaDelegateMock("calculateWaitingProgressTask").onExecutionSetVariables(
                 Variables.createVariables().putValue("waitingProgress", 1.0d)
         );
 
+        org.h2.tools.Server.createWebServer("-web").start();
         final ProcessInstance processInstance = startProcess();
+        verifyJavaDelegateMock("userAckMessage").executed(times(1));
 
         processEngineRule.getRuntimeService().correlateMessage("Message_PlayerJoinsAssault", "test");
-        processEngineRule.getRuntimeService().signalEventReceived("Signal_UpdateOpenGames");
-
         verifyJavaDelegateMock("initiateAssaultTask").executed(times(1));
         verifyJavaDelegateMock("planetUnderAssaultMessage").executed(times(1));
         verifyJavaDelegateMock("addCharacterToAssaultTask").executed(times(1));
         verifyJavaDelegateMock("battleParticipantJoinedAssaultMessage").executed(times(1));
+        verifyJavaDelegateMock("userAckMessage").executed(times(2));
+
+
+        processEngineRule.getRuntimeService().signalEventReceived("Signal_UpdateOpenGames");
         verifyJavaDelegateMock("calculateWaitingProgressTask").executed(times(1));
         verifyJavaDelegateMock("battleUpdateWaitingProgressMessage").executed(times(1));
+
         verifyJavaDelegateMock("removeCharacterFromAssaultTask").executedNever();
         verifyJavaDelegateMock("battleParticipantLeftAssaultMessage").executedNever();
         verifyJavaDelegateMock("closeAssaultTask").executed(times(1));
+        verifyJavaDelegateMock("processGameResultTask").executedNever();
         verifyJavaDelegateMock("planetDefendedMessage").executedNever();
-        verifyJavaDelegateMock("processGameResultTask").executed(times(1));
         verifyJavaDelegateMock("userErrorMessage").executedNever();
 
         assertThat(processInstance).isEnded();

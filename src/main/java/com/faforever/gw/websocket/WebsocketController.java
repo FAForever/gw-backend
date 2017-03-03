@@ -10,6 +10,7 @@ import com.faforever.gw.security.User;
 import com.faforever.gw.websocket.incoming.InitiateAssaultMessage;
 import com.faforever.gw.websocket.incoming.JoinAssaultMessage;
 //import jersey.repackaged.com.google.common.collect.ImmutableMap;
+import com.faforever.gw.websocket.incoming.LeaveAssaultMessage;
 import com.google.common.collect.ImmutableMap;
 import javafx.util.Pair;
 import lombok.extern.slf4j.Slf4j;
@@ -60,8 +61,8 @@ public class WebsocketController {
     }
 
     @MessageMapping("/leaveAssault")
-    public void leaveAssault(JoinAssaultMessage message, User user) throws Exception {
-        log.trace("received /joinAssault, message: {}, user: {}", message, user);
+    public void leaveAssault(LeaveAssaultMessage message, User user) throws Exception {
+        log.trace("received /leaveAssault, message: {}, user: {}", message, user);
         planetaryAssaultService.onCharacterLeavesAssault(message, user);
     }
 

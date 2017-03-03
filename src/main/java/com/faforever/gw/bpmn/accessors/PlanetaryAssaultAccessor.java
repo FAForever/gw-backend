@@ -9,13 +9,9 @@ import org.h2.table.Plan;
 import java.util.Map;
 import java.util.UUID;
 
-public class PlanetaryAssaultAccessor extends BaseAccessor {
+public class PlanetaryAssaultAccessor extends UserInteractionProcessAccessor {
     private PlanetaryAssaultAccessor(DelegateExecution processContext) {
         super(processContext);
-    }
-
-    public UUID getInitiatorId() {
-        return (UUID) get("initiator");
     }
 
     public UUID getBattleId() {
@@ -37,14 +33,6 @@ public class PlanetaryAssaultAccessor extends BaseAccessor {
 
     public Faction getDefendingFaction() {
         return (Faction) get("defendingFaction");
-    }
-
-    public UUID getLastJoinedCharacter() {
-        return (UUID) get("lastJoinedCharacter");
-    }
-
-    public UUID getLastLeftCharacter() {
-        return (UUID) get("lastLeftCharacter");
     }
 
     public boolean isGameFull() {
@@ -78,7 +66,7 @@ public class PlanetaryAssaultAccessor extends BaseAccessor {
         return (Double) get("waitingProgress");
     }
 
-    public PlanetaryAssaultAccessor setWaitingProgress(Double progress){
+    public PlanetaryAssaultAccessor setWaitingProgress(Double progress) {
         set("waitingProgress", progress);
         return this;
     }
@@ -93,15 +81,6 @@ public class PlanetaryAssaultAccessor extends BaseAccessor {
 
     public PlanetaryAssaultAccessor setWinner(BattleRole winner) {
         set("winner", winner.getName());
-        return this;
-    }
-
-    public UUID getErrorCharacter() {
-        return (UUID) get("errorCharacter");
-    }
-
-    public PlanetaryAssaultAccessor setErrorCharacter(UUID errorCharacter) {
-        set("errorCharacter", errorCharacter);
         return this;
     }
 

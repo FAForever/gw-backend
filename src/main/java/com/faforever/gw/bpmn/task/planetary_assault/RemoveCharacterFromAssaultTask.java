@@ -4,7 +4,6 @@ import com.faforever.gw.bpmn.accessors.PlanetaryAssaultAccessor;
 import com.faforever.gw.model.*;
 import com.faforever.gw.model.repository.BattleRepository;
 import com.faforever.gw.model.repository.CharacterRepository;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -36,7 +35,7 @@ public class RemoveCharacterFromAssaultTask implements JavaDelegate {
 
 
         Battle battle = battleRepository.getOne(accessor.getBattleId());
-        GwCharacter character = characterRepository.getOne(accessor.getLastLeftCharacter());
+        GwCharacter character = characterRepository.getOne(accessor.getRequestCharacter());
 
         try {
             validationHelper.validateCharacterInBattle(character, battle, true);
@@ -64,7 +63,7 @@ public class RemoveCharacterFromAssaultTask implements JavaDelegate {
                 accessor.setWinner(BattleRole.DEFENDER);
             }
         } catch (BpmnError e) {
-            accessor.setErrorCharacter(character.getId());
+            accessor.setRequestCharacter(character.getId());
             throw e;
         }
     }

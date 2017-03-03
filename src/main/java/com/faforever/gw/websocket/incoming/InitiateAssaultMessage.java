@@ -9,5 +9,6 @@ import java.util.UUID;
 @Value
 @AllArgsConstructor
 public class InitiateAssaultMessage {
+    private UUID requestId;
     private UUID planetId;
 }

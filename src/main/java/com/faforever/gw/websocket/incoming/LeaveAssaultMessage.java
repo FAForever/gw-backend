@@ -8,5 +8,6 @@ import java.util.UUID;
 @Value
 @AllArgsConstructor
 public class LeaveAssaultMessage {
+    private UUID requestId;
     private UUID battleId;
 }

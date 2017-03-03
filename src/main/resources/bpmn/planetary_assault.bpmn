@@ -125,11 +125,17 @@
       <bpmn:sequenceFlow id="SequenceFlow_1ddx0w9" sourceRef="IntermediateThrowEvent_LeftAssault" targetRef="ExclusiveGateway_AssaultFactionHasPlayers" />
       <bpmn:sequenceFlow id="SequenceFlow_086aaic" sourceRef="StartEvent_AssaultInitiated" targetRef="ExclusiveGateway_SetupMatch" />
       <bpmn:intermediateThrowEvent id="IntermediateThrowEvent_LeftAssault" name="character left assault">
+        <bpmn:extensionElements>
+          <camunda:executionListener delegateExpression="${userAckMessage}" event="start" />
+        </bpmn:extensionElements>
         <bpmn:incoming>SequenceFlow_1tim9i2</bpmn:incoming>
         <bpmn:outgoing>SequenceFlow_1ddx0w9</bpmn:outgoing>
         <bpmn:messageEventDefinition camunda:delegateExpression="${battleParticipantLeftAssaultMessage}" />
       </bpmn:intermediateThrowEvent>
       <bpmn:intermediateThrowEvent id="IntermediateThrowEvent_JoinedAssault" name="character joined assault">
+        <bpmn:extensionElements>
+          <camunda:executionListener delegateExpression="${userAckMessage}" event="start" />
+        </bpmn:extensionElements>
         <bpmn:incoming>SequenceFlow_0rbkusb</bpmn:incoming>
         <bpmn:outgoing>SequenceFlow_0wvhz73</bpmn:outgoing>
         <bpmn:messageEventDefinition camunda:delegateExpression="${battleParticipantJoinedAssaultMessage}" />
@@ -285,6 +291,9 @@
     </bpmn:boundaryEvent>
     <bpmn:sequenceFlow id="SequenceFlow_1any1mr" sourceRef="BoundaryEvent_Error_InitiateAssault" targetRef="EndEvent_Error_InvalidCharacterAction" />
     <bpmn:intermediateThrowEvent id="IntermediateThrowEvent_PlanetUnderAssault" name="planet under assault">
+      <bpmn:extensionElements>
+        <camunda:executionListener delegateExpression="${userAckMessage}" event="start" />
+      </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow_1ieu0hq</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0i3umkz</bpmn:outgoing>
       <bpmn:messageEventDefinition camunda:delegateExpression="${planetUnderAssaultMessage}" />

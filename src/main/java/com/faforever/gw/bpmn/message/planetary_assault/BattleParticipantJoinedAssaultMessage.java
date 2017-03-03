@@ -45,7 +45,7 @@ public class BattleParticipantJoinedAssaultMessage implements JavaDelegate, Webs
     public void execute(DelegateExecution execution) throws Exception {
         PlanetaryAssaultAccessor accessor = PlanetaryAssaultAccessor.of(execution);
 
-        GwCharacter character = characterRepository.getOne(accessor.getLastJoinedCharacter());
+        GwCharacter character = characterRepository.getOne(accessor.getRequestCharacter());
         characterId = character.getId();
         characterFaction = character.getFaction();
 

@@ -38,7 +38,7 @@ public class AddCharacterToAssaultTask implements JavaDelegate {
 
         Battle battle = battleRepository.getOne(accessor.getBattleId());
         Planet planet = planetRepository.getOne(accessor.getPlanetId());
-        GwCharacter character = characterRepository.getOne(accessor.getLastJoinedCharacter());
+        GwCharacter character = characterRepository.getOne(accessor.getRequestCharacter());
 
         try {
             validationHelper.validateCharacterInBattle(character, battle, false);
@@ -71,7 +71,7 @@ public class AddCharacterToAssaultTask implements JavaDelegate {
                 accessor.setGameFull(true);
             }
         } catch (BpmnError e) {
-            accessor.setErrorCharacter(character.getId());
+            accessor.setRequestCharacter(character.getId());
             throw e;
         }
     }

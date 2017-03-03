@@ -43,7 +43,7 @@ public class BattleParticipantLeftAssaultMessage implements JavaDelegate, Websoc
     public void execute(DelegateExecution execution) throws Exception {
         PlanetaryAssaultAccessor accessor = PlanetaryAssaultAccessor.of(execution);
 
-        GwCharacter character = characterRepository.findOne(accessor.getLastLeftCharacter());
+        GwCharacter character = characterRepository.findOne(accessor.getRequestCharacter());
         characterId = character.getId();
         characterFaction = character.getFaction();
 

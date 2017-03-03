@@ -9,6 +9,7 @@ import com.faforever.gw.security.User;
 import com.faforever.gw.services.messaging.MessagingService;
 import com.faforever.gw.websocket.incoming.InitiateAssaultMessage;
 import com.faforever.gw.websocket.incoming.JoinAssaultMessage;
+import com.faforever.gw.websocket.incoming.LeaveAssaultMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
 import org.camunda.bpm.engine.RuntimeService;
@@ -54,8 +55,7 @@ public class PlanetaryAssaultService {
         GwCharacter character = user.getActiveCharacter();
         Planet planet = planetRepository.getOne(message.getPlanetId());
 
-        VariableMap variables = Variables.createVariables()
-                .putValue("initiator", character.getId())
+        VariableMap variables = messagingService.createVariables(message.getRequestId(), user.getActiveCharacter().getId())
                 .putValue("battle", battleUUID)
                 .putValue("planet", planet.getId())
                 .putValue("attackingFaction", character.getFaction())
@@ -73,40 +73,33 @@ public class PlanetaryAssaultService {
     public void onCharacterJoinsAssault(JoinAssaultMessage message, User user) {
         log.debug("onCharacterJoinsAssault for battle {}", message.getBattleId());
 
-        UUID characterId = user.getActiveCharacter().getId();
-        VariableMap variables = Variables.createVariables()
-                .putValue("lastJoinedCharacter", characterId);
-
-        log.debug("-> set lastJoinedCharacter: {}", characterId);
+        VariableMap variables = messagingService.createVariables(message.getRequestId(), user.getActiveCharacter().getId());
 
         try {
             runtimeService.correlateMessage(PLAYER_JOINS_ASSAULT_MESSAGE, message.getBattleId().toString(), variables);
         } catch (MismatchingMessageCorrelationException e) {
             log.error("Battle {} is no active bpmn instance", message.getBattleId());
-            sendErrorToUser(user, GwErrorType.BATTLE_INVALID);
+            sendErrorToUser(user, message.getRequestId(), GwErrorType.BATTLE_INVALID);
         }
     }
 
-    public void onCharacterLeavesAssault(JoinAssaultMessage message, User user) {
+    public void onCharacterLeavesAssault(LeaveAssaultMessage message, User user) {
         log.debug("onCharacterLeavesAssault for battle {}", message.getBattleId().toString());
 
-        UUID characterId = user.getActiveCharacter().getId();
-        VariableMap variables = Variables.createVariables()
-                .putValue("lastLeftCharacter", characterId);
-
-        log.debug("-> set lastLeftCharacter: {}", characterId);
+        VariableMap variables = messagingService.createVariables(message.getRequestId(), user.getActiveCharacter().getId());
 
         try {
             runtimeService.correlateMessage(PLAYER_LEAVES_ASSAULT_MESSAGE, message.getBattleId().toString(), variables);
         } catch (MismatchingMessageCorrelationException e) {
             log.error("Battle {} is no active bpmn instance", message.getBattleId());
-            sendErrorToUser(user, GwErrorType.BATTLE_INVALID);
+            sendErrorToUser(user, message.getRequestId(), GwErrorType.BATTLE_INVALID);
         }
     }
 
-    private void sendErrorToUser(User user, GwErrorType errorType) {
+    private void sendErrorToUser(User user, UUID requestId, GwErrorType errorType) {
         UserErrorMessage errorMessage = applicationContext.getBean(UserErrorMessage.class);
-        errorMessage.setErrorCharacter(user.getActiveCharacter().getId());
+        errorMessage.setRequestId(requestId);
+        errorMessage.setRecepientCharacter(user.getActiveCharacter().getId());
         errorMessage.setErrorCode(errorType.getErrorCode());
         errorMessage.setErrorMessage(errorType.getErrorMessage());
         messagingService.send(errorMessage);
@@ -118,7 +111,7 @@ public class PlanetaryAssaultService {
     }
 
     @Transactional(dontRollbackOn = BpmnError.class)
-    public void onGameResult(GameResult gameResult){
+    public void onGameResult(GameResult gameResult) {
         UUID battleId = gameResult.getBattle();
 
         VariableMap variables = Variables.createVariables()

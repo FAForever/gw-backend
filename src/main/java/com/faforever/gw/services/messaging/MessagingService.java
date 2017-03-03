@@ -2,10 +2,13 @@ package com.faforever.gw.services.messaging;
 
 import com.faforever.gw.websocket.WebsocketController;
 import lombok.extern.slf4j.Slf4j;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -35,5 +38,14 @@ public class MessagingService {
                     template.convertAndSendToUser(user.getName(), channel.getChannelName(), message);
                 });
         }
+    }
+
+    public VariableMap createVariables(UUID requestId, UUID requestCharacter) {
+        log.debug("-> set requestId: {}", requestId);
+        log.debug("-> set requestCharacter: {}", requestCharacter);
+
+        return Variables.createVariables()
+                .putValue("requestId", requestId)
+                .putValue("requestCharacter", requestCharacter);
     }
 }

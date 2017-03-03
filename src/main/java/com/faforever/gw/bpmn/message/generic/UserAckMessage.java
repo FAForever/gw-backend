@@ -1,8 +1,9 @@
 package com.faforever.gw.bpmn.message.generic;
 
 import com.faforever.gw.bpmn.accessors.PlanetaryAssaultAccessor;
-import com.faforever.gw.security.User;
+import com.faforever.gw.bpmn.accessors.UserInteractionProcessAccessor;
 import com.faforever.gw.security.GwUserRegistry;
+import com.faforever.gw.security.User;
 import com.faforever.gw.services.messaging.MessagingService;
 import com.faforever.gw.services.messaging.WebsocketChannel;
 import com.faforever.gw.services.messaging.WebsocketMessage;
@@ -24,7 +25,7 @@ import java.util.UUID;
 @Slf4j
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class UserErrorMessage implements JavaDelegate, WebsocketMessage {
+public class UserAckMessage implements JavaDelegate, WebsocketMessage {
     private final MessagingService messagingService;
     private final GwUserRegistry gwUserRegistry;
 
@@ -33,44 +34,36 @@ public class UserErrorMessage implements JavaDelegate, WebsocketMessage {
     private UUID requestId;
 
     @Setter
-    private UUID recepientCharacter;
-
-    @Setter
-    @Getter
-    private String errorCode;
-    @Getter
-    @Setter
-    private String errorMessage;
-
+    private UUID recipientCharacter;
 
     @Inject
-    public UserErrorMessage(MessagingService messagingService, GwUserRegistry gwUserRegistry) {
+    public UserAckMessage(MessagingService messagingService, GwUserRegistry gwUserRegistry) {
         this.messagingService = messagingService;
         this.gwUserRegistry = gwUserRegistry;
     }
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {
-        PlanetaryAssaultAccessor accessor = PlanetaryAssaultAccessor.of(execution);
+        UserInteractionProcessAccessor accessor = UserInteractionProcessAccessor.of(execution);
 
-        errorCode = accessor.getErrorCode();
-        errorMessage = accessor.getErrorMessage();
-        recepientCharacter = accessor.getRequestCharacter();
+        requestId = accessor.getRequestId();
+        recipientCharacter = accessor.getRequestCharacter();
 
-        log.warn("Sending UserErrorMessage (code: {}, message: {}", errorCode, errorMessage);
+        log.debug("Sending UserAckMessage (requestId: {}", requestId);
         messagingService.send(this);
     }
 
     @Override
     public WebsocketChannel getChannel() {
-        return WebsocketChannel.USER_ERROR;
+        return WebsocketChannel.USER_ACK;
     }
+
 
     @Override
     public Collection<User> getRecipients() {
         final List<User> recipients = new ArrayList<>();
 
-        gwUserRegistry.getUser(recepientCharacter).ifPresent(user -> recipients.add(user));
+        gwUserRegistry.getUser(recipientCharacter).ifPresent(user -> recipients.add(user));
 
         return recipients;
     }

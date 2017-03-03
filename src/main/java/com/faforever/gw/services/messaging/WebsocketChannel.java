@@ -16,6 +16,7 @@ public enum WebsocketChannel {
     BATTLES_PARTICIPANT_LEFT("/battles/participant_left", Type.PUBLIC),
     CHARACTERS_PROMOTIONS("/characters/promotions", Type.PUBLIC),
     FACTION_CHAT_MESSAGE("/faction/{factionId]/chat_message", Type.FACTION),
+    USER_ACK("/direct/ack", Type.PRIVATE),
     USER_ERROR("/direct/error", Type.PRIVATE),
     USER_INCOME("/direct/income", Type.PRIVATE),
     USER_XP("/direct/xp", Type.PRIVATE);
