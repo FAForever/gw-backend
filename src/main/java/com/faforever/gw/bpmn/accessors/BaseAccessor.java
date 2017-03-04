@@ -3,8 +3,8 @@ package com.faforever.gw.bpmn.accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 
-/***
- * Abstract class for conveniently accessing process variables
+/**
+ * Abstract class for conveniently accessing process variables.
  * Each BPMN process should have it's own subclass.
  */
 @Slf4j

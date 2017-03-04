@@ -5,6 +5,9 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
+/**
+ * GW errors as used in all BPMN processes
+ */
 public enum GwErrorType {
     // Planet related error
     PLANET_DOES_NOT_EXIST("1001", "The given planet does not exist"),

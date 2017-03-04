@@ -1,9 +1,7 @@
 package com.faforever.gw.bpmn.services;
 
 import com.faforever.gw.bpmn.message.generic.UserErrorMessage;
-import com.faforever.gw.model.GameResult;
-import com.faforever.gw.model.GwCharacter;
-import com.faforever.gw.model.Planet;
+import com.faforever.gw.model.*;
 import com.faforever.gw.model.repository.PlanetRepository;
 import com.faforever.gw.security.User;
 import com.faforever.gw.services.messaging.MessagingService;
@@ -22,10 +20,14 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
 @Service
+/**
+ * Service class for the BPMN process "planetary assault"
+ */
 public class PlanetaryAssaultService {
     private final ApplicationContext applicationContext;
     private final RuntimeService runtimeService;
@@ -38,6 +40,8 @@ public class PlanetaryAssaultService {
     public static final String PLAYER_JOINS_ASSAULT_MESSAGE = "Message_PlayerJoinsAssault";
     public static final String PLAYER_LEAVES_ASSAULT_MESSAGE = "Message_PlayerLeavesAssault";
     public static final String GAME_RESULT_MESSAGE = "Message_GameResult";
+
+    public static final Long XP_MALUS_FOR_RECALL = 5L;
 
     @Inject
     public PlanetaryAssaultService(ApplicationContext applicationContext, RuntimeService runtimeService, MessagingService messagingService, PlanetRepository planetRepository) {
@@ -118,5 +122,48 @@ public class PlanetaryAssaultService {
                 .putValue("gameResult", gameResult);
 
         runtimeService.correlateMessage(GAME_RESULT_MESSAGE, battleId.toString(), variables);
+    }
+
+    public Long calcFactionVictoryXpForCharacter(Battle battle, GwCharacter character) {
+        Optional<BattleParticipant> participantOptional = battle.getParticipant(character);
+
+        if (participantOptional.isPresent()) {
+            BattleParticipant participant = participantOptional.get();
+
+            Long noOfAllies = battle.getParticipants().stream()
+                    .filter(battleParticipant -> battleParticipant.getCharacter().getFaction() == character.getFaction())
+                    .count();
+
+            Long noOfEnemies = battle.getParticipants().stream()
+                    .filter(battleParticipant -> battleParticipant.getCharacter().getFaction() != character.getFaction())
+                    .count();
+
+            if (battle.getWinningFaction() == character.getFaction()) {
+                Long gainedXP = Math.round(10.0 * noOfEnemies / Math.pow( noOfAllies * 0.9, noOfAllies - 1 ));
+
+                if(participant.getResult() == BattleParticipantResult.RECALL) {
+                    gainedXP -= XP_MALUS_FOR_RECALL;
+                }
+
+                return gainedXP;
+            } else {
+                return 0L;
+            }
+        } else {
+            throw new RuntimeException(String.format("Character {} didn't participate in battle {}", character.getId(), battle.getId()));
+        }
+    }
+
+    public Long calcTeamkillXpMalus(GwCharacter character) {
+        return Math.round(30.0 / Math.pow(0.88, character.getRank().getLevel()));
+    }
+
+    public Long calcKillXpBonus(GwCharacter killer, GwCharacter victim) {
+        // Killing an ACU is worth 5 points per Rank, with an added factor for drop off with higher ranked players
+        // + 5% bonus per rank the victim was higher than the killer
+
+        Integer killerRank = killer.getRank().getLevel();
+        Double rankDifferenceFactor = Math.min(0.0,victim.getRank().getLevel() - killerRank) * 5 / 100.0;
+        return Math.round(5*killerRank*Math.pow(0.99, killerRank-1)*rankDifferenceFactor);
     }
 }

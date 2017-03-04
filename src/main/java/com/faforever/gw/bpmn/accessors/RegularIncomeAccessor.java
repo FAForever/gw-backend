@@ -6,6 +6,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.UUID;
 
+/**
+ * Accessor class for BPMN process "regular income"
+ */
 public class RegularIncomeAccessor extends BaseAccessor {
 
     public Collection<UUID> getActiveCharacters() {

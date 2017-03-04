@@ -7,6 +7,9 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
+/**
+ * Service class for the BPMN process "regular income"
+ */
 public class RegularIncomeService {
     public static final String REGULAR_INCOME_DUE_SIGNAL = "Signal_RegularIncomeDue";
 

@@ -9,6 +9,9 @@ import org.h2.table.Plan;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Accessor class for BPMN process "planetary assault"
+ */
 public class PlanetaryAssaultAccessor extends UserInteractionProcessAccessor {
     private PlanetaryAssaultAccessor(DelegateExecution processContext) {
         super(processContext);

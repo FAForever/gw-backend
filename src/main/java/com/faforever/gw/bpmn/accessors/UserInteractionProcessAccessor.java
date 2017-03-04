@@ -4,6 +4,12 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 
 import java.util.UUID;
 
+/**
+ * A general purpose accessor that makes user communication variables accessible
+ * (requestId and requestCharacter)
+ *
+ * Use it, if you only need access to these variables. Otherwise use a more sophisticated accessor.
+ */
 public class UserInteractionProcessAccessor extends BaseAccessor{
     protected UserInteractionProcessAccessor(DelegateExecution processContext) {
         super(processContext);

@@ -13,12 +13,13 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Entity
 @Getter
 @Setter
-@Table(name="gw_battle")
+@Table(name = "gw_battle")
 @NoArgsConstructor
 public class Battle implements Serializable {
 
@@ -34,31 +35,37 @@ public class Battle implements Serializable {
     private UUID id;
 
     @ManyToOne
-    @JoinColumn(name="fk_planet")
+    @JoinColumn(name = "fk_planet")
     private Planet planet;
 
-    @OneToMany(mappedBy = "battle", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "battle", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @NotNull
     private List<BattleParticipant> participants = new ArrayList<>();
 
-    @Column(name="status", nullable = false, length = 1)
+    @Column(name = "status", nullable = false, length = 1)
     private BattleStatus status;
 
-    @Column(name="initiated_at", nullable = false)
+    @Column(name = "initiated_at", nullable = false)
     private Timestamp initiatedAt;
 
-    @Column(name="started_at")
+    @Column(name = "started_at")
     private Timestamp startedAt;
 
-    @Column(name="ended_at")
+    @Column(name = "ended_at")
     private Timestamp endedAt;
 
-    @Column(name="attacking_faction", nullable = true, updatable = false, length = 1)
+    @Column(name = "attacking_faction", nullable = true, updatable = false, length = 1)
     private Faction attackingFaction;
 
-    @Column(name="defending_faction", nullable = true, updatable = false, length = 1)
+    @Column(name = "defending_faction", nullable = true, updatable = false, length = 1)
     private Faction defendingFaction;
 
-    @Column(name="winning_faction", length = 1)
+    @Column(name = "winning_faction", length = 1)
     private Faction winningFaction;
+
+    public Optional<BattleParticipant> getParticipant(GwCharacter character) {
+        return getParticipants().stream()
+                .filter(battleParticipant -> battleParticipant.getCharacter().getId().equals(character.getId()))
+                .findFirst();
+    }
 }

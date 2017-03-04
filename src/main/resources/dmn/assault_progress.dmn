@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd" xmlns:biodi="http://bpmn.io/schema/dmn/biodi/1.0" xmlns:camunda="http://camunda.org/schema/1.0/dmn" id="definitions_1hemuax" name="definitions" namespace="http://camunda.org/schema/1.0/dmn">
-  <decision id="faction_influence_factor" name="Faction influence factor">
+  <decision id="assault_progress_factor" name="Assault progress factor">
     <extensionElements>
       <biodi:bounds x="21" y="24" width="180" height="80" />
     </extensionElements>

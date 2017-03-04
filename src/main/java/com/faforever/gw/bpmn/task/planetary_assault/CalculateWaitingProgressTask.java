@@ -52,8 +52,8 @@ public class CalculateWaitingProgressTask implements JavaDelegate{
                 .putValue("faction_player_count", defenderCount);
 
         DecisionService decisionService = processEngine.getDecisionService();
-        DmnDecisionTableResult attackerResult = decisionService.evaluateDecisionTableByKey("faction_influence_factor", attackerVariables);
-        DmnDecisionTableResult defenderResult = decisionService.evaluateDecisionTableByKey("faction_influence_factor", defenderVariables);
+        DmnDecisionTableResult attackerResult = decisionService.evaluateDecisionTableByKey("assault_progress_factor", attackerVariables);
+        DmnDecisionTableResult defenderResult = decisionService.evaluateDecisionTableByKey("assault_progress_factor", defenderVariables);
 
         // we can securely access getFirstResult, because the DMN table gives a unique result
         Double attackerProgress = (Double)attackerResult.getFirstResult().getEntry("progress_factor");

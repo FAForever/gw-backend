@@ -7,6 +7,9 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Accessor class for BPMN process "calculate promotions"
+ */
 public class CalculatePromotionsAccessor extends BaseAccessor {
     private CalculatePromotionsAccessor(DelegateExecution processContext) {
         super(processContext);
