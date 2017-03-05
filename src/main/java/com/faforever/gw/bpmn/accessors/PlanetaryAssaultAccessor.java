@@ -4,9 +4,7 @@ import com.faforever.gw.model.BattleRole;
 import com.faforever.gw.model.Faction;
 import com.faforever.gw.model.GameResult;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.h2.table.Plan;
 
-import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -15,6 +13,10 @@ import java.util.UUID;
 public class PlanetaryAssaultAccessor extends UserInteractionProcessAccessor {
     private PlanetaryAssaultAccessor(DelegateExecution processContext) {
         super(processContext);
+    }
+
+    public static PlanetaryAssaultAccessor of(DelegateExecution processContext) {
+        return new PlanetaryAssaultAccessor(processContext);
     }
 
     public UUID getBattleId() {
@@ -34,8 +36,18 @@ public class PlanetaryAssaultAccessor extends UserInteractionProcessAccessor {
         return (Faction) get("attackingFaction");
     }
 
+    public PlanetaryAssaultAccessor setAttackingFaction(Faction faction) {
+        set("attackingFaction", faction);
+        return this;
+    }
+
     public Faction getDefendingFaction() {
         return (Faction) get("defendingFaction");
+    }
+
+    public PlanetaryAssaultAccessor setDefendingFaction(Faction faction) {
+        set("defendingFaction", faction);
+        return this;
     }
 
     public boolean isGameFull() {
@@ -93,9 +105,5 @@ public class PlanetaryAssaultAccessor extends UserInteractionProcessAccessor {
 
     public String getErrorMessage() {
         return (String) get("errorMessage");
-    }
-
-    public static PlanetaryAssaultAccessor of(DelegateExecution processContext) {
-        return new PlanetaryAssaultAccessor(processContext);
     }
 }

@@ -1,7 +1,10 @@
 package com.faforever.gw.bpmn.task.planetary_assault;
 
 import com.faforever.gw.bpmn.accessors.PlanetaryAssaultAccessor;
-import com.faforever.gw.model.*;
+import com.faforever.gw.model.Battle;
+import com.faforever.gw.model.BattleRole;
+import com.faforever.gw.model.GwCharacter;
+import com.faforever.gw.model.ValidationHelper;
 import com.faforever.gw.model.repository.BattleRepository;
 import com.faforever.gw.model.repository.CharacterRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -37,34 +40,29 @@ public class RemoveCharacterFromAssaultTask implements JavaDelegate {
         Battle battle = battleRepository.getOne(accessor.getBattleId());
         GwCharacter character = characterRepository.getOne(accessor.getRequestCharacter());
 
-        try {
-            validationHelper.validateCharacterInBattle(character, battle, true);
+        validationHelper.validateCharacterInBattle(character, battle, true);
 
-            battle.getParticipants().removeIf(battleParticipant -> battleParticipant.getCharacter() == character);
-            battleRepository.save(battle);
+        battle.getParticipants().removeIf(battleParticipant -> battleParticipant.getCharacter() == character);
+        battleRepository.save(battle);
 
-            Integer newParticipantsOfFactionCount = 0;
-            Boolean noMoreAttackerRemaining = false;
-            if (character.getFaction() == battle.getAttackingFaction()) {
-                newParticipantsOfFactionCount = accessor.getAttackerCount() - 1;
-                accessor.setParticipantCount(BattleRole.ATTACKER, newParticipantsOfFactionCount);
-                noMoreAttackerRemaining = (newParticipantsOfFactionCount == 0);
-            } else if (character.getFaction() == battle.getDefendingFaction()) {
-                newParticipantsOfFactionCount = accessor.getDefenderCount() - 1;
-                accessor.setParticipantCount(BattleRole.DEFENDER, newParticipantsOfFactionCount);
-            }
+        Integer newParticipantsOfFactionCount = 0;
+        Boolean noMoreAttackerRemaining = false;
+        if (character.getFaction() == battle.getAttackingFaction()) {
+            newParticipantsOfFactionCount = accessor.getAttackerCount() - 1;
+            accessor.setParticipantCount(BattleRole.ATTACKER, newParticipantsOfFactionCount);
+            noMoreAttackerRemaining = (newParticipantsOfFactionCount == 0);
+        } else if (character.getFaction() == battle.getDefendingFaction()) {
+            newParticipantsOfFactionCount = accessor.getDefenderCount() - 1;
+            accessor.setParticipantCount(BattleRole.DEFENDER, newParticipantsOfFactionCount);
+        }
 
-            accessor.setGameFull(false);
+        accessor.setGameFull(false);
 
-            log.info("Character {} left battle {}", character.getId(), battle.getId());
+        log.info("Character {} left battle {}", character.getId(), battle.getId());
 
-            if (noMoreAttackerRemaining) {
-                log.info("Battle {} won by defender (all attacker left)", battle.getId());
-                accessor.setWinner(BattleRole.DEFENDER);
-            }
-        } catch (BpmnError e) {
-            accessor.setRequestCharacter(character.getId());
-            throw e;
+        if (noMoreAttackerRemaining) {
+            log.info("Battle {} won by defender (all attacker left)", battle.getId());
+            accessor.setWinner(BattleRole.DEFENDER);
         }
     }
 }

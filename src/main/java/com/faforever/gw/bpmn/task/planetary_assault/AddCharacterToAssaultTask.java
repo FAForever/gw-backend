@@ -36,43 +36,37 @@ public class AddCharacterToAssaultTask implements JavaDelegate {
         PlanetaryAssaultAccessor accessor = PlanetaryAssaultAccessor.of(execution);
         log.debug("addCharacterToAssaultTask for battle {}", accessor.getBusinessKey());
 
-        Battle battle = battleRepository.getOne(accessor.getBattleId());
-        Planet planet = planetRepository.getOne(accessor.getPlanetId());
-        GwCharacter character = characterRepository.getOne(accessor.getRequestCharacter());
+        Battle battle = battleRepository.findOne(accessor.getBattleId());
+        Planet planet = planetRepository.findOne(accessor.getPlanetId());
+        GwCharacter character = characterRepository.findOne(accessor.getRequestCharacter());
 
-        try {
-            validationHelper.validateCharacterInBattle(character, battle, false);
-            validationHelper.validateCharacterFreeForGame(character);
+        validationHelper.validateCharacterInBattle(character, battle, false);
+        validationHelper.validateCharacterFreeForGame(character);
 
-            BattleRole battleRole;
-            String countVariable = "";
-            Integer newParticipantsOfFactionCount = 0;
-            if (character.getFaction() == battle.getAttackingFaction()) {
-                battleRole = BattleRole.ATTACKER;
-                newParticipantsOfFactionCount = accessor.getAttackerCount()+1;
-            } else if (character.getFaction() == battle.getDefendingFaction()) {
-                battleRole = BattleRole.DEFENDER;
-                newParticipantsOfFactionCount = accessor.getDefenderCount()+1;
-            } else {
-                battleRole = null;
-            }
+        BattleRole battleRole;
+        Integer newParticipantsOfFactionCount = 0;
+        if (character.getFaction() == battle.getAttackingFaction()) {
+            battleRole = BattleRole.ATTACKER;
+            newParticipantsOfFactionCount = accessor.getAttackerCount() + 1;
+        } else if (character.getFaction() == battle.getDefendingFaction()) {
+            battleRole = BattleRole.DEFENDER;
+            newParticipantsOfFactionCount = accessor.getDefenderCount() + 1;
+        } else {
+            battleRole = null;
+        }
 
-            validationHelper.validateOpenSlotForCharacter(character, battle, battleRole);
-            BattleParticipant battleParticipant = new BattleParticipant(battle, character, battleRole);
-            battle.getParticipants().add(battleParticipant);
-            battleRepository.save(battle);
+        validationHelper.validateOpenSlotForCharacter(character, battle, battleRole);
+        BattleParticipant battleParticipant = new BattleParticipant(battle, character, battleRole);
+        battle.getParticipants().add(battleParticipant);
+        battleRepository.save(battle);
 
-            accessor.setParticipantCount(battleRole, newParticipantsOfFactionCount);
+        accessor.setParticipantCount(battleRole, newParticipantsOfFactionCount);
 
-            log.info("Character {} joined battle {}", character.getId(), battle.getId());
+        log.info("Character {} joined battle {}", character.getId(), battle.getId());
 
-            if(battle.getParticipants().size() == planet.getMap().getTotalSlots()){
-                log.info("Battle {} is full", battle.getId());
-                accessor.setGameFull(true);
-            }
-        } catch (BpmnError e) {
-            accessor.setRequestCharacter(character.getId());
-            throw e;
+        if (battle.getParticipants().size() == planet.getMap().getTotalSlots()) {
+            log.info("Battle {} is full", battle.getId());
+            accessor.setGameFull(true);
         }
     }
 }
