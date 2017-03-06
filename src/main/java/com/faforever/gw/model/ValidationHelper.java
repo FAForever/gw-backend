@@ -9,9 +9,8 @@ import java.util.EnumSet;
 
 @Component
 public class ValidationHelper {
-    private final GwErrorService gwErrorService;
-
     private static final EnumSet<BattleStatus> OCCUPIED_BATTLE_STATUSSES = EnumSet.of(BattleStatus.INITIATED, BattleStatus.RUNNING);
+    private final GwErrorService gwErrorService;
 
     @Inject
     public ValidationHelper(GwErrorService gwErrorService) {
@@ -19,7 +18,7 @@ public class ValidationHelper {
     }
 
     public void validateCharacterInBattle(GwCharacter character, Battle battle, boolean expect) {
-        if (character.getBattleParticipantList().stream()
+        if (battle.getParticipants().stream()
                 .anyMatch(battleParticipant -> battleParticipant.getCharacter() == character) != expect) {
             throw gwErrorService.getBpmnErrorOf(GwErrorType.CHARACTER_ALREADY_IN_BATTLE);
         }
@@ -33,7 +32,7 @@ public class ValidationHelper {
         }
     }
 
-    public void validateOpenSlotForCharacter(GwCharacter character, Battle battle, BattleRole battleRole) {
+    public void validateOpenSlotForCharacter(Battle battle, BattleRole battleRole) {
         if (battleRole == null) {
             throw gwErrorService.getBpmnErrorOf(GwErrorType.NO_SLOTS_FOR_FACTION);
         }

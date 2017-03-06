@@ -88,7 +88,7 @@ public class AddCharacterToAssaultTest {
         // Assert validation methods called correctly
         verify(validationHelper).validateCharacterInBattle(character, battle, false);
         verify(validationHelper).validateCharacterFreeForGame(character);
-        verify(validationHelper).validateOpenSlotForCharacter(character, battle, BattleRole.ATTACKER);
+        verify(validationHelper).validateOpenSlotForCharacter(battle, BattleRole.ATTACKER);
 
         // Assert attributes of battle
         ArgumentCaptor<Battle> battleArgument = ArgumentCaptor.forClass(Battle.class);
@@ -132,7 +132,7 @@ public class AddCharacterToAssaultTest {
         // Assert validation methods called correctly
         verify(validationHelper).validateCharacterInBattle(character, battle, false);
         verify(validationHelper).validateCharacterFreeForGame(character);
-        verify(validationHelper).validateOpenSlotForCharacter(character, battle, BattleRole.DEFENDER);
+        verify(validationHelper).validateOpenSlotForCharacter(battle, BattleRole.DEFENDER);
 
         // Assert attributes of battle
         ArgumentCaptor<Battle> battleArgument = ArgumentCaptor.forClass(Battle.class);
@@ -169,7 +169,7 @@ public class AddCharacterToAssaultTest {
     @Test(expected = BpmnError.class)
     public void testValidateOpenSlotForCharacterThrowsException() throws Exception {
         doThrow(new BpmnError("validationHelper.validateOpenSlotForCharacter"))
-                .when(validationHelper).validateOpenSlotForCharacter(character, battle, BattleRole.ATTACKER);
+                .when(validationHelper).validateOpenSlotForCharacter(battle, BattleRole.ATTACKER);
 
         task.execute(delegateExecution);
     }

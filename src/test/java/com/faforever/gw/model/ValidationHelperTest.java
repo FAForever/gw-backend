@@ -1,16 +1,21 @@
 package com.faforever.gw.model;
 
 import com.faforever.gw.bpmn.services.GwErrorService;
+import com.faforever.gw.bpmn.services.GwErrorType;
+import org.camunda.bpm.engine.delegate.BpmnError;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.security.jwt.Jwt;
 import org.springframework.security.jwt.JwtHelper;
 import org.springframework.security.jwt.crypto.sign.MacSigner;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -18,23 +23,216 @@ import static org.mockito.Mockito.when;
 public class ValidationHelperTest {
     ValidationHelper validationHelper;
 
+    @Mock
+    GwErrorService gwErrorService;
+
     @Before
     public void setUp() throws Exception {
-        validationHelper = new ValidationHelper(mock(GwErrorService.class));
+        when(gwErrorService.getBpmnErrorOf(any(GwErrorType.class))).thenReturn(new BpmnError("test"));
+
+        validationHelper = new ValidationHelper(gwErrorService);
     }
 
     @Test
     public void validateCharacterInBattle__ExpectTrue_Success() {
         GwCharacter character = mock(GwCharacter.class);
+        BattleParticipant participant = mock(BattleParticipant.class);
+        when(participant.getCharacter()).thenReturn(character);
+
         Battle battle = mock(Battle.class);
-        List<BattleParticipant> battleParticipantList = mock(List.class);
+        List<BattleParticipant> battleParticipantList = new ArrayList<>();
+        battleParticipantList.add(participant);
 
-        when(character.getBattleParticipantList()).thenReturn(battleParticipantList);
+        when(battle.getParticipants()).thenReturn(battleParticipantList);
 
-         validationHelper.validateCharacterInBattle(character, battle, true);
+        validationHelper.validateCharacterInBattle(character, battle, true);
+    }
+
+    @Test(expected = BpmnError.class)
+    public void validateCharacterInBattle__ExpectTrue_Error() {
+        GwCharacter character = mock(GwCharacter.class);
+
+        Battle battle = mock(Battle.class);
+        List<BattleParticipant> battleParticipantList = new ArrayList<>();
+
+        when(battle.getParticipants()).thenReturn(battleParticipantList);
+
+        validationHelper.validateCharacterInBattle(character, battle, true);
     }
 
     @Test
+    public void validateCharacterInBattle__ExpectFalse_Success() {
+        GwCharacter character = mock(GwCharacter.class);
+        BattleParticipant participant = mock(BattleParticipant.class);
+        when(participant.getCharacter()).thenReturn(character);
+
+        Battle battle = mock(Battle.class);
+        List<BattleParticipant> battleParticipantList = new ArrayList<>();
+        battleParticipantList.add(participant);
+
+        when(battle.getParticipants()).thenReturn(battleParticipantList);
+
+        validationHelper.validateCharacterInBattle(mock(GwCharacter.class), battle, false);
+    }
+
+    @Test(expected = BpmnError.class)
+    public void validateCharacterInBattle__ExpectFalse_Error() {
+        GwCharacter character = mock(GwCharacter.class);
+        BattleParticipant participant = mock(BattleParticipant.class);
+        when(participant.getCharacter()).thenReturn(character);
+
+        Battle battle = mock(Battle.class);
+        List<BattleParticipant> battleParticipantList = new ArrayList<>();
+        battleParticipantList.add(participant);
+
+        when(battle.getParticipants()).thenReturn(battleParticipantList);
+
+        validationHelper.validateCharacterInBattle(character, battle, false);
+    }
+
+    @Test
+    public void validateCharacterFreeForGame_EmptyList() {
+        GwCharacter character = mock(GwCharacter.class);
+
+        List<BattleParticipant> battleParticipantList = new ArrayList<>();
+        when(character.getBattleParticipantList()).thenReturn(battleParticipantList);
+
+        validationHelper.validateCharacterFreeForGame(character);
+    }
+
+    @Test(expected = BpmnError.class)
+    public void validateCharacterFreeForGame_BattleInitiated() {
+        GwCharacter character = mock(GwCharacter.class);
+        BattleParticipant participant = mock(BattleParticipant.class);
+        Battle battle = mock(Battle.class);
+        when(participant.getBattle()).thenReturn(battle);
+        when(battle.getStatus()).thenReturn(BattleStatus.INITIATED);
+
+        List<BattleParticipant> battleParticipantList = new ArrayList<>();
+        battleParticipantList.add(participant);
+        when(character.getBattleParticipantList()).thenReturn(battleParticipantList);
+
+        validationHelper.validateCharacterFreeForGame(character);
+    }
+
+    @Test(expected = BpmnError.class)
+    public void validateCharacterFreeForGame_BattleRunning() {
+        GwCharacter character = mock(GwCharacter.class);
+        BattleParticipant participant = mock(BattleParticipant.class);
+        Battle battle = mock(Battle.class);
+        when(participant.getBattle()).thenReturn(battle);
+        when(battle.getStatus()).thenReturn(BattleStatus.RUNNING);
+
+        List<BattleParticipant> battleParticipantList = new ArrayList<>();
+        battleParticipantList.add(participant);
+        when(character.getBattleParticipantList()).thenReturn(battleParticipantList);
+
+        validationHelper.validateCharacterFreeForGame(character);
+    }
+
+    @Test
+    public void validateCharacterFreeForGame_BattleFinished() {
+        GwCharacter character = mock(GwCharacter.class);
+        BattleParticipant participant = mock(BattleParticipant.class);
+        Battle battle = mock(Battle.class);
+        when(participant.getBattle()).thenReturn(battle);
+        when(battle.getStatus()).thenReturn(BattleStatus.FINISHED);
+
+        List<BattleParticipant> battleParticipantList = new ArrayList<>();
+        battleParticipantList.add(participant);
+        when(character.getBattleParticipantList()).thenReturn(battleParticipantList);
+
+        validationHelper.validateCharacterFreeForGame(character);
+    }
+
+    @Test
+    public void validateCharacterFreeForGame_BattleCanceled() {
+        GwCharacter character = mock(GwCharacter.class);
+        BattleParticipant participant = mock(BattleParticipant.class);
+        Battle battle = mock(Battle.class);
+        when(participant.getBattle()).thenReturn(battle);
+        when(battle.getStatus()).thenReturn(BattleStatus.CANCELED);
+
+        List<BattleParticipant> battleParticipantList = new ArrayList<>();
+        battleParticipantList.add(participant);
+        when(character.getBattleParticipantList()).thenReturn(battleParticipantList);
+
+        validationHelper.validateCharacterFreeForGame(character);
+    }
+
+    @Test
+    public void validateOpenSlotForCharacter_Attacker_OpenSlot() {
+        Battle battle = mock(Battle.class);
+        Planet planet = mock(Planet.class);
+        Map map = mock(Map.class);
+        when(battle.getPlanet()).thenReturn(planet);
+        when(planet.getMap()).thenReturn(map);
+        when(map.getTotalSlots()).thenReturn(2);
+
+        List<BattleParticipant> battleParticipants = new ArrayList<>();
+        BattleParticipant participant = mock(BattleParticipant.class);
+        when(participant.getRole()).thenReturn(BattleRole.DEFENDER);
+        battleParticipants.add(participant);
+        when(battle.getParticipants()).thenReturn(battleParticipants);
+
+        validationHelper.validateOpenSlotForCharacter(battle, BattleRole.ATTACKER);
+    }
+
+    @Test(expected = BpmnError.class)
+    public void validateOpenSlotForCharacter_Attacker_NoSlot() {
+        Battle battle = mock(Battle.class);
+        Planet planet = mock(Planet.class);
+        Map map = mock(Map.class);
+        when(battle.getPlanet()).thenReturn(planet);
+        when(planet.getMap()).thenReturn(map);
+        when(map.getTotalSlots()).thenReturn(2);
+
+        List<BattleParticipant> battleParticipants = new ArrayList<>();
+        BattleParticipant participant = mock(BattleParticipant.class);
+        when(participant.getRole()).thenReturn(BattleRole.ATTACKER);
+        battleParticipants.add(participant);
+        when(battle.getParticipants()).thenReturn(battleParticipants);
+
+        validationHelper.validateOpenSlotForCharacter(battle, BattleRole.ATTACKER);
+    }
+
+    @Test
+    public void validateOpenSlotForCharacter_Defender_OpenSlot() {
+        Battle battle = mock(Battle.class);
+        Planet planet = mock(Planet.class);
+        Map map = mock(Map.class);
+        when(battle.getPlanet()).thenReturn(planet);
+        when(planet.getMap()).thenReturn(map);
+        when(map.getTotalSlots()).thenReturn(2);
+
+        List<BattleParticipant> battleParticipants = new ArrayList<>();
+        BattleParticipant participant = mock(BattleParticipant.class);
+        when(participant.getRole()).thenReturn(BattleRole.ATTACKER);
+        battleParticipants.add(participant);
+        when(battle.getParticipants()).thenReturn(battleParticipants);
+
+        validationHelper.validateOpenSlotForCharacter(battle, BattleRole.DEFENDER);
+    }
+
+    @Test(expected = BpmnError.class)
+    public void validateOpenSlotForCharacter_Defender_NoSlot() {
+        Battle battle = mock(Battle.class);
+        Planet planet = mock(Planet.class);
+        Map map = mock(Map.class);
+        when(battle.getPlanet()).thenReturn(planet);
+        when(planet.getMap()).thenReturn(map);
+        when(map.getTotalSlots()).thenReturn(2);
+
+        List<BattleParticipant> battleParticipants = new ArrayList<>();
+        BattleParticipant participant = mock(BattleParticipant.class);
+        when(participant.getRole()).thenReturn(BattleRole.DEFENDER);
+        battleParticipants.add(participant);
+        when(battle.getParticipants()).thenReturn(battleParticipants);
+
+        validationHelper.validateOpenSlotForCharacter(battle, BattleRole.DEFENDER);
+    }
+
+    //    @Test
     public void generateTestUser() {
         MacSigner macSigner = new MacSigner("secret");
 

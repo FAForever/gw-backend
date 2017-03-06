@@ -1,7 +1,9 @@
 package com.faforever.gw.bpmn.task.planetary_assault;
 
 import com.faforever.gw.bpmn.accessors.PlanetaryAssaultAccessor;
-import com.faforever.gw.model.*;
+import com.faforever.gw.model.Battle;
+import com.faforever.gw.model.BattleRole;
+import com.faforever.gw.model.BattleStatus;
 import com.faforever.gw.model.repository.BattleRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.BpmnError;
@@ -30,7 +32,7 @@ public class CloseAssaultTask implements JavaDelegate {
         PlanetaryAssaultAccessor accessor = PlanetaryAssaultAccessor.of(execution);
         log.debug("closeAssaultTask for battle {}", accessor.getBusinessKey());
 
-        Battle battle = battleRepository.getOne(accessor.getBattleId());
+        Battle battle = battleRepository.findOne(accessor.getBattleId());
         battle.setEndedAt(Timestamp.from(Instant.now()));
         battle.setStatus(BattleStatus.FINISHED);
 

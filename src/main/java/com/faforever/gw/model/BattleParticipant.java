@@ -3,7 +3,6 @@ package com.faforever.gw.model;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -39,5 +38,9 @@ public class BattleParticipant implements Serializable{
         this.battle = battle;
         this.character = gwCharacter;
         this.role = role;
+    }
+
+    public Faction getFaction() {
+        return character.getFaction();
     }
 }

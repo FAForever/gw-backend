@@ -9,10 +9,7 @@ import com.faforever.gw.model.repository.PlanetRepository;
 import com.faforever.gw.security.User;
 import com.faforever.gw.websocket.incoming.InitiateAssaultMessage;
 import com.faforever.gw.websocket.incoming.JoinAssaultMessage;
-//import jersey.repackaged.com.google.common.collect.ImmutableMap;
 import com.faforever.gw.websocket.incoming.LeaveAssaultMessage;
-import com.google.common.collect.ImmutableMap;
-import javafx.util.Pair;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.RuntimeService;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -25,8 +22,11 @@ import org.springframework.stereotype.Controller;
 
 import javax.inject.Inject;
 import java.security.Principal;
-import java.util.*;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.UUID;
+
+//import jersey.repackaged.com.google.common.collect.ImmutableMap;
 
 @Slf4j
 @Controller
@@ -74,16 +74,12 @@ public class WebsocketController {
         gameResult.setBattle(message.getBattleId());
         gameResult.setWinner(Faction.UEF);
 
-        Map<UUID, GameCharacterResult> characterResults = new HashMap();
-        characterResults.put(UUID.fromString("a1111111-e35c-11e6-bf01-fe55135034f3"),new GameCharacterResult(UUID.fromString("a1111111-e35c-11e6-bf01-fe55135034f3"), BattleRole.ATTACKER, BattleParticipantResult.VICTORY));
-        characterResults.put(UUID.fromString("a2222222-e35c-11e6-bf01-fe55135034f3"),new GameCharacterResult(UUID.fromString("a2222222-e35c-11e6-bf01-fe55135034f3"), BattleRole.ATTACKER, BattleParticipantResult.DEATH));
-        characterResults.put(UUID.fromString("a3333333-e4e2-11e6-bf01-fe55135034f3"),new GameCharacterResult(UUID.fromString("a3333333-e4e2-11e6-bf01-fe55135034f3"), BattleRole.DEFENDER, BattleParticipantResult.RECALL));
-        characterResults.put(UUID.fromString("a4444444-e4e2-11e6-bf01-fe55135034f3"),new GameCharacterResult(UUID.fromString("a4444444-e4e2-11e6-bf01-fe55135034f3"), BattleRole.DEFENDER, BattleParticipantResult.DEATH));
+        ArrayList<GameCharacterResult> characterResults = new ArrayList<>();
+        characterResults.add(new GameCharacterResult(UUID.fromString("a1111111-e35c-11e6-bf01-fe55135034f3"), BattleRole.ATTACKER, BattleParticipantResult.VICTORY, null));
+        characterResults.add(new GameCharacterResult(UUID.fromString("a2222222-e35c-11e6-bf01-fe55135034f3"), BattleRole.ATTACKER, BattleParticipantResult.DEATH, UUID.fromString("a4444444-e4e2-11e6-bf01-fe55135034f3")));
+        characterResults.add(new GameCharacterResult(UUID.fromString("a3333333-e4e2-11e6-bf01-fe55135034f3"), BattleRole.DEFENDER, BattleParticipantResult.RECALL, null));
+        characterResults.add(new GameCharacterResult(UUID.fromString("a4444444-e4e2-11e6-bf01-fe55135034f3"), BattleRole.DEFENDER, BattleParticipantResult.DEATH, UUID.fromString("a1111111-e35c-11e6-bf01-fe55135034f3")));
         gameResult.setCharacterResults(characterResults);
-
-        Collection<Pair<UUID,UUID>> killList = new ArrayList<>();
-        killList.add(new Pair<UUID, UUID>(UUID.fromString("a1111111-e35c-11e6-bf01-fe55135034f3"),UUID.fromString("a4444444-e4e2-11e6-bf01-fe55135034f3")));
-        gameResult.setCharacterKills(killList);
 
         planetaryAssaultService.onGameResult(gameResult);
     }

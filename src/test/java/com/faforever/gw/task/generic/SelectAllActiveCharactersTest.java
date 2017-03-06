@@ -7,6 +7,8 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -15,7 +17,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-import static org.mockito.Matchers.anyListOf;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
@@ -26,6 +28,9 @@ public class SelectAllActiveCharactersTest {
     private DelegateExecution delegateExecution;
     @Mock
     private CharacterRepository characterRepository;
+
+    @Captor
+    private ArgumentCaptor<List<UUID>> captor;
 
     private SelectAllActiveCharactersTask task;
 
@@ -46,11 +51,24 @@ public class SelectAllActiveCharactersTest {
 
     @Test
     public void testSomeActiveCharacters() throws Exception {
-        List<GwCharacter> characterList = Arrays.asList(mock(GwCharacter.class), mock(GwCharacter.class));
+        GwCharacter dummy1 = mock(GwCharacter.class);
+        UUID uuid1 = UUID.fromString("11111111-1111-1111-1111-111111111111");
+        when(dummy1.getId()).thenReturn(uuid1);
+
+        GwCharacter dummy2 = mock(GwCharacter.class);
+        UUID uuid2 = UUID.fromString("22222222-2222-2222-2222-222222222222");
+        when(dummy2.getId()).thenReturn(uuid2);
+
+        List<GwCharacter> characterList = Arrays.asList(dummy1, dummy2);
         when(characterRepository.findActiveCharacters()).thenReturn(characterList);
 
         task.execute(delegateExecution);
 
-        verify(delegateExecution).setVariable(eq("activeCharacters"), anyListOf(UUID.class));
+        verify(delegateExecution).setVariable(eq("activeCharacters"), captor.capture());
+        List<UUID> characters = captor.getValue();
+
+        assertEquals(characters.size(), 2);
+        assertEquals(characters.get(0), uuid1);
+        assertEquals(characters.get(1), uuid2);
     }
 }

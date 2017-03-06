@@ -13,7 +13,9 @@ import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -38,50 +40,62 @@ public class ProcessGameResultTask implements JavaDelegate {
         log.debug("processGameResultTask for battle {}", accessor.getBusinessKey());
 
         GameResult gameResult = accessor.getGameResult();
+        Battle battle = battleRepository.findOne(accessor.getBattleId());
+        battle.setWinningFaction(gameResult.getWinner());
+        accessor.setWinner(gameResult.getWinner() == accessor.getAttackingFaction() ? BattleRole.ATTACKER : BattleRole.DEFENDER);
 
-        BattleRole winner = gameResult.getWinner() == accessor.getAttackingFaction() ? BattleRole.ATTACKER : BattleRole.DEFENDER;
-        accessor.setWinner(winner);
+        HashMap<UUID, GwCharacter> characterMap = new HashMap<>();
+        HashMap<UUID, List<UUID>> killsMap = new HashMap<>();
 
-        Battle battle = battleRepository.getOne(gameResult.getBattle());
-        Map<UUID, GameCharacterResult> results = gameResult.getCharacterResults();
+        // first initialize the HashMaps
+        for (GameCharacterResult characterResult : gameResult.getCharacterResults()) {
+            UUID characterId = characterResult.getCharacter();
+            GwCharacter character = characterRepository.findOne(characterId);
+            characterMap.put(characterId, character);
 
-        for (BattleParticipant battleParticipant : battle.getParticipants()) {
-            GwCharacter character = battleParticipant.getCharacter();
-            GameCharacterResult result = results.get(character.getId());
-            battleParticipant.setResult(result.getParticipantResult());
+            UUID killerId = characterResult.getKilledByCharacter();
+            if (killerId != null) {
+                killsMap.putIfAbsent(killerId, new ArrayList<>());
+                killsMap.get(killerId).add(characterId);
+            }
+        }
 
-            // if killed, store the killer
-            if (result.getParticipantResult() == BattleParticipantResult.DEATH) {
-                gameResult.getCharacterKills().stream()
-                        .filter(uuidPair -> uuidPair.getValue().equals(character.getId()))
-                        .findFirst().ifPresent(uuidPair ->
-                        battleParticipant.getCharacter().setKiller(characterRepository.getOne(uuidPair.getKey()))
-                );
-            } else {
-                // if participants faction won, gain XP
-                if (battle.getWinningFaction() == character.getFaction()) {
+        // now the HashMaps are filled with all values -> process results
+        for (GameCharacterResult characterResult : gameResult.getCharacterResults()) {
+            UUID characterId = characterResult.getCharacter();
+
+            GwCharacter character = characterMap.get(characterId);
+            BattleParticipant participant = battle.getParticipant(character).get();
+
+            BattleParticipantResult participantResult = characterResult.getParticipantResult();
+            participant.setResult(participantResult);
+            log.debug("-> Character {} result: {}", characterId, participantResult.getName());
+
+            if (characterResult.getParticipantResult() != BattleParticipantResult.DEATH) {
+                // give XP for winning the battle
+                if (gameResult.getWinner() == character.getFaction()) {
                     Long gainedXp = planetaryAssaultService.calcFactionVictoryXpForCharacter(battle, character);
                     character.setXp(character.getXp() + gainedXp);
                     log.info("Character {} gained {} xp in battle", character.getId(), gainedXp);
                 }
 
-                // process all kills for this character
-                gameResult.getCharacterKills().stream()
-                        .filter(uuidPair -> uuidPair.getKey().equals(character.getId()))
-                        .forEach(uuidPair -> {
-                                    GwCharacter victim = characterRepository.getOne(uuidPair.getValue());
+                // give XP for killing characters
+                if (killsMap.containsKey(characterId)) {
+                    for (UUID killedId : killsMap.get(characterId)) {
+                        GwCharacter killedCharacter = characterMap.get(killedId);
+                        killedCharacter.setKiller(character);
 
-                                    if (character.getFaction() == victim.getFaction()) {
-                                        Long xpMalus = planetaryAssaultService.calcTeamkillXpMalus(character);
-                                        character.setXp(character.getXp() - xpMalus);
-                                        log.info("Teamkill detected: character {} killed {}, {} xp malus", character.getId(), uuidPair.getValue(), xpMalus);
-                                    } else {
-                                        Long xpBonus = planetaryAssaultService.calcKillXpBonus(character, victim);
-                                        character.setXp(character.getXp() + xpBonus);
-                                        log.info("Character {} killed character {}, {} xp bonus", uuidPair.getKey(), uuidPair.getValue(), xpBonus);
-                                    }
-                                }
-                        );
+                        if (character.getFaction() == killedCharacter.getFaction()) {
+                            Long xpMalus = planetaryAssaultService.calcTeamkillXpMalus(character);
+                            character.setXp(character.getXp() - xpMalus);
+                            log.info("Teamkill detected: character {} killed {}, {} xp malus", characterId, killedId, xpMalus);
+                        } else {
+                            Long xpBonus = planetaryAssaultService.calcKillXpBonus(character, killedCharacter);
+                            character.setXp(character.getXp() + xpBonus);
+                            log.info("Character {} killed character {}, {} xp bonus", killedId, characterId, xpBonus);
+                        }
+                    }
+                }
             }
         }
     }

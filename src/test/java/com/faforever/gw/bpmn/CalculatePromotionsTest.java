@@ -1,7 +1,6 @@
 package com.faforever.gw.bpmn;
 
 import com.faforever.gw.model.GwCharacter;
-//import jersey.repackaged.com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -19,6 +18,8 @@ import static org.camunda.bpm.extension.mockito.DelegateExpressions.verifyJavaDe
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 
+//import jersey.repackaged.com.google.common.collect.ImmutableMap;
+
 
 public class CalculatePromotionsTest {
 
@@ -29,8 +30,8 @@ public class CalculatePromotionsTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         DelegateExpressions.registerJavaDelegateMock("selectAllActiveCharactersTask").onExecutionSetVariables(ImmutableMap.of("activeCharacters", Arrays.asList(mock(GwCharacter.class), mock(GwCharacter.class))));
-        DelegateExpressions.registerJavaDelegateMock("getAvailableRankTask");
-        DelegateExpressions.registerJavaDelegateMock("promoteCharacterTask");
+        DelegateExpressions.registerJavaDelegateMock("checkAndPerformPromotionTask");
+        DelegateExpressions.registerJavaDelegateMock("characterPromotionMessage");
     }
 
     @After
@@ -41,25 +42,25 @@ public class CalculatePromotionsTest {
     @Test
     @Deployment(resources = "bpmn/calculate_promotions.bpmn")
     public void success_2active_bothPromoted() throws Exception {
-        DelegateExpressions.registerJavaDelegateMock("getAvailableRankTask").onExecutionSetVariables(ImmutableMap.of("rankAvailable", true));
+        DelegateExpressions.registerJavaDelegateMock("checkAndPerformPromotionTask").onExecutionSetVariables(ImmutableMap.of("rankAvailable", true));
 
         startProcess();
 
         verifyJavaDelegateMock("selectAllActiveCharactersTask").executed(times(1));
-        verifyJavaDelegateMock("getAvailableRankTask").executed(times(2));
-        verifyJavaDelegateMock("promoteCharacterTask").executed(times(2));
+        verifyJavaDelegateMock("checkAndPerformPromotionTask").executed(times(2));
+        verifyJavaDelegateMock("characterPromotionMessage").executed(times(2));
     }
 
     @Test
     @Deployment(resources = "bpmn/calculate_promotions.bpmn")
     public void success_2active_nonePromoted() throws Exception {
-        DelegateExpressions.registerJavaDelegateMock("getAvailableRankTask").onExecutionSetVariables(ImmutableMap.of("rankAvailable", false));
+        DelegateExpressions.registerJavaDelegateMock("checkAndPerformPromotionTask").onExecutionSetVariables(ImmutableMap.of("rankAvailable", false));
 
         startProcess();
 
         verifyJavaDelegateMock("selectAllActiveCharactersTask").executed(times(1));
-        verifyJavaDelegateMock("getAvailableRankTask").executed(times(2));
-        verifyJavaDelegateMock("promoteCharacterTask").executed(times(0));
+        verifyJavaDelegateMock("checkAndPerformPromotionTask").executed(times(2));
+        verifyJavaDelegateMock("characterPromotionMessage").executed(times(0));
     }
 
     private void startProcess() {

@@ -55,7 +55,7 @@ public class AddCharacterToAssaultTask implements JavaDelegate {
             battleRole = null;
         }
 
-        validationHelper.validateOpenSlotForCharacter(character, battle, battleRole);
+        validationHelper.validateOpenSlotForCharacter(battle, battleRole);
         BattleParticipant battleParticipant = new BattleParticipant(battle, character, battleRole);
         battle.getParticipants().add(battleParticipant);
         battleRepository.save(battle);

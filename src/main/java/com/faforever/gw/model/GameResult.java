@@ -1,6 +1,5 @@
 package com.faforever.gw.model;
 
-import javafx.util.Pair;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -11,6 +10,5 @@ import java.util.UUID;
 public class GameResult implements Serializable {
     UUID battle;
     Faction winner;
-    java.util.Map<UUID, GameCharacterResult> characterResults;
-    Collection<Pair<UUID, UUID>> characterKills;
+    Collection<GameCharacterResult> characterResults; // there must be one GameCharacterResult for each participant of the battle!
 }

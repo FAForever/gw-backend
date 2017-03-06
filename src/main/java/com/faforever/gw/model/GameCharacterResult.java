@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.UUID;
 
 @Data
@@ -13,5 +12,6 @@ public class GameCharacterResult implements Serializable {
     UUID character;
     BattleRole battleRole;
     BattleParticipantResult participantResult;
+    UUID killedByCharacter;
 //    Integer killedExperimentals;
 }

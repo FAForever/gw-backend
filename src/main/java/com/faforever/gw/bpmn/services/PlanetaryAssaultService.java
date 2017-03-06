@@ -9,7 +9,10 @@ import com.faforever.gw.websocket.incoming.InitiateAssaultMessage;
 import com.faforever.gw.websocket.incoming.JoinAssaultMessage;
 import com.faforever.gw.websocket.incoming.LeaveAssaultMessage;
 import lombok.extern.slf4j.Slf4j;
+import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
+import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -29,23 +32,22 @@ import java.util.UUID;
  * Service class for the BPMN process "planetary assault"
  */
 public class PlanetaryAssaultService {
-    private final ApplicationContext applicationContext;
-    private final RuntimeService runtimeService;
-    private final MessagingService messagingService;
-    private final PlanetRepository planetRepository;
-
     public static final String UPDATE_OPEN_GAMES_SIGNAL = "Signal_UpdateOpenGames";
-
     public static final String INITIATE_ASSAULT_MESSAGE = "Message_InitiateAssault";
     public static final String PLAYER_JOINS_ASSAULT_MESSAGE = "Message_PlayerJoinsAssault";
     public static final String PLAYER_LEAVES_ASSAULT_MESSAGE = "Message_PlayerLeavesAssault";
     public static final String GAME_RESULT_MESSAGE = "Message_GameResult";
-
     public static final Long XP_MALUS_FOR_RECALL = 5L;
+    private final ApplicationContext applicationContext;
+    private final ProcessEngine processEngine;
+    private final RuntimeService runtimeService;
+    private final MessagingService messagingService;
+    private final PlanetRepository planetRepository;
 
     @Inject
-    public PlanetaryAssaultService(ApplicationContext applicationContext, RuntimeService runtimeService, MessagingService messagingService, PlanetRepository planetRepository) {
+    public PlanetaryAssaultService(ApplicationContext applicationContext, ProcessEngine processEngine, RuntimeService runtimeService, MessagingService messagingService, PlanetRepository planetRepository) {
         this.applicationContext = applicationContext;
+        this.processEngine = processEngine;
         this.runtimeService = runtimeService;
         this.messagingService = messagingService;
         this.planetRepository = planetRepository;
@@ -131,11 +133,11 @@ public class PlanetaryAssaultService {
             BattleParticipant participant = participantOptional.get();
 
             Long noOfAllies = battle.getParticipants().stream()
-                    .filter(battleParticipant -> battleParticipant.getCharacter().getFaction() == character.getFaction())
+                    .filter(battleParticipant -> battleParticipant.getFaction() == character.getFaction())
                     .count();
 
             Long noOfEnemies = battle.getParticipants().stream()
-                    .filter(battleParticipant -> battleParticipant.getCharacter().getFaction() != character.getFaction())
+                    .filter(battleParticipant -> battleParticipant.getFaction() != character.getFaction())
                     .count();
 
             if (battle.getWinningFaction() == character.getFaction()) {
@@ -165,5 +167,27 @@ public class PlanetaryAssaultService {
         Integer killerRank = killer.getRank().getLevel();
         Double rankDifferenceFactor = Math.min(0.0,victim.getRank().getLevel() - killerRank) * 5 / 100.0;
         return Math.round(5*killerRank*Math.pow(0.99, killerRank-1)*rankDifferenceFactor);
+    }
+
+    public double calcWaitingProgress(int mapSlots, long attackerCount, long defenderCount) {
+        VariableMap attackerVariables = Variables.createVariables()
+                .putValue("map_slots", mapSlots)
+                .putValue("faction_player_count", attackerCount);
+
+        VariableMap defenderVariables = Variables.createVariables()
+                .putValue("map_slots", mapSlots)
+                .putValue("faction_player_count", defenderCount);
+
+        DecisionService decisionService = processEngine.getDecisionService();
+        DmnDecisionTableResult attackerResult = decisionService.evaluateDecisionTableByKey("assault_progress_factor", attackerVariables);
+        DmnDecisionTableResult defenderResult = decisionService.evaluateDecisionTableByKey("assault_progress_factor", defenderVariables);
+
+        // we can securely access getFirstResult, because the DMN table gives a unique result
+        Double attackerProgress = attackerResult.getFirstResult().getEntry("progress_factor");
+        Double defenderProgress = defenderResult.getFirstResult().getEntry("progress_factor");
+
+        Double progressNormalizer = mapSlots * 20.0;
+
+        return (attackerCount * attackerProgress + defenderCount * defenderProgress) / progressNormalizer;
     }
 }
