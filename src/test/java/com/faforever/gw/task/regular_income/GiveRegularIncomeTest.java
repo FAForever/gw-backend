@@ -1,12 +1,9 @@
 package com.faforever.gw.task.regular_income;
 
 import com.faforever.gw.bpmn.task.regular_income.GiveRegularIncomeTask;
-import com.faforever.gw.model.Battle;
-import com.faforever.gw.model.GwCharacter;
-import com.faforever.gw.model.repository.CharacterRepository;
-import com.faforever.gw.model.repository.RankRepository;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -17,18 +14,9 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class GiveRegularIncomeTest {
-    @Mock
-    private Battle battle;
     private GiveRegularIncomeTask task;
     @Mock
     private DelegateExecution delegateExecution;
-
-    @Mock
-    private CharacterRepository characterRepository;
-    @Mock
-    private GwCharacter character;
-    @Mock
-    private RankRepository rankRepository;
 
     @Before
     public void setUp() throws Exception {
@@ -41,6 +29,10 @@ public class GiveRegularIncomeTest {
         task = new GiveRegularIncomeTask();
     }
 
+    @Test
+    public void dummy() throws Exception {
+        task.execute(delegateExecution);
+    }
     // TODO: Add tests according to implementation
 
 }

@@ -59,7 +59,7 @@ public class PlanetaryAssaultService {
         UUID battleUUID = UUID.randomUUID();
 
         GwCharacter character = user.getActiveCharacter();
-        Planet planet = planetRepository.getOne(message.getPlanetId());
+        Planet planet = planetRepository.findOne(message.getPlanetId());
 
         VariableMap variables = messagingService.createVariables(message.getRequestId(), user.getActiveCharacter().getId())
                 .putValue("battle", battleUUID)
