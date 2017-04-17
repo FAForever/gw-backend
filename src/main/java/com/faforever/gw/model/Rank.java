@@ -1,42 +1,61 @@
 package com.faforever.gw.model;
 
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
-import java.util.UUID;
 
 @Entity
 @Table(name="gw_rank")
-@Getter
 @Setter
 @NoArgsConstructor
 public class Rank implements Serializable{
-    @Id
-    private Integer level;
-
-    @Column(name = "xp_min", nullable = false, updatable = false, length = 20)
     Long xpMin;
-
-    @OneToMany(mappedBy = "rank")
+    private Integer level;
     private List<GwCharacter> characters;
-
-    @Column(name = "uef_title", nullable = false, updatable = false, length = 20)
     private String uefTitle;
-
-    @Column(name = "aeon_title", nullable = false, updatable = false, length = 20)
     private String aeonTitle;
-
-    @Column(name = "cybran_title", nullable = false, updatable = false, length = 20)
     private String cybranTitle;
-
-    @Column(name = "seraphim_title", nullable = false, updatable = false, length = 20)
     private String seraphimTitle;
 
+    @Id
+    public Integer getLevel() {
+        return level;
+    }
+
+    @Column(name = "xp_min", nullable = false, updatable = false, length = 20)
+    public Long getXpMin() {
+        return xpMin;
+    }
+
+    @OneToMany(mappedBy = "rank")
+    public List<GwCharacter> getCharacters() {
+        return characters;
+    }
+
+    @Column(name = "uef_title", nullable = false, updatable = false, length = 20)
+    public String getUefTitle() {
+        return uefTitle;
+    }
+
+    @Column(name = "aeon_title", nullable = false, updatable = false, length = 20)
+    public String getAeonTitle() {
+        return aeonTitle;
+    }
+
+    @Column(name = "cybran_title", nullable = false, updatable = false, length = 20)
+    public String getCybranTitle() {
+        return cybranTitle;
+    }
+
+    @Column(name = "seraphim_title", nullable = false, updatable = false, length = 20)
+    public String getSeraphimTitle() {
+        return seraphimTitle;
+    }
+
+    @Transient
     public String getTitle(Faction faction) {
         switch (faction) {
             case UEF:

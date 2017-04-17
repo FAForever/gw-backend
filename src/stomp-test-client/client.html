@@ -20,6 +20,7 @@
     <script type="text/javascript">
         var stompClient;
         var subscriptions = [];
+        var openRequests = [];
 
         (function () {
             var exLog = console.log;
@@ -73,6 +74,15 @@
 
             console.log('STOMP: Attempting connection');
             stompClient.connect({"X-Authorization": $("#userToken").val()}, stompSuccessCallback, stompFailureCallback);
+
+            // get a list of open games
+            $.getJSON("http://localhost:8080/data/battle?filter[battle]=status==INITIATED", function (data) {
+                battles = data["data"]
+                $.each(battles, function (i, item) {
+                    var option = new Option(battles[i].id, '{"battleId":"' + battles[i].id + '"}');
+                    $("#joinAssaultBattle").append(option);
+                })
+            })
 
         }
 

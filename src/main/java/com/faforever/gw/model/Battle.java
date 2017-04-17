@@ -1,6 +1,6 @@
 package com.faforever.gw.model;
 
-import lombok.Getter;
+import com.yahoo.elide.annotation.Include;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
@@ -15,33 +15,21 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Entity
-@Getter
 @Setter
 @Table(name = "gw_battle")
+@Include(rootLevel = true)
 @NoArgsConstructor
 public class Battle implements Serializable {
 
-    @Id
     private UUID id;
-    @ManyToOne
-    @JoinColumn(name = "fk_planet")
     private Planet planet;
-    @OneToMany(mappedBy = "battle", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    @NotNull
     private List<BattleParticipant> participants = new ArrayList<>();
-    @Column(name = "status", nullable = false, length = 1)
     private BattleStatus status;
-    @Column(name = "initiated_at", nullable = false)
     private Timestamp initiatedAt;
-    @Column(name = "started_at")
     private Timestamp startedAt;
-    @Column(name = "ended_at")
     private Timestamp endedAt;
-    @Column(name = "attacking_faction", nullable = true, updatable = false, length = 1)
     private Faction attackingFaction;
-    @Column(name = "defending_faction", nullable = true, updatable = false, length = 1)
     private Faction defendingFaction;
-    @Column(name = "winning_faction", length = 1)
     private Faction winningFaction;
 
     public Battle(UUID id, Planet planet, Faction attackingFaction, Faction defendingFaction) {
@@ -51,6 +39,58 @@ public class Battle implements Serializable {
         this.defendingFaction = defendingFaction;
         this.status = BattleStatus.INITIATED;
         this.initiatedAt = Timestamp.from(Instant.now());
+    }
+
+    @Id
+    public UUID getId() {
+        return id;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "fk_planet")
+    public Planet getPlanet() {
+        return planet;
+    }
+
+    @OneToMany(mappedBy = "battle", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @NotNull
+    public List<BattleParticipant> getParticipants() {
+        return participants;
+    }
+
+    @Column(name = "status", nullable = false, length = 1)
+    public BattleStatus getStatus() {
+        return status;
+    }
+
+    @Column(name = "initiated_at", nullable = false)
+    public Timestamp getInitiatedAt() {
+        return initiatedAt;
+    }
+
+    @Column(name = "started_at")
+    public Timestamp getStartedAt() {
+        return startedAt;
+    }
+
+    @Column(name = "ended_at")
+    public Timestamp getEndedAt() {
+        return endedAt;
+    }
+
+    @Column(name = "attacking_faction", nullable = true, updatable = false, length = 1)
+    public Faction getAttackingFaction() {
+        return attackingFaction;
+    }
+
+    @Column(name = "defending_faction", nullable = true, updatable = false, length = 1)
+    public Faction getDefendingFaction() {
+        return defendingFaction;
+    }
+
+    @Column(name = "winning_faction", length = 1)
+    public Faction getWinningFaction() {
+        return winningFaction;
     }
 
     public Optional<BattleParticipant> getParticipant(GwCharacter character) {
