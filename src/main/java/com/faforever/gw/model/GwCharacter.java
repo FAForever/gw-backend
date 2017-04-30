@@ -2,13 +2,13 @@ package com.faforever.gw.model;
 
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.val;
+import org.hibernate.Hibernate;
 
 import javax.persistence.*;
+import javax.transaction.Transactional;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @NoArgsConstructor
 @Setter
@@ -77,5 +77,20 @@ public class GwCharacter implements Serializable {
     @Transient
     public String getTitle() {
         return rank.getTitle(getFaction());
+    }
+
+    @Transient
+    @Transactional
+    public Optional<Battle> getCurrentBattle() {
+        Hibernate.initialize(this);
+        Hibernate.initialize(getBattleParticipantList());
+        val currentParticipant = getBattleParticipantList().stream()
+                .filter(battleParticipant -> {
+                    BattleStatus battleStatus = battleParticipant.getBattle().getStatus();
+                    return battleStatus == BattleStatus.INITIATED || battleStatus == BattleStatus.RUNNING;
+                })
+                .findFirst();
+
+        return currentParticipant.map(BattleParticipant::getBattle);
     }
 }

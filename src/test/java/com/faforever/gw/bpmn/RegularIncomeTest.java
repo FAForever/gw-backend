@@ -27,7 +27,7 @@ public class RegularIncomeTest {
         MockitoAnnotations.initMocks(this);
         DelegateExpressions.registerJavaDelegateMock("selectAllActiveCharactersTask").onExecutionSetVariables(ImmutableMap.of("activeCharacters", Arrays.asList("GwCharacter.class", "GwCharacter.class")));
         DelegateExpressions.registerJavaDelegateMock("giveRegularIncomeTask");
-        DelegateExpressions.registerJavaDelegateMock("regularIncomeMessage");
+        DelegateExpressions.registerJavaDelegateMock("regularIncomeNotification");
     }
 
     @After
@@ -42,7 +42,7 @@ public class RegularIncomeTest {
 
         verifyJavaDelegateMock("selectAllActiveCharactersTask").executed(times(1));
         verifyJavaDelegateMock("giveRegularIncomeTask").executed(times(2));
-        verifyJavaDelegateMock("regularIncomeMessage").executed(times(2));
+        verifyJavaDelegateMock("regularIncomeNotification").executed(times(2));
     }
 
     private void startProcess() {

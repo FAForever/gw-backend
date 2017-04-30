@@ -10,9 +10,9 @@ import com.faforever.gw.model.repository.PlanetRepository;
 import com.faforever.gw.security.GwUserRegistry;
 import com.faforever.gw.security.User;
 import com.faforever.gw.services.messaging.MessagingService;
-import com.faforever.gw.websocket.incoming.InitiateAssaultMessage;
-import com.faforever.gw.websocket.incoming.JoinAssaultMessage;
-import com.faforever.gw.websocket.incoming.LeaveAssaultMessage;
+import com.faforever.gw.services.messaging.incoming.InitiateAssaultMessage;
+import com.faforever.gw.services.messaging.incoming.JoinAssaultMessage;
+import com.faforever.gw.services.messaging.incoming.LeaveAssaultMessage;
 import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
@@ -59,7 +59,7 @@ public class PlanetaryAssaultServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        service = new PlanetaryAssaultService(applicationContext, processEngine, runtimeService, messagingService, planetRepository);
+        service = new PlanetaryAssaultService(processEngine, runtimeService, messagingService, planetRepository);
     }
 
     @Test
@@ -114,7 +114,6 @@ public class PlanetaryAssaultServiceTest {
 
         verify(messagingService).createVariables(message.getRequestId(), character.getId());
         verify(runtimeService).correlateMessage(eq(PlanetaryAssaultService.PLAYER_JOINS_ASSAULT_MESSAGE), anyString(), any());
-        verify(applicationContext, never()).getBean(UserErrorMessage.class);
     }
 
     @Test
@@ -140,7 +139,6 @@ public class PlanetaryAssaultServiceTest {
 
         verify(messagingService).createVariables(message.getRequestId(), character.getId());
         verify(runtimeService).correlateMessage(eq(PlanetaryAssaultService.PLAYER_JOINS_ASSAULT_MESSAGE), anyString(), any());
-        verify(applicationContext).getBean(UserErrorMessage.class);
         verify(messagingService).send(any());
     }
 
@@ -188,7 +186,6 @@ public class PlanetaryAssaultServiceTest {
 
         verify(messagingService).createVariables(message.getRequestId(), character.getId());
         verify(runtimeService).correlateMessage(eq(PlanetaryAssaultService.PLAYER_LEAVES_ASSAULT_MESSAGE), anyString(), any());
-        verify(applicationContext).getBean(UserErrorMessage.class);
         verify(messagingService).send(any());
     }
 

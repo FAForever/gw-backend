@@ -1,13 +1,13 @@
 package com.faforever.gw.bpmn.services;
 
-import com.faforever.gw.bpmn.message.generic.UserErrorMessage;
 import com.faforever.gw.model.*;
 import com.faforever.gw.model.repository.PlanetRepository;
 import com.faforever.gw.security.User;
 import com.faforever.gw.services.messaging.MessagingService;
-import com.faforever.gw.websocket.incoming.InitiateAssaultMessage;
-import com.faforever.gw.websocket.incoming.JoinAssaultMessage;
-import com.faforever.gw.websocket.incoming.LeaveAssaultMessage;
+import com.faforever.gw.services.messaging.incoming.InitiateAssaultMessage;
+import com.faforever.gw.services.messaging.incoming.JoinAssaultMessage;
+import com.faforever.gw.services.messaging.incoming.LeaveAssaultMessage;
+import com.faforever.gw.services.messaging.outgoing.ErrorMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.engine.DecisionService;
@@ -17,7 +17,6 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
-import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -38,15 +37,13 @@ public class PlanetaryAssaultService {
     public static final String PLAYER_LEAVES_ASSAULT_MESSAGE = "Message_PlayerLeavesAssault";
     public static final String GAME_RESULT_MESSAGE = "Message_GameResult";
     public static final Long XP_MALUS_FOR_RECALL = 5L;
-    private final ApplicationContext applicationContext;
     private final ProcessEngine processEngine;
     private final RuntimeService runtimeService;
     private final MessagingService messagingService;
     private final PlanetRepository planetRepository;
 
     @Inject
-    public PlanetaryAssaultService(ApplicationContext applicationContext, ProcessEngine processEngine, RuntimeService runtimeService, MessagingService messagingService, PlanetRepository planetRepository) {
-        this.applicationContext = applicationContext;
+    public PlanetaryAssaultService(ProcessEngine processEngine, RuntimeService runtimeService, MessagingService messagingService, PlanetRepository planetRepository) {
         this.processEngine = processEngine;
         this.runtimeService = runtimeService;
         this.messagingService = messagingService;
@@ -60,6 +57,8 @@ public class PlanetaryAssaultService {
 
         GwCharacter character = user.getActiveCharacter();
         Planet planet = planetRepository.findOne(message.getPlanetId());
+
+        // TODO: How do we handle NullPointerException i.e. if planet is null?
 
         VariableMap variables = messagingService.createVariables(message.getRequestId(), user.getActiveCharacter().getId())
                 .putValue("battle", battleUUID)
@@ -103,12 +102,7 @@ public class PlanetaryAssaultService {
     }
 
     private void sendErrorToUser(User user, UUID requestId, GwErrorType errorType) {
-        UserErrorMessage errorMessage = applicationContext.getBean(UserErrorMessage.class);
-        errorMessage.setRequestId(requestId);
-        errorMessage.setRecepientCharacter(user.getActiveCharacter().getId());
-        errorMessage.setErrorCode(errorType.getErrorCode());
-        errorMessage.setErrorMessage(errorType.getErrorMessage());
-        messagingService.send(errorMessage);
+        messagingService.send(new ErrorMessage(user, requestId, errorType.getErrorCode(), errorType.getErrorMessage()));
     }
 
     @Scheduled(fixedDelay = 60000)
@@ -152,7 +146,7 @@ public class PlanetaryAssaultService {
                 return 0L;
             }
         } else {
-            throw new RuntimeException(String.format("Character {} didn't participate in battle {}", character.getId(), battle.getId()));
+            throw new RuntimeException(String.format("Character %s didn't participate in battle %s", character.getId(), battle.getId()));
         }
     }
 

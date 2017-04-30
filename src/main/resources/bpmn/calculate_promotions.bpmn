@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="1.6.0">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="1.7.2">
   <bpmn:process id="Process_CalculatePromotions" name="Calculate Promotions" isExecutable="true" camunda:versionTag="0.1">
     <bpmn:startEvent id="StartEvent_UpdatePromotions" name="update&#10;promotions">
       <bpmn:outgoing>SequenceFlow_0e2xo0f</bpmn:outgoing>
@@ -38,7 +38,7 @@
       </bpmn:serviceTask>
       <bpmn:endEvent id="EndEvent_CharacterPromoted" name="character promoted">
         <bpmn:incoming>SequenceFlow_NewRank_Yes</bpmn:incoming>
-        <bpmn:messageEventDefinition camunda:delegateExpression="${characterPromotionMessage}" />
+        <bpmn:messageEventDefinition camunda:delegateExpression="${characterPromotionNotification}" />
       </bpmn:endEvent>
     </bpmn:subProcess>
     <bpmn:endEvent id="EndEvent_PromotionsUpdated" name="promotions updated">

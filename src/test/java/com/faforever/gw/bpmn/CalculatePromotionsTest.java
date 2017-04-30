@@ -31,7 +31,7 @@ public class CalculatePromotionsTest {
         MockitoAnnotations.initMocks(this);
         DelegateExpressions.registerJavaDelegateMock("selectAllActiveCharactersTask").onExecutionSetVariables(ImmutableMap.of("activeCharacters", Arrays.asList(mock(GwCharacter.class), mock(GwCharacter.class))));
         DelegateExpressions.registerJavaDelegateMock("checkAndPerformPromotionTask");
-        DelegateExpressions.registerJavaDelegateMock("characterPromotionMessage");
+        DelegateExpressions.registerJavaDelegateMock("characterPromotionNotification");
     }
 
     @After
@@ -48,7 +48,7 @@ public class CalculatePromotionsTest {
 
         verifyJavaDelegateMock("selectAllActiveCharactersTask").executed(times(1));
         verifyJavaDelegateMock("checkAndPerformPromotionTask").executed(times(2));
-        verifyJavaDelegateMock("characterPromotionMessage").executed(times(2));
+        verifyJavaDelegateMock("characterPromotionNotification").executed(times(2));
     }
 
     @Test
@@ -60,7 +60,7 @@ public class CalculatePromotionsTest {
 
         verifyJavaDelegateMock("selectAllActiveCharactersTask").executed(times(1));
         verifyJavaDelegateMock("checkAndPerformPromotionTask").executed(times(2));
-        verifyJavaDelegateMock("characterPromotionMessage").executed(times(0));
+        verifyJavaDelegateMock("characterPromotionNotification").executed(times(0));
     }
 
     private void startProcess() {

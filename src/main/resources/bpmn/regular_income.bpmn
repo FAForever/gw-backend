@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="1.6.0">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="1.7.2">
   <bpmn:process id="Process_RegularIncome" name="Regular Income" isExecutable="true">
     <bpmn:extensionElements>
       <camunda:properties>
@@ -38,7 +38,7 @@
       </bpmn:serviceTask>
       <bpmn:endEvent id="EndEvent_GenerateIncomeSub" name="regular income received">
         <bpmn:incoming>SequenceFlow_1qbpz3u</bpmn:incoming>
-        <bpmn:messageEventDefinition camunda:delegateExpression="${regularIncomeMessage}" />
+        <bpmn:messageEventDefinition camunda:delegateExpression="${regularIncomeNotification}" />
       </bpmn:endEvent>
     </bpmn:subProcess>
     <bpmn:sequenceFlow id="SequenceFlow_16dj4iv" sourceRef="Task_SelectAllActiveCharacters" targetRef="SubProcess_GenerateIncomePerPlayer" />

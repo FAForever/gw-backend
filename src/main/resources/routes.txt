@@ -1,13 +1,13 @@
 /planets/attacked - planetId, battleId attackingFaction, defendingFaction
 /planets/conquered - planetId, battleId, newOwnerFaction
 /planets/defended - planetId, battleId, oldOwnerFaction
-/battles/character_joined - battleId, characterId, characterFaction
-/battles/character_left - battleId, characterId, characterFaction
-/character/promotions - characterId, characterFaction
+/battles/character_joined - battleId, planetId, characterFaction
+/battles/character_left - battleId, planetId, characterFaction
+/character/promotions - planetId, characterFaction
 /user/{userId}/error - errorCode, errorMessage
 /user/{userId}/income -
 /user/{userId}/xp
-/faction/{factionId}/chat_message - characterId, characterName, message
+/faction/{factionId}/chat_message - planetId, characterName, message
 
 
-/action/initiateAttack - planetId [characterId, Faction come from WebsocketSession]
+/action/initiateAttack - planetId [planetId, Faction come from WebsocketSession]

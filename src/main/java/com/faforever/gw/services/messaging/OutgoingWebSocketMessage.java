@@ -7,9 +7,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.util.Collection;
 
-public interface WebsocketMessage extends Serializable {
+public interface OutgoingWebSocketMessage extends Serializable {
     @JsonIgnore
-    WebsocketChannel getChannel();
+    MessageType getAction();
     @JsonIgnore
     default Faction getFaction() { return null; }
     @JsonIgnore
