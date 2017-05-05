@@ -7,12 +7,14 @@ import com.yahoo.elide.core.EntityDictionary;
 import com.yahoo.elide.core.filter.dialect.RSQLFilterDialect;
 import com.yahoo.elide.datastores.hibernate5.HibernateStore;
 import com.yahoo.elide.security.checks.Check;
+
 import org.hibernate.SessionFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.persistence.EntityManagerFactory;
 import java.util.concurrent.ConcurrentHashMap;
+
+import javax.persistence.EntityManagerFactory;
 
 @Configuration
 public class ElideConfig {

@@ -1,29 +1,40 @@
 package com.faforever.gw.bpmn.task.planetary_assault;
 
 import com.faforever.gw.bpmn.accessors.PlanetaryAssaultAccessor;
-import com.faforever.gw.model.*;
+import com.faforever.gw.model.Battle;
+import com.faforever.gw.model.BattleParticipant;
+import com.faforever.gw.model.BattleRole;
+import com.faforever.gw.model.Faction;
+import com.faforever.gw.model.GwCharacter;
+import com.faforever.gw.model.Planet;
+import com.faforever.gw.model.ValidationHelper;
 import com.faforever.gw.model.repository.BattleRepository;
 import com.faforever.gw.model.repository.CharacterRepository;
 import com.faforever.gw.model.repository.PlanetRepository;
-import lombok.extern.slf4j.Slf4j;
+
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.springframework.stereotype.Component;
 
+import lombok.extern.slf4j.Slf4j;
+
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 
 @Slf4j
 @Component
 public class InitiateAssaultTask implements JavaDelegate {
+    private final EntityManager entityManager;
     private final CharacterRepository characterRepository;
     private final PlanetRepository planetRepository;
     private final BattleRepository battleRepository;
     private final ValidationHelper validationHelper;
 
     @Inject
-    public InitiateAssaultTask(CharacterRepository characterRepository, PlanetRepository planetRepository, BattleRepository battleRepository, ValidationHelper validationHelper) {
+    public InitiateAssaultTask(EntityManager entityManager, CharacterRepository characterRepository, PlanetRepository planetRepository, BattleRepository battleRepository, ValidationHelper validationHelper) {
+        this.entityManager = entityManager;
         this.characterRepository = characterRepository;
         this.planetRepository = planetRepository;
         this.battleRepository = battleRepository;

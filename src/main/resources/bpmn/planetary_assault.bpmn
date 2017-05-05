@@ -73,7 +73,7 @@
         <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression"><![CDATA[${waitingProgress>=0.9999}]]></bpmn:conditionExpression>
       </bpmn:sequenceFlow>
       <bpmn:sequenceFlow id="SequenceFlow_0i55tdb" name="no" sourceRef="ExclusiveGateway_WaitingProgress" targetRef="ExclusiveGateway_SetupMatch" />
-      <bpmn:endEvent id="EndEvent_AttackersWon_NoMatch" name="attackers won w/o match">
+      <bpmn:endEvent id="EndEvent_AttackersWon_NoMatch" name="attackers won w/o match" camunda:asyncBefore="true">
         <bpmn:extensionElements>
           <camunda:inputOutput>
             <camunda:inputParameter name="winner">defender</camunda:inputParameter>
@@ -82,7 +82,7 @@
         <bpmn:incoming>SequenceFlow_13sgv8p</bpmn:incoming>
         <bpmn:escalationEventDefinition escalationRef="Escalation_1kmsvke" />
       </bpmn:endEvent>
-      <bpmn:endEvent id="EndEvent_DefendersWon_NoMatch" name="defenders won w/o match">
+      <bpmn:endEvent id="EndEvent_DefendersWon_NoMatch" name="defenders won w/o match" camunda:asyncBefore="true">
         <bpmn:incoming>SequenceFlow_0khdpb8</bpmn:incoming>
         <bpmn:escalationEventDefinition escalationRef="Escalation_0jzrhra" />
       </bpmn:endEvent>
@@ -124,7 +124,7 @@
       <bpmn:sequenceFlow id="SequenceFlow_1kqqy8o" sourceRef="IntermediateThrowEvent_Error_RemoveCharacter" targetRef="ExclusiveGateway_SetupMatch" />
       <bpmn:sequenceFlow id="SequenceFlow_1ddx0w9" sourceRef="IntermediateThrowEvent_LeftAssault" targetRef="ExclusiveGateway_AssaultFactionHasPlayers" />
       <bpmn:sequenceFlow id="SequenceFlow_086aaic" sourceRef="StartEvent_AssaultInitiated" targetRef="ExclusiveGateway_SetupMatch" />
-      <bpmn:intermediateThrowEvent id="IntermediateThrowEvent_LeftAssault" name="character left assault">
+      <bpmn:intermediateThrowEvent id="IntermediateThrowEvent_LeftAssault" name="character left assault" camunda:asyncBefore="true">
         <bpmn:extensionElements>
           <camunda:executionListener delegateExpression="${userAckMessage}" event="start" />
         </bpmn:extensionElements>
@@ -132,7 +132,7 @@
         <bpmn:outgoing>SequenceFlow_1ddx0w9</bpmn:outgoing>
         <bpmn:messageEventDefinition camunda:delegateExpression="${battleParticipantLeftAssaultNotification}" />
       </bpmn:intermediateThrowEvent>
-      <bpmn:intermediateThrowEvent id="IntermediateThrowEvent_JoinedAssault" name="character joined assault">
+      <bpmn:intermediateThrowEvent id="IntermediateThrowEvent_JoinedAssault" name="character joined assault" camunda:asyncBefore="true">
         <bpmn:extensionElements>
           <camunda:executionListener delegateExpression="${userAckMessage}" event="start" />
         </bpmn:extensionElements>
@@ -186,7 +186,7 @@
         <bpmn:outgoing>SequenceFlow_13sgv8p</bpmn:outgoing>
       </bpmn:serviceTask>
       <bpmn:sequenceFlow id="SequenceFlow_1uidmte" sourceRef="IntermediateThrowEvent_UpdateWaitingProgress" targetRef="ExclusiveGateway_WaitingProgress" />
-      <bpmn:intermediateThrowEvent id="IntermediateThrowEvent_UpdateWaitingProgress" name="waiting progress update">
+      <bpmn:intermediateThrowEvent id="IntermediateThrowEvent_UpdateWaitingProgress" name="waiting progress update" camunda:asyncBefore="true">
         <bpmn:incoming>SequenceFlow_1fu2bvw</bpmn:incoming>
         <bpmn:outgoing>SequenceFlow_1uidmte</bpmn:outgoing>
         <bpmn:messageEventDefinition camunda:delegateExpression="${battleUpdateWaitingProgressNotification}" />
@@ -285,7 +285,7 @@
       <bpmn:errorEventDefinition errorRef="Error_1hmln4n" camunda:errorCodeVariable="errorCode" camunda:errorMessageVariable="errorMessage" />
     </bpmn:boundaryEvent>
     <bpmn:sequenceFlow id="SequenceFlow_1any1mr" sourceRef="BoundaryEvent_Error_InitiateAssault" targetRef="EndEvent_Error_InvalidCharacterAction" />
-    <bpmn:intermediateThrowEvent id="IntermediateThrowEvent_PlanetUnderAssault" name="planet under assault">
+    <bpmn:intermediateThrowEvent id="IntermediateThrowEvent_PlanetUnderAssault" name="planet under assault" camunda:asyncBefore="true">
       <bpmn:extensionElements>
         <camunda:executionListener delegateExpression="${userAckMessage}" event="start" />
       </bpmn:extensionElements>

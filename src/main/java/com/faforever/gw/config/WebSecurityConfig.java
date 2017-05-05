@@ -1,6 +1,7 @@
 package com.faforever.gw.config;
 
 import com.faforever.gw.security.GetRequestTokenAuthenticationFilter;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -41,8 +42,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //				.permitAll()
 //				.and()
                 .authorizeRequests()
-				.antMatchers("/h2-console").permitAll()
-				.antMatchers("/js/**", "/lib/**", "/images/**", "/css/**", "/index.html", "/").permitAll()
+                .antMatchers("/h2-console/**").permitAll()
+                .antMatchers("/js/**", "/lib/**", "/images/**", "/css/**", "/index.html", "/").permitAll()
 //				.antMatchers("/websocket").permitAll()//.hasRole("ADMIN")
                 .antMatchers("/data/**").permitAll()
                 .anyRequest().authenticated();

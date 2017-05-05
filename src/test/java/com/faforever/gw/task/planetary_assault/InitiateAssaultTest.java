@@ -1,10 +1,28 @@
 package com.faforever.gw.task.planetary_assault;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.faforever.gw.bpmn.task.planetary_assault.InitiateAssaultTask;
-import com.faforever.gw.model.*;
+import com.faforever.gw.model.Battle;
+import com.faforever.gw.model.BattleParticipant;
+import com.faforever.gw.model.BattleStatus;
+import com.faforever.gw.model.Faction;
+import com.faforever.gw.model.GwCharacter;
+import com.faforever.gw.model.Planet;
+import com.faforever.gw.model.ValidationHelper;
 import com.faforever.gw.model.repository.BattleRepository;
 import com.faforever.gw.model.repository.CharacterRepository;
 import com.faforever.gw.model.repository.PlanetRepository;
+
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.junit.Before;
@@ -17,8 +35,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import javax.persistence.EntityManager;
 
 @RunWith(MockitoJUnitRunner.class)
 public class InitiateAssaultTest {
@@ -59,7 +76,7 @@ public class InitiateAssaultTest {
         when(planet.getCurrentOwner())
                 .thenReturn(Faction.CYBRAN);
 
-        task = new InitiateAssaultTask(characterRepository, planetRepository, battleRepository, validationHelper);
+        task = new InitiateAssaultTask(mock(EntityManager.class), characterRepository, planetRepository, battleRepository, validationHelper);
 
     }
 

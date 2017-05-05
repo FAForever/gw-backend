@@ -24,7 +24,7 @@
 		<java.version>1.8</java.version>
 		<camunda.version>7.6.0</camunda.version>
 		<camunda-bpm-spring-boot-starter.version>2.0.0</camunda-bpm-spring-boot-starter.version>
-        <elide.version>3.0.4</elide.version>
+		<elide.version>3.0.6-SNAPSHOT</elide.version>
 	</properties>
 
 	<repositories>
@@ -34,6 +34,10 @@
 			<url>
 				https://app.camunda.com/nexus/content/groups/public
 			</url>
+		</repository>
+		<repository>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
 		</repository>
 	</repositories>
 
@@ -115,7 +119,8 @@
             <version>${elide.version}</version>
         </dependency>
 
-        <dependency>
+
+		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
 			<!--<scope>runtime</scope>-->

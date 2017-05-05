@@ -4,11 +4,13 @@ import com.faforever.gw.bpmn.accessors.PlanetaryAssaultAccessor;
 import com.faforever.gw.bpmn.services.PlanetaryAssaultService;
 import com.faforever.gw.model.Battle;
 import com.faforever.gw.model.repository.BattleRepository;
-import lombok.extern.slf4j.Slf4j;
+
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.springframework.stereotype.Component;
+
+import lombok.extern.slf4j.Slf4j;
 
 import javax.transaction.Transactional;
 
@@ -40,6 +42,7 @@ public class CalculateWaitingProgressTask implements JavaDelegate{
 
         double waitingProgressDelta = planetaryAssaultService.calcWaitingProgress(mapSlots, attackerCount, defenderCount);
         double newWaitingProgress = accessor.getWaitingProgress() + waitingProgressDelta;
+        battle.setWaitingProgress(newWaitingProgress);
         accessor.setWaitingProgress(newWaitingProgress);
     }
 }

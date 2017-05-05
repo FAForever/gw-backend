@@ -1,11 +1,10 @@
 package com.faforever.gw.model;
 
 import com.yahoo.elide.annotation.Include;
+
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -13,6 +12,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Setter
@@ -26,6 +36,7 @@ public class Battle implements Serializable {
     private List<BattleParticipant> participants = new ArrayList<>();
     private BattleStatus status;
     private Timestamp initiatedAt;
+    private double waitingProgress = 0.0;
     private Timestamp startedAt;
     private Timestamp endedAt;
     private Faction attackingFaction;
@@ -66,6 +77,11 @@ public class Battle implements Serializable {
     @Column(name = "initiated_at", nullable = false)
     public Timestamp getInitiatedAt() {
         return initiatedAt;
+    }
+
+    @Column(name = "waitingProgress", nullable = false)
+    public double getWaitingProgress() {
+        return waitingProgress;
     }
 
     @Column(name = "started_at")
