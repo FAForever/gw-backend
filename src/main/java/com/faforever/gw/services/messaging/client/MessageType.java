@@ -1,9 +1,9 @@
-package com.faforever.gw.services.messaging;
+package com.faforever.gw.services.messaging.client;
 
-import com.faforever.gw.services.messaging.incoming.InitiateAssaultMessage;
-import com.faforever.gw.services.messaging.incoming.JoinAssaultMessage;
-import com.faforever.gw.services.messaging.incoming.LeaveAssaultMessage;
-import com.faforever.gw.services.messaging.outgoing.*;
+import com.faforever.gw.services.messaging.client.incoming.InitiateAssaultMessage;
+import com.faforever.gw.services.messaging.client.incoming.JoinAssaultMessage;
+import com.faforever.gw.services.messaging.client.incoming.LeaveAssaultMessage;
+import com.faforever.gw.services.messaging.client.outgoing.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

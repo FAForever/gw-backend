@@ -17,7 +17,7 @@ public class CharacterService {
     }
 
     @Transactional
-    public GwCharacter getByFafId(int fafId) {
+    public GwCharacter getByFafId(long fafId) {
         return characterRepository.findByFafId(fafId);
     }
 }

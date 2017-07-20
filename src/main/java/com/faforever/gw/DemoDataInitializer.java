@@ -112,7 +112,7 @@ public class DemoDataInitializer {
         map.setFafMapId(1);
         map.setFafMapVersion(1);
         map.setSize(10);
-        map.setTotalSlots(4);
+        map.setTotalSlots(2);
         mapRepository.save(map);
 
         Planet planet = new Planet();

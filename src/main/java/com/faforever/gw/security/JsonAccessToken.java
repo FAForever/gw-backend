@@ -13,7 +13,7 @@ public class JsonAccessToken {
     @JsonProperty("authorities")
     List<String> authorities;
     @JsonProperty("user_id")
-    private int userId;
+    private long userId;
     @JsonProperty("user_name")
     private String userName;
     @JsonProperty("exp")

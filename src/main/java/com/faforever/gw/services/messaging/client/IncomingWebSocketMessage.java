@@ -1,4 +1,4 @@
-package com.faforever.gw.services.messaging;
+package com.faforever.gw.services.messaging.client;
 
 import java.io.Serializable;
 import java.util.UUID;

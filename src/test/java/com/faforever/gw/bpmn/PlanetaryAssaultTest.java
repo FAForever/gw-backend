@@ -14,6 +14,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.MockitoAnnotations;
 
+import java.sql.SQLException;
 import java.util.Map;
 import java.util.UUID;
 
@@ -32,7 +33,9 @@ public class PlanetaryAssaultTest {
 
 
     @Before
-    public void setUp() {
+    public void setUp() throws SQLException {
+        org.h2.tools.Server.createWebServer("-web").start();
+
         MockitoAnnotations.initMocks(this);
         DelegateExpressions.registerJavaDelegateMock("initiateAssaultTask").onExecutionSetVariables(
                 Variables.createVariables()
@@ -122,7 +125,6 @@ public class PlanetaryAssaultTest {
         final ProcessInstance processInstance = startProcess();
         verifyJavaDelegateMock("initiateAssaultTask").executed(times(1));
         verifyJavaDelegateMock("planetUnderAssaultNotification").executed(times(1));
-        ;
         verifyJavaDelegateMock("userAckMessage").executed(times(1));
 
         processEngineRule.getRuntimeService().correlateMessage("Message_PlayerJoinsAssault", "test");

@@ -222,7 +222,7 @@ public class ProcessGameResultTest {
             this.id = id;
             this.character = mock(GwCharacter.class);
             this.participant = mock(BattleParticipant.class);
-            this.result = new GameCharacterResult(id, battleRole, result, null);
+            this.result = new GameCharacterResult(id, result, null);
             when(participant.getCharacter()).thenReturn(character);
 
             when(character.getId()).thenReturn(id);

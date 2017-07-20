@@ -10,7 +10,6 @@ import java.util.UUID;
 @AllArgsConstructor
 public class GameCharacterResult implements Serializable {
     UUID character;
-    BattleRole battleRole;
     BattleParticipantResult participantResult;
     UUID killedByCharacter;
 //    Integer killedExperimentals;

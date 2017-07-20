@@ -16,7 +16,7 @@ import java.util.Map;
 @Component
 @Slf4j
 public class WebSocketRegistry {
-    private Multimap<Integer, WebSocketSession> userIdToWebSocketSession;
+    private Multimap<Long, WebSocketSession> userIdToWebSocketSession;
     private Map<String, User> webSocketSessionIdToUser = new HashMap<>();
 
     public WebSocketRegistry() {
@@ -62,7 +62,7 @@ public class WebSocketRegistry {
     }
 
     public void remove(WebSocketSession session) {
-        int userId = webSocketSessionIdToUser.get(session.getId()).getId();
+        long userId = webSocketSessionIdToUser.get(session.getId()).getId();
         userIdToWebSocketSession.remove(userId, session);
         webSocketSessionIdToUser.remove(session.getId());
     }

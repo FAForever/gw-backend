@@ -1,4 +1,4 @@
-package com.faforever.gw.services.messaging;
+package com.faforever.gw.services.messaging.client;
 
 import com.faforever.gw.model.Faction;
 import com.faforever.gw.security.User;

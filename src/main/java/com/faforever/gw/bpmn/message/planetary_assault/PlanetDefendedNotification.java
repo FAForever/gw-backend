@@ -2,8 +2,8 @@ package com.faforever.gw.bpmn.message.planetary_assault;
 
 import com.faforever.gw.bpmn.accessors.PlanetaryAssaultAccessor;
 import com.faforever.gw.security.GwUserRegistry;
-import com.faforever.gw.services.messaging.MessagingService;
-import com.faforever.gw.services.messaging.outgoing.PlanetDefendedMessage;
+import com.faforever.gw.services.messaging.client.MessagingService;
+import com.faforever.gw.services.messaging.client.outgoing.PlanetDefendedMessage;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.camunda.bpm.engine.delegate.DelegateExecution;

@@ -10,7 +10,7 @@ import java.util.UUID;
 
 @Repository
 public interface CharacterRepository extends JpaRepository<GwCharacter, UUID> {
-    GwCharacter findByFafId(int fafId);
+    GwCharacter findByFafId(long fafId);
     @Query("select character from GwCharacter character where killer is null")
     List<GwCharacter> findActiveCharacters();
 }

@@ -1,6 +1,6 @@
-package com.faforever.gw.services.messaging.incoming;
+package com.faforever.gw.services.messaging.client.incoming;
 
-import com.faforever.gw.services.messaging.IncomingWebSocketMessage;
+import com.faforever.gw.services.messaging.client.IncomingWebSocketMessage;
 import lombok.AllArgsConstructor;
 import lombok.Value;
 

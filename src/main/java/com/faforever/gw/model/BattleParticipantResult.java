@@ -1,5 +1,6 @@
 package com.faforever.gw.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -10,8 +11,11 @@ import java.util.Map;
 
 @AllArgsConstructor
 public enum BattleParticipantResult {
+    @JsonProperty("victory")
     VICTORY("V", "victory"),
+    @JsonProperty("death")
     DEATH("D", "death"),
+    @JsonProperty("recall")
     RECALL("R", "recall");
 
 

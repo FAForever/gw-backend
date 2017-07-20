@@ -1,13 +1,15 @@
 package com.faforever.gw.bpmn.services;
 
 import com.faforever.gw.model.*;
+import com.faforever.gw.model.repository.CharacterRepository;
 import com.faforever.gw.model.repository.PlanetRepository;
 import com.faforever.gw.security.User;
-import com.faforever.gw.services.messaging.MessagingService;
-import com.faforever.gw.services.messaging.incoming.InitiateAssaultMessage;
-import com.faforever.gw.services.messaging.incoming.JoinAssaultMessage;
-import com.faforever.gw.services.messaging.incoming.LeaveAssaultMessage;
-import com.faforever.gw.services.messaging.outgoing.ErrorMessage;
+import com.faforever.gw.services.messaging.client.MessagingService;
+import com.faforever.gw.services.messaging.client.incoming.InitiateAssaultMessage;
+import com.faforever.gw.services.messaging.client.incoming.JoinAssaultMessage;
+import com.faforever.gw.services.messaging.client.incoming.LeaveAssaultMessage;
+import com.faforever.gw.services.messaging.client.outgoing.ErrorMessage;
+import com.faforever.gw.services.messaging.lobby_server.incoming.GameResultMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.engine.DecisionService;
@@ -17,13 +19,14 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
-import java.util.Optional;
-import java.util.UUID;
+import java.text.MessageFormat;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -41,13 +44,15 @@ public class PlanetaryAssaultService {
     private final RuntimeService runtimeService;
     private final MessagingService messagingService;
     private final PlanetRepository planetRepository;
+    private final CharacterRepository characterRepository;
 
     @Inject
-    public PlanetaryAssaultService(ProcessEngine processEngine, RuntimeService runtimeService, MessagingService messagingService, PlanetRepository planetRepository) {
+    public PlanetaryAssaultService(ProcessEngine processEngine, RuntimeService runtimeService, MessagingService messagingService, PlanetRepository planetRepository, CharacterRepository characterRepository) {
         this.processEngine = processEngine;
         this.runtimeService = runtimeService;
         this.messagingService = messagingService;
         this.planetRepository = planetRepository;
+        this.characterRepository = characterRepository;
     }
 
     @Transactional(dontRollbackOn = BpmnError.class)
@@ -89,7 +94,7 @@ public class PlanetaryAssaultService {
     }
 
     public void onCharacterLeavesAssault(LeaveAssaultMessage message, User user) {
-        log.debug("onCharacterLeavesAssault for battle {}", message.getBattleId().toString());
+        log.debug("onCharacterLeavesAssault for battle {}", message.getBattleId());
 
         VariableMap variables = messagingService.createVariables(message.getRequestId(), user.getActiveCharacter().getId());
 
@@ -110,14 +115,54 @@ public class PlanetaryAssaultService {
         runtimeService.signalEventReceived(UPDATE_OPEN_GAMES_SIGNAL);
     }
 
+    @EventListener
     @Transactional(dontRollbackOn = BpmnError.class)
-    public void onGameResult(GameResult gameResult) {
-        UUID battleId = gameResult.getBattle();
+    public void onGameResult(GameResultMessage gameResultMessage) {
+        log.debug("onGameResult for battle {}", gameResultMessage.getBattleId());
+
+        // The lobby server does not know about GW characters and factions, so we need to convert manually
+        GameResult gameResult = new GameResult();
+        gameResult.setBattle(gameResultMessage.getBattleId());
+
+        HashMap<Long, GwCharacter> fafUserIdToCharacter = new HashMap<>();
+
+        gameResultMessage.getPlayerResults().forEach(
+                playerResult -> {
+                    long fafId = playerResult.getPlayerFafId();
+                    // FIXME: What if there is more than one Character for this user?
+                    GwCharacter character = characterRepository.findByFafId(fafId);
+
+                    if (playerResult.getResult() == BattleParticipantResult.VICTORY) {
+                        gameResult.setWinner(character.getFaction());
+                    }
+
+                    fafUserIdToCharacter.put(fafId, character);
+                }
+        );
+
+        if (gameResult.getWinner() == null) {
+            String errorMessage = MessageFormat.format("For battle {} no winning faction could be determined (message={})", gameResultMessage.getBattleId(), gameResultMessage);
+            log.error(errorMessage);
+            throw new IllegalStateException(errorMessage);
+        }
+
+        List<GameCharacterResult> characterResults = new ArrayList<>();
+
+        gameResultMessage.getPlayerResults().forEach(
+                playerResult -> characterResults.add(
+                        new GameCharacterResult(
+                                fafUserIdToCharacter.get(playerResult.getPlayerFafId()).getId(),
+                                playerResult.getResult(),
+                                fafUserIdToCharacter.get(playerResult.getKilledBy()) == null ? null : fafUserIdToCharacter.get(playerResult.getKilledBy()).getId())
+                )
+        );
+
+        gameResult.setCharacterResults(characterResults);
 
         VariableMap variables = Variables.createVariables()
                 .putValue("gameResult", gameResult);
 
-        runtimeService.correlateMessage(GAME_RESULT_MESSAGE, battleId.toString(), variables);
+        runtimeService.correlateMessage(GAME_RESULT_MESSAGE, gameResultMessage.getBattleId().toString(), variables);
     }
 
     public Long calcFactionVictoryXpForCharacter(Battle battle, GwCharacter character) {

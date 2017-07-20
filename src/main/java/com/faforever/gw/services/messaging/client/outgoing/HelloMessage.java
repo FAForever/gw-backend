@@ -1,8 +1,8 @@
-package com.faforever.gw.services.messaging.outgoing;
+package com.faforever.gw.services.messaging.client.outgoing;
 
 import com.faforever.gw.security.User;
-import com.faforever.gw.services.messaging.AbstractOutgoingWebSocketMessage;
-import com.faforever.gw.services.messaging.MessageType;
+import com.faforever.gw.services.messaging.client.AbstractOutgoingWebSocketMessage;
+import com.faforever.gw.services.messaging.client.MessageType;
 import lombok.Data;
 
 import java.util.UUID;

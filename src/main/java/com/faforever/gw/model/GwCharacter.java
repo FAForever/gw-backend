@@ -16,7 +16,7 @@ import java.util.*;
 @Table(name = "gw_character")
 public class GwCharacter implements Serializable {
     private UUID id;
-    private int fafId;
+    private long fafId;
     private String name;
     private Faction faction;
     private Long xp;
@@ -33,7 +33,7 @@ public class GwCharacter implements Serializable {
     }
 
     @Column(name = "faf_id", nullable = false, updatable = false)
-    public int getFafId() {
+    public long getFafId() {
         return fafId;
     }
 

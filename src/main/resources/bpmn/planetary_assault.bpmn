@@ -262,7 +262,7 @@
       </bpmn:dataOutputAssociation>
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="SequenceFlow_18pqvnq" sourceRef="ServiceTask_CommandLobbyServerToSetupMatch" targetRef="IntermediateCatchEvent_GameResult" />
-    <bpmn:sendTask id="ServiceTask_CommandLobbyServerToSetupMatch" name="command lobby server to setup match" camunda:delegateExpression="${noopTask}">
+    <bpmn:sendTask id="ServiceTask_CommandLobbyServerToSetupMatch" name="command lobby server to setup match" camunda:delegateExpression="${setupLobbyMatchTask}">
       <bpmn:incoming>SequenceFlow_1jgqdyp</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_18pqvnq</bpmn:outgoing>
       <bpmn:property id="Property_1nt8csh" name="__targetRef_placeholder" />

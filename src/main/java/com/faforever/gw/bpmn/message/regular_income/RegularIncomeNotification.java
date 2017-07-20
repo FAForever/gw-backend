@@ -2,8 +2,8 @@ package com.faforever.gw.bpmn.message.regular_income;
 
 import com.faforever.gw.bpmn.accessors.RegularIncomeAccessor;
 import com.faforever.gw.security.GwUserRegistry;
-import com.faforever.gw.services.messaging.MessagingService;
-import com.faforever.gw.services.messaging.outgoing.UserIncomeMessage;
+import com.faforever.gw.services.messaging.client.MessagingService;
+import com.faforever.gw.services.messaging.client.outgoing.UserIncomeMessage;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
