@@ -114,9 +114,14 @@ public class DemoDataInitializer {
         map.setSize(10);
         map.setTotalSlots(2);
         mapRepository.save(map);
+        for (Faction faction : Faction.values()) {
+            createPlanet(faction, map, UUID.randomUUID());
+        }
+    }
 
+    private void createPlanet(Faction faction, Map map, UUID uuid) {
         Planet planet = new Planet();
-        planet.setId(UUID.fromString("e1e4c4c4-e35c-11e6-bf01-fe55135034f3"));
+        planet.setId(uuid);
         planet.setGround(Ground.SOIL);
         planet.setHabitable(true);
         planet.setOrbitLevel(5);
@@ -131,7 +136,7 @@ public class DemoDataInitializer {
         initBattle.setInitiatedAt(Timestamp.from(Instant.EPOCH));
         initBattle.setStartedAt(Timestamp.from(Instant.EPOCH));
         initBattle.setEndedAt(Timestamp.from(Instant.EPOCH));
-        initBattle.setWinningFaction(Faction.CYBRAN);
+        initBattle.setWinningFaction(faction);
         initBattle.setStatus(BattleStatus.FINISHED);
 
         battleRepository.save(initBattle);
