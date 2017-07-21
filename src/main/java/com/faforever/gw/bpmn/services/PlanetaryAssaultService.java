@@ -141,7 +141,7 @@ public class PlanetaryAssaultService {
         );
 
         if (gameResult.getWinner() == null) {
-            String errorMessage = MessageFormat.format("For battle {} no winning faction could be determined (message={})", gameResultMessage.getBattleId(), gameResultMessage);
+            String errorMessage = MessageFormat.format("For battle {0} no winning faction could be determined (message={1})", gameResultMessage.getBattleId(), gameResultMessage);
             log.error(errorMessage);
             throw new IllegalStateException(errorMessage);
         }

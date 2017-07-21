@@ -23,6 +23,7 @@ import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -172,8 +173,8 @@ public class LobbyService {
         }
     }
 
-    public void createGame(UUID battleId) {
-        enqueue(new CreateGameMessage(UUID.randomUUID(), battleId));
+    public void createGame(UUID battleId, List<Long> participants) {
+        enqueue(new CreateGameMessage(UUID.randomUUID(), battleId, participants));
     }
 
     private interface ActionFunc {

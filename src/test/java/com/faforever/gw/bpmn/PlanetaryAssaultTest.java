@@ -8,10 +8,8 @@ import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.mock.Mocks;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.extension.mockito.DelegateExpressions;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.h2.tools.Server;
+import org.junit.*;
 import org.mockito.MockitoAnnotations;
 
 import java.sql.SQLException;
@@ -23,19 +21,27 @@ import static org.camunda.bpm.extension.mockito.DelegateExpressions.verifyJavaDe
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 
-//import jersey.repackaged.com.google.common.collect.ImmutableMap;
-
 
 public class PlanetaryAssaultTest {
 
     @Rule
     public ProcessEngineRule processEngineRule = new ProcessEngineRule();
 
+    private static Server webServer;
+
+    @BeforeClass
+    public static void setUpClass() throws Exception {
+        webServer = org.h2.tools.Server.createWebServer("-web");
+        webServer.start();
+    }
+
+    @AfterClass
+    public static void tearDownClass() {
+        webServer.stop();
+    }
 
     @Before
     public void setUp() throws SQLException {
-        org.h2.tools.Server.createWebServer("-web").start();
-
         MockitoAnnotations.initMocks(this);
         DelegateExpressions.registerJavaDelegateMock("initiateAssaultTask").onExecutionSetVariables(
                 Variables.createVariables()
@@ -193,7 +199,6 @@ public class PlanetaryAssaultTest {
                 Variables.createVariables().putValue("waitingProgress", 1.0d)
         );
 
-        org.h2.tools.Server.createWebServer("-web").start();
         final ProcessInstance processInstance = startProcess();
         verifyJavaDelegateMock("userAckMessage").executed(times(1));
 
