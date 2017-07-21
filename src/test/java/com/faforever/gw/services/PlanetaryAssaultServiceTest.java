@@ -2,6 +2,7 @@ package com.faforever.gw.services;
 
 import com.faforever.gw.bpmn.message.generic.UserErrorMessage;
 import com.faforever.gw.bpmn.services.PlanetaryAssaultService;
+import com.faforever.gw.model.BattleParticipantResult;
 import com.faforever.gw.model.Faction;
 import com.faforever.gw.model.GwCharacter;
 import com.faforever.gw.model.Planet;
@@ -13,7 +14,9 @@ import com.faforever.gw.services.messaging.client.MessagingService;
 import com.faforever.gw.services.messaging.client.incoming.InitiateAssaultMessage;
 import com.faforever.gw.services.messaging.client.incoming.JoinAssaultMessage;
 import com.faforever.gw.services.messaging.client.incoming.LeaveAssaultMessage;
+import com.faforever.gw.services.messaging.lobby_server.incoming.GamePlayerResult;
 import com.faforever.gw.services.messaging.lobby_server.incoming.GameResultMessage;
+import com.google.common.collect.ImmutableList;
 import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
@@ -26,7 +29,6 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.context.ApplicationContext;
 
-import java.util.ArrayList;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
@@ -201,10 +203,15 @@ public class PlanetaryAssaultServiceTest {
 
     @Test
     public void onGameResult() {
+        long fafId = 5L;
+        when(characterRepository.findByFafId(fafId)).thenReturn(character);
+        when(character.getId()).thenReturn(UUID.fromString("33333333-3333-3333-3333-333333333333"));
+        when(character.getFaction()).thenReturn(Faction.UEF);
+
         GameResultMessage result = new GameResultMessage(
                 UUID.fromString("11111111-1111-1111-1111-111111111111"),
                 123456L,
-                new ArrayList<>()
+                ImmutableList.of(new GamePlayerResult(fafId, BattleParticipantResult.VICTORY, -1L))
         );
         service.onGameResult(result);
         verify(runtimeService).correlateMessage(eq(PlanetaryAssaultService.GAME_RESULT_MESSAGE), anyString(), anyMap());
