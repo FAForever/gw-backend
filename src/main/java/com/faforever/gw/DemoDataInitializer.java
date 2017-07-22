@@ -10,8 +10,6 @@ import org.springframework.stereotype.Component;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.UUID;
 
 @Component
@@ -128,18 +126,8 @@ public class DemoDataInitializer {
         planet.setSize(20);
 
         planet.setMap(map);
+        planet.setCurrentOwner(faction);
         planetRepository.save(planet);
-
-        Battle initBattle = new Battle();
-        initBattle.setId(UUID.randomUUID());
-        initBattle.setPlanet(planet);
-        initBattle.setInitiatedAt(Timestamp.from(Instant.EPOCH));
-        initBattle.setStartedAt(Timestamp.from(Instant.EPOCH));
-        initBattle.setEndedAt(Timestamp.from(Instant.EPOCH));
-        initBattle.setWinningFaction(faction);
-        initBattle.setStatus(BattleStatus.FINISHED);
-
-        battleRepository.save(initBattle);
     }
 
     private void generateUserToken() {

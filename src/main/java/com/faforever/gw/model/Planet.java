@@ -2,7 +2,6 @@ package com.faforever.gw.model;
 
 import com.yahoo.elide.annotation.Include;
 import lombok.Setter;
-import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -64,18 +63,8 @@ public class Planet implements Serializable {
         return map;
     }
 
-    /***
-     * The current owner is the winner of the last finished battle over this planet.
-     * In case of a draw, the defending faction (= previous owner) remains the owner.
-     */
-    @Formula("(select coalesce(b.winning_faction, b.defending_faction) " +
-            "from gw_battle b where b.fk_planet = id and b.status='F' and " +
-            "b.ended_at = (select max(b2.ended_at) from gw_battle b2 where b2.fk_planet = id and b2.status='F'))")
+    @Column(name = "current_owner")
     public Faction getCurrentOwner() {
         return currentOwner;
-    }
-
-    public void setCurrentOwner(Faction value) {
-        currentOwner = value;
     }
 }

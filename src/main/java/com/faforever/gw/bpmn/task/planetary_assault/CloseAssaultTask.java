@@ -4,7 +4,9 @@ import com.faforever.gw.bpmn.accessors.PlanetaryAssaultAccessor;
 import com.faforever.gw.model.Battle;
 import com.faforever.gw.model.BattleRole;
 import com.faforever.gw.model.BattleStatus;
+import com.faforever.gw.model.Planet;
 import com.faforever.gw.model.repository.BattleRepository;
+import com.faforever.gw.model.repository.PlanetRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -20,10 +22,12 @@ import java.time.Instant;
 @Component
 public class CloseAssaultTask implements JavaDelegate {
     private final BattleRepository battleRepository;
+    private final PlanetRepository planetRepository;
 
     @Inject
-    public CloseAssaultTask(BattleRepository battleRepository) {
+    public CloseAssaultTask(BattleRepository battleRepository, PlanetRepository planetRepository) {
         this.battleRepository = battleRepository;
+        this.planetRepository = planetRepository;
     }
 
     @Override
@@ -36,8 +40,11 @@ public class CloseAssaultTask implements JavaDelegate {
         battle.setEndedAt(Timestamp.from(Instant.now()));
         battle.setStatus(BattleStatus.FINISHED);
 
+        Planet planet = planetRepository.findOne(accessor.getPlanetId());
+
         if(accessor.getWinner() == BattleRole.ATTACKER) {
             battle.setWinningFaction(battle.getAttackingFaction());
+            planet.setCurrentOwner(battle.getAttackingFaction());
         } else {
             battle.setWinningFaction(battle.getDefendingFaction());
         }

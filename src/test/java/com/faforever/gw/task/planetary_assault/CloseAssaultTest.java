@@ -4,7 +4,9 @@ import com.faforever.gw.bpmn.task.planetary_assault.CloseAssaultTask;
 import com.faforever.gw.model.Battle;
 import com.faforever.gw.model.BattleStatus;
 import com.faforever.gw.model.Faction;
+import com.faforever.gw.model.Planet;
 import com.faforever.gw.model.repository.BattleRepository;
+import com.faforever.gw.model.repository.PlanetRepository;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,7 +25,11 @@ public class CloseAssaultTest {
     @Mock
     private BattleRepository battleRepository;
     @Mock
+    private PlanetRepository planetRepository;
+    @Mock
     private Battle battle;
+    @Mock
+    private Planet planet;
 
     private CloseAssaultTask task;
 
@@ -36,10 +42,11 @@ public class CloseAssaultTest {
                 .thenReturn(UUID.fromString("11111111-1111-1111-1111-111111111111"));
 
         when(battleRepository.findOne(any(UUID.class))).thenReturn(battle);
+        when(planetRepository.findOne(any(UUID.class))).thenReturn(planet);
         when(battle.getAttackingFaction()).thenReturn(Faction.UEF);
         when(battle.getDefendingFaction()).thenReturn(Faction.CYBRAN);
 
-        task = new CloseAssaultTask(battleRepository);
+        task = new CloseAssaultTask(battleRepository, planetRepository);
     }
 
     @Test
@@ -55,6 +62,7 @@ public class CloseAssaultTest {
         verify(battle).setEndedAt(any());
         verify(battle).setStatus(BattleStatus.FINISHED);
         verify(battle).setWinningFaction(Faction.UEF);
+        verify(planet).setCurrentOwner(Faction.UEF);
     }
 
     @Test
@@ -70,6 +78,7 @@ public class CloseAssaultTest {
         verify(battle).setEndedAt(any());
         verify(battle).setStatus(BattleStatus.FINISHED);
         verify(battle).setWinningFaction(Faction.CYBRAN);
+        verify(planet, never()).setCurrentOwner(any());
     }
 
 }
