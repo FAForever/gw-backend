@@ -11,22 +11,23 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 import java.sql.SQLException;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Component
 public class DemoDataInitializer {
     private final CharacterRepository characterRepository;
     private final PlanetRepository planetRepository;
     private final MapRepository mapRepository;
-    private final BattleRepository battleRepository;
     private final RankRepository rankRepository;
+    private final SolarSystemRepository solarSystemRepository;
 
     @Inject
-    public DemoDataInitializer(CharacterRepository characterRepository, PlanetRepository planetRepository, MapRepository mapRepository, BattleRepository battleRepository, RankRepository rankRepository) {
+    public DemoDataInitializer(CharacterRepository characterRepository, PlanetRepository planetRepository, MapRepository mapRepository, RankRepository rankRepository, SolarSystemRepository solarSystemRepository) {
         this.characterRepository = characterRepository;
         this.planetRepository = planetRepository;
         this.mapRepository = mapRepository;
-        this.battleRepository = battleRepository;
         this.rankRepository = rankRepository;
+        this.solarSystemRepository = solarSystemRepository;
     }
 
     @Transactional
@@ -118,8 +119,15 @@ public class DemoDataInitializer {
     }
 
     private void createPlanet(Faction faction, Map map, UUID uuid) {
+        SolarSystem solarSystem = new SolarSystem();
+        solarSystem.setX(ThreadLocalRandom.current().nextLong(0, 100));
+        solarSystem.setY(ThreadLocalRandom.current().nextLong(0, 100));
+        solarSystem.setZ(0);
+        solarSystemRepository.save(solarSystem);
+
         Planet planet = new Planet();
         planet.setId(uuid);
+        planet.setSolarSystem(solarSystem);
         planet.setGround(Ground.SOIL);
         planet.setHabitable(true);
         planet.setOrbitLevel(5);

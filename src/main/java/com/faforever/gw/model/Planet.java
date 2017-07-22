@@ -22,6 +22,7 @@ public class Planet implements Serializable {
     private Ground ground;
     private Map map;
     private Faction currentOwner;
+    private SolarSystem solarSystem;
 
     @Id
 //    @GeneratedValue(generator = "uuid2")
@@ -30,7 +31,11 @@ public class Planet implements Serializable {
         return id;
     }
 
-    // TODO: sun system
+    @ManyToOne
+    @JoinColumn(name = "fk_solar_system")
+    public SolarSystem getSolarSystem() {
+        return solarSystem;
+    }
 
     @OneToMany(mappedBy = "planet")
     public List<Battle> getBattles() {
