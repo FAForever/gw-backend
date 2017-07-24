@@ -114,23 +114,27 @@ public class DemoDataInitializer {
         map.setTotalSlots(2);
         mapRepository.save(map);
         for (Faction faction : Faction.values()) {
-            createPlanet(faction, map, UUID.randomUUID());
+            createSolarSystem(faction, map);
         }
     }
 
-    private void createPlanet(Faction faction, Map map, UUID uuid) {
+    private void createSolarSystem(Faction faction, Map map) {
         SolarSystem solarSystem = new SolarSystem();
         solarSystem.setX(ThreadLocalRandom.current().nextLong(0, 100));
         solarSystem.setY(ThreadLocalRandom.current().nextLong(0, 100));
         solarSystem.setZ(0);
         solarSystemRepository.save(solarSystem);
 
+        createPlanet(solarSystem, faction, map, 5);
+        createPlanet(solarSystem, faction, map, 10);
+    }
+
+    private void createPlanet(SolarSystem solarSystem, Faction faction, Map map, int orbitLevel) {
         Planet planet = new Planet();
-        planet.setId(uuid);
         planet.setSolarSystem(solarSystem);
         planet.setGround(Ground.SOIL);
         planet.setHabitable(true);
-        planet.setOrbitLevel(5);
+        planet.setOrbitLevel(orbitLevel);
         planet.setSize(20);
 
         planet.setMap(map);

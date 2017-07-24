@@ -1,5 +1,6 @@
 package com.faforever.gw.model;
 
+import com.yahoo.elide.annotation.Include;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.val;
@@ -13,6 +14,7 @@ import java.util.*;
 @NoArgsConstructor
 @Setter
 @Entity
+@Include(rootLevel = true)
 @Table(name = "gw_character")
 public class GwCharacter implements Serializable {
     private UUID id;

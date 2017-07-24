@@ -1,5 +1,6 @@
 package com.faforever.gw.model;
 
+import com.yahoo.elide.annotation.Include;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
@@ -10,6 +11,7 @@ import java.util.List;
 @Entity
 @Table(name="gw_rank")
 @Setter
+@Include(rootLevel = true)
 @NoArgsConstructor
 public class Rank implements Serializable{
     Long xpMin;

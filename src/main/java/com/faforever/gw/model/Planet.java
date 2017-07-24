@@ -2,6 +2,7 @@ package com.faforever.gw.model;
 
 import com.yahoo.elide.annotation.Include;
 import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -25,8 +26,8 @@ public class Planet implements Serializable {
     private SolarSystem solarSystem;
 
     @Id
-//    @GeneratedValue(generator = "uuid2")
-//    @GenericGenerator(name = "uuid2", strategy = "uuid2")
+    @GeneratedValue(generator = "uuid2")
+    @GenericGenerator(name = "uuid2", strategy = "uuid2")
     public UUID getId() {
         return id;
     }

@@ -14,7 +14,7 @@ public enum GwErrorType {
     // Battle related errors
     BATTLE_INVALID("2001", "The given battle does not exist or is not accessible"),
     CHARACTER_NOT_FREE_FOR_BATTLE("2002", "Character not free for game"),
-    CHARACTER_ALREADY_IN_BATTLE("2003", "Character is already participating in this battle"),
+    CHARACTER_ALREADY_IN_BATTLE("2003", "Character is already participating a battle"),
     CHARACTER_NOT_IN_BATTLE("2004", "Character is not participant in this battle"),
     NO_SLOTS_FOR_FACTION("2005", "There are no open slots in this battle for the character's faction"),
     PLANET_PROTECTED_FROM_ASSAULT("2006", "Planet is currently protected from assaults"),
