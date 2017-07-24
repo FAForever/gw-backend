@@ -42,7 +42,7 @@
       </bpmn:exclusiveGateway>
       <bpmn:sequenceFlow id="SequenceFlow_1tim9i2" sourceRef="ServiceTask_RemovePlayersCharacterToAssault" targetRef="IntermediateThrowEvent_LeftAssault" />
       <bpmn:sequenceFlow id="SequenceFlow_1hl2d99" name="yes" sourceRef="ExclusiveGateway_AssaultFactionHasPlayers" targetRef="ExclusiveGateway_SetupMatch" />
-      <bpmn:sequenceFlow id="SequenceFlow_1o6z0ru" name="no" sourceRef="ExclusiveGateway_AssaultFactionHasPlayers" targetRef="Task_1vstppt">
+      <bpmn:sequenceFlow id="SequenceFlow_1o6z0ru" name="no" sourceRef="ExclusiveGateway_AssaultFactionHasPlayers" targetRef="ServiceTask_SetDefenderAsWinner">
         <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${attackerCount == 0}</bpmn:conditionExpression>
       </bpmn:sequenceFlow>
       <bpmn:sequenceFlow id="SequenceFlow_12kkkio" sourceRef="ExclusiveGateway_SetupMatch" targetRef="IntermediateCatchEvent_UpdateOpenGames" />
@@ -69,7 +69,7 @@
         <bpmn:outgoing>SequenceFlow_0i55tdb</bpmn:outgoing>
       </bpmn:exclusiveGateway>
       <bpmn:sequenceFlow id="SequenceFlow_1fu2bvw" sourceRef="ServiceTask_CalculateWaitingProgress" targetRef="IntermediateThrowEvent_UpdateWaitingProgress" />
-      <bpmn:sequenceFlow id="SequenceFlow_1mn1ssi" name="yes" sourceRef="ExclusiveGateway_WaitingProgress" targetRef="ExclusiveGateway_0ltc7r2">
+      <bpmn:sequenceFlow id="SequenceFlow_1mn1ssi" name="yes" sourceRef="ExclusiveGateway_WaitingProgress" targetRef="ExclusiveGateway_MergeAttackersWin">
         <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression"><![CDATA[${waitingProgress>=0.9999}]]></bpmn:conditionExpression>
       </bpmn:sequenceFlow>
       <bpmn:sequenceFlow id="SequenceFlow_0i55tdb" name="no" sourceRef="ExclusiveGateway_WaitingProgress" targetRef="ExclusiveGateway_SetupMatch" />
@@ -107,7 +107,7 @@
       </bpmn:intermediateThrowEvent>
       <bpmn:sequenceFlow id="SequenceFlow_0rbkusb" sourceRef="ServiceTask_AddPlayersCharacterToAssault" targetRef="IntermediateThrowEvent_JoinedAssault" />
       <bpmn:sequenceFlow id="SequenceFlow_0wvhz73" sourceRef="IntermediateThrowEvent_JoinedAssault" targetRef="ExclusiveGateway_AllSlotsOccupied" />
-      <bpmn:sequenceFlow id="SequenceFlow_1hiat5s" name="yes" sourceRef="ExclusiveGateway_AllSlotsOccupied" targetRef="ExclusiveGateway_00jz1c2">
+      <bpmn:sequenceFlow id="SequenceFlow_1hiat5s" name="yes" sourceRef="ExclusiveGateway_AllSlotsOccupied" targetRef="ExclusiveGateway_MergeMatchStarting">
         <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${gameFull==true}</bpmn:conditionExpression>
       </bpmn:sequenceFlow>
       <bpmn:sequenceFlow id="SequenceFlow_043heqj" sourceRef="IntermediateThrowEvent_Error_AddCharacter" targetRef="ExclusiveGateway_SetupMatch" />
@@ -150,23 +150,23 @@
         <bpmn:outgoing>SequenceFlow_0k13rbw</bpmn:outgoing>
         <bpmn:messageEventDefinition messageRef="Message_05coxf7" />
       </bpmn:intermediateCatchEvent>
-      <bpmn:exclusiveGateway id="ExclusiveGateway_0ltc7r2" name="defenders&#10;in battle?" default="SequenceFlow_01dz8gr">
+      <bpmn:exclusiveGateway id="ExclusiveGateway_MergeAttackersWin" name="defenders&#10;in battle?" default="SequenceFlow_01dz8gr">
         <bpmn:incoming>SequenceFlow_1mn1ssi</bpmn:incoming>
         <bpmn:outgoing>SequenceFlow_01f5pnp</bpmn:outgoing>
         <bpmn:outgoing>SequenceFlow_01dz8gr</bpmn:outgoing>
       </bpmn:exclusiveGateway>
-      <bpmn:sequenceFlow id="SequenceFlow_01f5pnp" name="no" sourceRef="ExclusiveGateway_0ltc7r2" targetRef="Task_1gisjkt">
+      <bpmn:sequenceFlow id="SequenceFlow_01f5pnp" name="no" sourceRef="ExclusiveGateway_MergeAttackersWin" targetRef="ServiceTask_SetAtackerAsWinner">
         <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${defenderCount == 0}</bpmn:conditionExpression>
       </bpmn:sequenceFlow>
-      <bpmn:exclusiveGateway id="ExclusiveGateway_00jz1c2">
+      <bpmn:exclusiveGateway id="ExclusiveGateway_MergeMatchStarting">
         <bpmn:incoming>SequenceFlow_1hiat5s</bpmn:incoming>
         <bpmn:incoming>SequenceFlow_01dz8gr</bpmn:incoming>
         <bpmn:outgoing>SequenceFlow_144evqe</bpmn:outgoing>
       </bpmn:exclusiveGateway>
-      <bpmn:sequenceFlow id="SequenceFlow_144evqe" sourceRef="ExclusiveGateway_00jz1c2" targetRef="EndEvent_MatchStarting" />
-      <bpmn:sequenceFlow id="SequenceFlow_01dz8gr" name="yes" sourceRef="ExclusiveGateway_0ltc7r2" targetRef="ExclusiveGateway_00jz1c2" />
-      <bpmn:sequenceFlow id="SequenceFlow_0khdpb8" sourceRef="Task_1vstppt" targetRef="EndEvent_DefendersWon_NoMatch" />
-      <bpmn:serviceTask id="Task_1vstppt" name="set defender as winner" camunda:expression="${true}">
+      <bpmn:sequenceFlow id="SequenceFlow_144evqe" sourceRef="ExclusiveGateway_MergeMatchStarting" targetRef="EndEvent_MatchStarting" />
+      <bpmn:sequenceFlow id="SequenceFlow_01dz8gr" name="yes" sourceRef="ExclusiveGateway_MergeAttackersWin" targetRef="ExclusiveGateway_MergeMatchStarting" />
+      <bpmn:sequenceFlow id="SequenceFlow_0khdpb8" sourceRef="ServiceTask_SetDefenderAsWinner" targetRef="EndEvent_DefendersWon_NoMatch" />
+      <bpmn:serviceTask id="ServiceTask_SetDefenderAsWinner" name="set defender as winner" camunda:expression="${true}">
         <bpmn:extensionElements>
           <camunda:inputOutput>
             <camunda:outputParameter name="winner">defender</camunda:outputParameter>
@@ -175,8 +175,8 @@
         <bpmn:incoming>SequenceFlow_1o6z0ru</bpmn:incoming>
         <bpmn:outgoing>SequenceFlow_0khdpb8</bpmn:outgoing>
       </bpmn:serviceTask>
-      <bpmn:sequenceFlow id="SequenceFlow_13sgv8p" sourceRef="Task_1gisjkt" targetRef="EndEvent_AttackersWon_NoMatch" />
-      <bpmn:serviceTask id="Task_1gisjkt" name="set attacker as winner" camunda:expression="${true}">
+      <bpmn:sequenceFlow id="SequenceFlow_13sgv8p" sourceRef="ServiceTask_SetAtackerAsWinner" targetRef="EndEvent_AttackersWon_NoMatch" />
+      <bpmn:serviceTask id="ServiceTask_SetAtackerAsWinner" name="set attacker as winner" camunda:expression="${true}">
         <bpmn:extensionElements>
           <camunda:inputOutput>
             <camunda:outputParameter name="winner">attacker</camunda:outputParameter>
@@ -211,22 +211,22 @@
       <bpmn:outgoing>SequenceFlow_1ct6dzf</bpmn:outgoing>
       <bpmn:escalationEventDefinition escalationRef="Escalation_1kmsvke" />
     </bpmn:boundaryEvent>
-    <bpmn:sequenceFlow id="SequenceFlow_0fg1u36" sourceRef="IntermediateCatchEvent_GameResult" targetRef="Task_ProcessGameResults" />
+    <bpmn:sequenceFlow id="SequenceFlow_0fg1u36" sourceRef="IntermediateCatchEvent_GameResult" targetRef="ServiceTask_ProcessGameResults" />
     <bpmn:intermediateThrowEvent id="IntermediateThrowEvent_UpdatePromotions" name="update promotions">
       <bpmn:incoming>SequenceFlow_1bj8bw1</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_1v3koco</bpmn:outgoing>
       <bpmn:signalEventDefinition signalRef="Signal_1a2zq7s" />
     </bpmn:intermediateThrowEvent>
-    <bpmn:exclusiveGateway id="ExclusiveGateway_1ahgfng">
+    <bpmn:exclusiveGateway id="ExclusiveGateway_MergeAssaultFinish">
       <bpmn:incoming>SequenceFlow_1v3koco</bpmn:incoming>
       <bpmn:incoming>SequenceFlow_0ix85k0</bpmn:incoming>
       <bpmn:incoming>SequenceFlow_1ct6dzf</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0fsaxri</bpmn:outgoing>
     </bpmn:exclusiveGateway>
-    <bpmn:sequenceFlow id="SequenceFlow_1v3koco" sourceRef="IntermediateThrowEvent_UpdatePromotions" targetRef="ExclusiveGateway_1ahgfng" />
-    <bpmn:sequenceFlow id="SequenceFlow_0ix85k0" sourceRef="BoundaryEvent_DefendersWon_NoMatch" targetRef="ExclusiveGateway_1ahgfng" />
-    <bpmn:sequenceFlow id="SequenceFlow_1ct6dzf" sourceRef="BoundaryEvent_AttackersWon_NoMatch" targetRef="ExclusiveGateway_1ahgfng" />
-    <bpmn:sequenceFlow id="SequenceFlow_0fsaxri" sourceRef="ExclusiveGateway_1ahgfng" targetRef="ServiceTask_CloseAssault" />
+    <bpmn:sequenceFlow id="SequenceFlow_1v3koco" sourceRef="IntermediateThrowEvent_UpdatePromotions" targetRef="ExclusiveGateway_MergeAssaultFinish" />
+    <bpmn:sequenceFlow id="SequenceFlow_0ix85k0" sourceRef="BoundaryEvent_DefendersWon_NoMatch" targetRef="ExclusiveGateway_MergeAssaultFinish" />
+    <bpmn:sequenceFlow id="SequenceFlow_1ct6dzf" sourceRef="BoundaryEvent_AttackersWon_NoMatch" targetRef="ExclusiveGateway_MergeAssaultFinish" />
+    <bpmn:sequenceFlow id="SequenceFlow_0fsaxri" sourceRef="ExclusiveGateway_MergeAssaultFinish" targetRef="ServiceTask_CloseAssault" />
     <bpmn:exclusiveGateway id="ExclusiveGateway_AttackersWin" name="who won?" default="SequenceFlow_02zsqih">
       <bpmn:incoming>SequenceFlow_1ay41r5</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_1h8mvog</bpmn:outgoing>
@@ -301,8 +301,8 @@
       <bpmn:incoming>SequenceFlow_02zsqih</bpmn:incoming>
       <bpmn:messageEventDefinition camunda:delegateExpression="${planetDefendedNotification}" />
     </bpmn:endEvent>
-    <bpmn:sequenceFlow id="SequenceFlow_1bj8bw1" sourceRef="Task_ProcessGameResults" targetRef="IntermediateThrowEvent_UpdatePromotions" />
-    <bpmn:serviceTask id="Task_ProcessGameResults" name="process game results" camunda:delegateExpression="${processGameResultTask}">
+    <bpmn:sequenceFlow id="SequenceFlow_1bj8bw1" sourceRef="ServiceTask_ProcessGameResults" targetRef="IntermediateThrowEvent_UpdatePromotions" />
+    <bpmn:serviceTask id="ServiceTask_ProcessGameResults" name="process game results" camunda:delegateExpression="${processGameResultTask}">
       <bpmn:incoming>SequenceFlow_0fg1u36</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_1bj8bw1</bpmn:outgoing>
     </bpmn:serviceTask>
@@ -549,7 +549,7 @@
           <dc:Bounds x="2598" y="465" width="54" height="24" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="ExclusiveGateway_1ahgfng_di" bpmnElement="ExclusiveGateway_1ahgfng" isMarkerVisible="true">
+      <bpmndi:BPMNShape id="ExclusiveGateway_1ahgfng_di" bpmnElement="ExclusiveGateway_MergeAssaultFinish" isMarkerVisible="true">
         <dc:Bounds x="2730" y="422" width="50" height="50" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="2710" y="399" width="90" height="0" />
@@ -857,7 +857,7 @@
           <dc:Bounds x="754" y="587" width="65" height="24" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="ExclusiveGateway_0ltc7r2_di" bpmnElement="ExclusiveGateway_0ltc7r2" isMarkerVisible="true">
+      <bpmndi:BPMNShape id="ExclusiveGateway_0ltc7r2_di" bpmnElement="ExclusiveGateway_MergeAttackersWin" isMarkerVisible="true">
         <dc:Bounds x="1338" y="717" width="50" height="50" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="1338" y="767" width="49" height="24" />
@@ -870,7 +870,7 @@
           <dc:Bounds x="1386" y="723" width="12" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="ExclusiveGateway_00jz1c2_di" bpmnElement="ExclusiveGateway_00jz1c2" isMarkerVisible="true">
+      <bpmndi:BPMNShape id="ExclusiveGateway_00jz1c2_di" bpmnElement="ExclusiveGateway_MergeMatchStarting" isMarkerVisible="true">
         <dc:Bounds x="1338" y="303" width="50" height="50" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="1318" y="353" width="90" height="0" />
@@ -913,7 +913,7 @@
           <dc:Bounds x="1506" y="554" width="90" height="0" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="ServiceTask_0k8ne9g_di" bpmnElement="Task_1vstppt">
+      <bpmndi:BPMNShape id="ServiceTask_0k8ne9g_di" bpmnElement="ServiceTask_SetDefenderAsWinner">
         <dc:Bounds x="1428" y="529" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_13sgv8p_di" bpmnElement="SequenceFlow_13sgv8p">
@@ -923,7 +923,7 @@
           <dc:Bounds x="1506" y="727" width="90" height="0" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="ServiceTask_1km3vi7_di" bpmnElement="Task_1gisjkt">
+      <bpmndi:BPMNShape id="ServiceTask_1km3vi7_di" bpmnElement="ServiceTask_SetAtackerAsWinner">
         <dc:Bounds x="1428" y="702" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_1uidmte_di" bpmnElement="SequenceFlow_1uidmte">
@@ -946,7 +946,7 @@
           <dc:Bounds x="2525" y="432" width="90" height="0" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="ServiceTask_1jcqicg_di" bpmnElement="Task_ProcessGameResults">
+      <bpmndi:BPMNShape id="ServiceTask_1jcqicg_di" bpmnElement="ServiceTask_ProcessGameResults">
         <dc:Bounds x="2432" y="407" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_0x6oncf_di" bpmnElement="SequenceFlow_0x6oncf">

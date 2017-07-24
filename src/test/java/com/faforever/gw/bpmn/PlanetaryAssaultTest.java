@@ -17,9 +17,9 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.camunda.bpm.engine.test.assertions.ProcessEngineAssertions.assertThat;
-import static org.camunda.bpm.extension.mockito.DelegateExpressions.verifyJavaDelegateMock;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.execute;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.job;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 
 
 public class PlanetaryAssaultTest {
@@ -57,6 +57,7 @@ public class PlanetaryAssaultTest {
         DelegateExpressions.registerJavaDelegateMock("calculateWaitingProgressTask");
         DelegateExpressions.registerJavaDelegateMock("battleUpdateWaitingProgressNotification");
         DelegateExpressions.registerJavaDelegateMock("noopTask");
+        DelegateExpressions.registerJavaDelegateMock("setupLobbyMatchTask");
         DelegateExpressions.registerJavaDelegateMock("processGameResultTask");
         DelegateExpressions.registerJavaDelegateMock("closeAssaultTask");
         DelegateExpressions.registerJavaDelegateMock("planetConqueredNotification");
@@ -82,28 +83,55 @@ public class PlanetaryAssaultTest {
 
         final ProcessInstance processInstance = startProcess();
 
+        assertThat(processInstance).hasPassedInOrder(
+                "StartEvent_CharacterInitiatesAssault",
+                "ServiceTask_InitateAssault");
+
+        execute(job()); // IntermediateThrowEvent_PlanetUnderAssault is async
+
+        assertThat(processInstance).hasPassedInOrder(
+                "ServiceTask_InitateAssault",
+                "IntermediateThrowEvent_PlanetUnderAssault",
+                "IntermediateThrowEvent_JoinedAssault_FirstPlayer",
+                "StartEvent_AssaultInitiated");
+
+        assertThat(processInstance).isWaitingAt("ExclusiveGateway_SetupMatch");
+
         processEngineRule.getRuntimeService().correlateMessage("Message_PlayerJoinsAssault", "test");
+
+        assertThat(processInstance).hasPassedInOrder(
+                "StartEvent_AssaultInitiated",
+                "ExclusiveGateway_SetupMatch",
+                "IntermediateCatchEvent_PlayerJoins",
+                "ServiceTask_AddPlayersCharacterToAssault");
+
+        execute(job()); // IntermediateThrowEvent_JoinedAssault is async
+
+        assertThat(processInstance).hasPassedInOrder(
+                "ServiceTask_AddPlayersCharacterToAssault",
+                "IntermediateThrowEvent_JoinedAssault",
+                "ExclusiveGateway_AllSlotsOccupied",
+                "ExclusiveGateway_MergeMatchStarting",
+                "EndEvent_MatchStarting",
+                "Task_SetupMatch",
+                "ServiceTask_CreateGameOptions",
+                "ServiceTask_ConsumePlayersReinforcements",
+                "ServiceTask_CommandLobbyServerToSetupMatch");
+
         processEngineRule.getRuntimeService().correlateMessage("Message_GameResult", "test",
                 Variables.createVariables()
                         .putValue("gameResult", mock(GameResult.class))
         );
 
-
-//        // Example for completing manual tasks:
-//        TaskService taskService = processEngineRule.getTaskService();
-//        assertThat(processInstance).isWaitingAtExactly("Task_110bnz1");
-//        Task task = taskService.createTaskQuery().taskDefinitionKey("Task_110bnz1").singleResult();
-//        taskService.complete(task.getId());
-
-        verifyJavaDelegateMock("initiateAssaultTask").executed(times(1));
-        verifyJavaDelegateMock("planetUnderAssaultNotification").executed(times(1));
-        verifyJavaDelegateMock("userErrorMessage").executedNever();
-        verifyJavaDelegateMock("addCharacterToAssaultTask").executed(times(1));
-        verifyJavaDelegateMock("battleParticipantJoinedAssaultNotification").executed(times(1));
-//        verifyJavaDelegateMock("createGameOptionsTask").executed(times(1));
-        verifyJavaDelegateMock("processGameResultTask").executed(times(1));
-        verifyJavaDelegateMock("closeAssaultTask").executed(times(1));
-        verifyJavaDelegateMock("planetConqueredNotification").executed(times(1));
+        assertThat(processInstance).hasPassedInOrder(
+                "ServiceTask_CommandLobbyServerToSetupMatch",
+                "IntermediateCatchEvent_GameResult",
+                "ServiceTask_ProcessGameResults",
+                "IntermediateThrowEvent_UpdatePromotions",
+                "ExclusiveGateway_MergeAssaultFinish",
+                "ServiceTask_CloseAssault",
+                "ExclusiveGateway_AttackersWin",
+                "EndEvent_PlanetConquered");
 
         assertThat(processInstance).isEnded();
     }
@@ -115,10 +143,10 @@ public class PlanetaryAssaultTest {
 
         final ProcessInstance processInstance = startProcess();
 
-        verifyJavaDelegateMock("initiateAssaultTask").executed(times(1));
-        verifyJavaDelegateMock("planetUnderAssaultNotification").executedNever();
-        verifyJavaDelegateMock("userAckMessage").executedNever();
-        verifyJavaDelegateMock("userErrorMessage").executed(times(1));
+        assertThat(processInstance).hasPassedInOrder(
+                "StartEvent_CharacterInitiatesAssault",
+                "ServiceTask_InitateAssault",
+                "EndEvent_Error_InvalidCharacterAction");
 
         assertThat(processInstance).isEnded();
     }
@@ -129,17 +157,32 @@ public class PlanetaryAssaultTest {
         DelegateExpressions.registerJavaDelegateMock("addCharacterToAssaultTask").onExecutionThrowBpmnError("2002", "Character not free for game");
 
         final ProcessInstance processInstance = startProcess();
-        verifyJavaDelegateMock("initiateAssaultTask").executed(times(1));
-        verifyJavaDelegateMock("planetUnderAssaultNotification").executed(times(1));
-        verifyJavaDelegateMock("userAckMessage").executed(times(1));
+
+        assertThat(processInstance).hasPassedInOrder(
+                "StartEvent_CharacterInitiatesAssault",
+                "ServiceTask_InitateAssault");
+
+        execute(job()); // IntermediateThrowEvent_PlanetUnderAssault is async
+
+        assertThat(processInstance).hasPassedInOrder(
+                "ServiceTask_InitateAssault",
+                "IntermediateThrowEvent_PlanetUnderAssault",
+                "IntermediateThrowEvent_JoinedAssault_FirstPlayer",
+                "StartEvent_AssaultInitiated");
+
+        assertThat(processInstance).isWaitingAt("ExclusiveGateway_SetupMatch");
 
         processEngineRule.getRuntimeService().correlateMessage("Message_PlayerJoinsAssault", "test");
-        verifyJavaDelegateMock("addCharacterToAssaultTask").executed(times(1));;
-        verifyJavaDelegateMock("userAckMessage").executed(times(1));
-        verifyJavaDelegateMock("userErrorMessage").executed(times(1));
-        verifyJavaDelegateMock("battleParticipantJoinedAssaultNotification").executedNever();
 
-        assertThat(processInstance).isActive();
+        assertThat(processInstance).hasPassedInOrder(
+                "StartEvent_AssaultInitiated",
+                "ExclusiveGateway_SetupMatch",
+                "IntermediateCatchEvent_PlayerJoins",
+                "ServiceTask_AddPlayersCharacterToAssault",
+                "BoundaryEvent_Error_AddCharacter",
+                "IntermediateThrowEvent_Error_AddCharacter");
+
+        assertThat(processInstance).isWaitingAt("ExclusiveGateway_SetupMatch");
     }
 
     @Test
@@ -148,18 +191,32 @@ public class PlanetaryAssaultTest {
         DelegateExpressions.registerJavaDelegateMock("removeCharacterFromAssaultTask").onExecutionThrowBpmnError("2002", "Character not free for game");
 
         final ProcessInstance processInstance = startProcess();
-        verifyJavaDelegateMock("initiateAssaultTask").executed(times(1));
-        verifyJavaDelegateMock("planetUnderAssaultNotification").executed(times(1));
-        ;
-        verifyJavaDelegateMock("userAckMessage").executed(times(1));
+
+        assertThat(processInstance).hasPassedInOrder(
+                "StartEvent_CharacterInitiatesAssault",
+                "ServiceTask_InitateAssault");
+
+        execute(job()); // IntermediateThrowEvent_PlanetUnderAssault is async
+
+        assertThat(processInstance).hasPassedInOrder(
+                "ServiceTask_InitateAssault",
+                "IntermediateThrowEvent_PlanetUnderAssault",
+                "IntermediateThrowEvent_JoinedAssault_FirstPlayer",
+                "StartEvent_AssaultInitiated");
+
+        assertThat(processInstance).isWaitingAt("ExclusiveGateway_SetupMatch");
 
         processEngineRule.getRuntimeService().correlateMessage("Message_PlayerLeavesAssault", "test");
-        verifyJavaDelegateMock("removeCharacterFromAssaultTask").executed(times(1));;
-        verifyJavaDelegateMock("userAckMessage").executed(times(1));
-        verifyJavaDelegateMock("userErrorMessage").executed(times(1));
-        verifyJavaDelegateMock("battleParticipantLeftAssaultNotification").executedNever();
 
-        assertThat(processInstance).isActive();
+        assertThat(processInstance).hasPassedInOrder(
+                "StartEvent_AssaultInitiated",
+                "ExclusiveGateway_SetupMatch",
+                "IntermediateCatchEvent_PlayerLeaves",
+                "ServiceTask_RemovePlayersCharacterToAssault",
+                "BoundaryEvent_Error_RemoveCharacter",
+                "IntermediateThrowEvent_Error_RemoveCharacter");
+
+        assertThat(processInstance).isWaitingAt("ExclusiveGateway_SetupMatch");
     }
 
     @Test
@@ -170,23 +227,63 @@ public class PlanetaryAssaultTest {
         );
 
         final ProcessInstance processInstance = startProcess();
-        verifyJavaDelegateMock("initiateAssaultTask").executed(times(1));
-        verifyJavaDelegateMock("planetUnderAssaultNotification").executed(times(1));
-        verifyJavaDelegateMock("userAckMessage").executed(times(1));
+
+        assertThat(processInstance).hasPassedInOrder(
+                "StartEvent_CharacterInitiatesAssault",
+                "ServiceTask_InitateAssault");
+
+        execute(job()); // IntermediateThrowEvent_PlanetUnderAssault is async
+
+        assertThat(processInstance).hasPassedInOrder(
+                "ServiceTask_InitateAssault",
+                "IntermediateThrowEvent_PlanetUnderAssault",
+                "IntermediateThrowEvent_JoinedAssault_FirstPlayer",
+                "StartEvent_AssaultInitiated");
+
+        assertThat(processInstance).isWaitingAt("ExclusiveGateway_SetupMatch");
 
         processEngineRule.getRuntimeService().signalEventReceived("Signal_UpdateOpenGames");
-        verifyJavaDelegateMock("calculateWaitingProgressTask").executed(times(1));
+
+        assertThat(processInstance).hasPassedInOrder(
+                "StartEvent_AssaultInitiated",
+                "ExclusiveGateway_SetupMatch",
+                "IntermediateCatchEvent_UpdateOpenGames",
+                "ServiceTask_CalculateWaitingProgress");
+
+        execute(job()); // IntermediateThrowEvent_UpdateWaitingProgress is async
+
+        assertThat(processInstance).hasPassedInOrder(
+                "ServiceTask_CalculateWaitingProgress",
+                "IntermediateThrowEvent_UpdateWaitingProgress",
+                "ExclusiveGateway_WaitingProgress");
+
+        assertThat(processInstance).isWaitingAt("ExclusiveGateway_SetupMatch");
 
         processEngineRule.getRuntimeService().correlateMessage("Message_PlayerLeavesAssault", "test");
-        verifyJavaDelegateMock("userAckMessage").executed(times(2));
-        verifyJavaDelegateMock("addCharacterToAssaultTask").executedNever();
-        verifyJavaDelegateMock("battleUpdateWaitingProgressNotification").executed(times(1));
-        verifyJavaDelegateMock("removeCharacterFromAssaultTask").executed(times(1));
-        verifyJavaDelegateMock("battleParticipantLeftAssaultNotification").executed(times(1));
-        verifyJavaDelegateMock("closeAssaultTask").executed(times(1));
-        verifyJavaDelegateMock("planetDefendedNotification").executed(times(1));
-        verifyJavaDelegateMock("processGameResultTask").executedNever();
-        verifyJavaDelegateMock("userErrorMessage").executedNever();
+
+        assertThat(processInstance).hasPassedInOrder(
+                "ExclusiveGateway_WaitingProgress",
+                "IntermediateCatchEvent_PlayerLeaves",
+                "ServiceTask_RemovePlayersCharacterToAssault");
+
+        execute(job()); // IntermediateThrowEvent_LeftAssault is async
+
+        assertThat(processInstance).hasPassedInOrder(
+                "ServiceTask_RemovePlayersCharacterToAssault",
+                "ExclusiveGateway_AssaultFactionHasPlayers",
+                "ServiceTask_SetDefenderAsWinner");
+
+        execute(job()); // EndEvent_DefendersWon_NoMatch is async
+
+        assertThat(processInstance).hasPassedInOrder(
+                "ServiceTask_SetDefenderAsWinner",
+                "EndEvent_DefendersWon_NoMatch",
+                "Task_SetupMatch",
+                "BoundaryEvent_DefendersWon_NoMatch",
+                "ExclusiveGateway_MergeAssaultFinish",
+                "ServiceTask_CloseAssault",
+                "ExclusiveGateway_AttackersWin",
+                "EndEvent_PlanetDefended");
 
         assertThat(processInstance).isEnded();
     }
@@ -200,26 +297,64 @@ public class PlanetaryAssaultTest {
         );
 
         final ProcessInstance processInstance = startProcess();
-        verifyJavaDelegateMock("userAckMessage").executed(times(1));
+
+        assertThat(processInstance).hasPassedInOrder(
+                "StartEvent_CharacterInitiatesAssault",
+                "ServiceTask_InitateAssault");
+
+        execute(job()); // IntermediateThrowEvent_PlanetUnderAssault is async
+
+        assertThat(processInstance).hasPassedInOrder(
+                "ServiceTask_InitateAssault",
+                "IntermediateThrowEvent_PlanetUnderAssault",
+                "IntermediateThrowEvent_JoinedAssault_FirstPlayer",
+                "StartEvent_AssaultInitiated");
+
+        assertThat(processInstance).isWaitingAt("ExclusiveGateway_SetupMatch");
 
         processEngineRule.getRuntimeService().correlateMessage("Message_PlayerJoinsAssault", "test");
-        verifyJavaDelegateMock("initiateAssaultTask").executed(times(1));
-        verifyJavaDelegateMock("planetUnderAssaultNotification").executed(times(1));
-        verifyJavaDelegateMock("addCharacterToAssaultTask").executed(times(1));
-        verifyJavaDelegateMock("battleParticipantJoinedAssaultNotification").executed(times(1));
-        verifyJavaDelegateMock("userAckMessage").executed(times(2));
 
+        assertThat(processInstance).hasPassedInOrder(
+                "StartEvent_AssaultInitiated",
+                "IntermediateCatchEvent_PlayerJoins",
+                "ServiceTask_AddPlayersCharacterToAssault");
+
+        execute(job()); // IntermediateThrowEvent_JoinedAssault is async
+
+        assertThat(processInstance).hasPassedInOrder(
+                "ServiceTask_AddPlayersCharacterToAssault",
+                "ExclusiveGateway_AllSlotsOccupied");
+
+        assertThat(processInstance).isWaitingAt("ExclusiveGateway_SetupMatch");
 
         processEngineRule.getRuntimeService().signalEventReceived("Signal_UpdateOpenGames");
-        verifyJavaDelegateMock("calculateWaitingProgressTask").executed(times(1));
-        verifyJavaDelegateMock("battleUpdateWaitingProgressNotification").executed(times(1));
 
-        verifyJavaDelegateMock("removeCharacterFromAssaultTask").executedNever();
-        verifyJavaDelegateMock("battleParticipantLeftAssaultNotification").executedNever();
-        verifyJavaDelegateMock("closeAssaultTask").executed(times(1));
-        verifyJavaDelegateMock("processGameResultTask").executedNever();
-        verifyJavaDelegateMock("planetDefendedNotification").executedNever();
-        verifyJavaDelegateMock("userErrorMessage").executedNever();
+        assertThat(processInstance).hasPassedInOrder(
+                "ExclusiveGateway_SetupMatch",
+                "IntermediateCatchEvent_UpdateOpenGames",
+                "ServiceTask_CalculateWaitingProgress");
+
+        execute(job()); // IntermediateThrowEvent_UpdateWaitingProgress is async
+
+        assertThat(processInstance).hasPassedInOrder(
+                "ServiceTask_CalculateWaitingProgress",
+                "IntermediateThrowEvent_UpdateWaitingProgress",
+                "ExclusiveGateway_WaitingProgress",
+                "ExclusiveGateway_MergeAttackersWin",
+                "ServiceTask_SetAtackerAsWinner");
+
+
+        execute(job()); // EndEvent_AttackersWon_NoMatch is async
+
+        assertThat(processInstance).hasPassedInOrder(
+                "ServiceTask_SetAtackerAsWinner",
+                "EndEvent_AttackersWon_NoMatch",
+                "Task_SetupMatch",
+                "BoundaryEvent_AttackersWon_NoMatch",
+                "ExclusiveGateway_MergeAssaultFinish",
+                "ServiceTask_CloseAssault",
+                "ExclusiveGateway_AttackersWin",
+                "EndEvent_PlanetConquered");
 
         assertThat(processInstance).isEnded();
     }
