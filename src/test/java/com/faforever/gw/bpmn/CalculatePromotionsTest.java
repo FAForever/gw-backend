@@ -2,6 +2,7 @@ package com.faforever.gw.bpmn;
 
 import com.faforever.gw.model.GwCharacter;
 import com.google.common.collect.ImmutableMap;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.mock.Mocks;
@@ -14,12 +15,8 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.Arrays;
 
-import static org.camunda.bpm.extension.mockito.DelegateExpressions.verifyJavaDelegateMock;
+import static org.camunda.bpm.engine.test.assertions.ProcessEngineAssertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-
-//import jersey.repackaged.com.google.common.collect.ImmutableMap;
-
 
 public class CalculatePromotionsTest {
 
@@ -44,11 +41,21 @@ public class CalculatePromotionsTest {
     public void success_2active_bothPromoted() throws Exception {
         DelegateExpressions.registerJavaDelegateMock("checkAndPerformPromotionTask").onExecutionSetVariables(ImmutableMap.of("rankAvailable", true));
 
-        startProcess();
+        ProcessInstance processInstance = startProcess();
 
-        verifyJavaDelegateMock("selectAllActiveCharactersTask").executed(times(1));
-        verifyJavaDelegateMock("checkAndPerformPromotionTask").executed(times(2));
-        verifyJavaDelegateMock("characterPromotionNotification").executed(times(2));
+        assertThat(processInstance).hasPassedInOrder(
+                "StartEvent_UpdatePromotions",
+                "ServiceTask_SelectAllActiveCharacters",
+                "StartEvent_CharacterPromotion",
+                "Task_GetAvailableRank",
+                "ExclusiveGateway_NewRankAvailable",
+                "EndEvent_CharacterPromoted",
+                "StartEvent_CharacterPromotion",
+                "Task_GetAvailableRank",
+                "ExclusiveGateway_NewRankAvailable",
+                "EndEvent_CharacterPromoted",
+                "EndEvent_PromotionsUpdated"
+        );
     }
 
     @Test
@@ -56,14 +63,25 @@ public class CalculatePromotionsTest {
     public void success_2active_nonePromoted() throws Exception {
         DelegateExpressions.registerJavaDelegateMock("checkAndPerformPromotionTask").onExecutionSetVariables(ImmutableMap.of("rankAvailable", false));
 
-        startProcess();
+        ProcessInstance processInstance = startProcess();
 
-        verifyJavaDelegateMock("selectAllActiveCharactersTask").executed(times(1));
-        verifyJavaDelegateMock("checkAndPerformPromotionTask").executed(times(2));
-        verifyJavaDelegateMock("characterPromotionNotification").executed(times(0));
+        assertThat(processInstance).hasPassedInOrder(
+                "StartEvent_UpdatePromotions",
+                "ServiceTask_SelectAllActiveCharacters",
+                "StartEvent_CharacterPromotion",
+                "Task_GetAvailableRank",
+                "ExclusiveGateway_NewRankAvailable",
+                "EndEvent_CharacterNotPromoted",
+                "StartEvent_CharacterPromotion",
+                "Task_GetAvailableRank",
+                "ExclusiveGateway_NewRankAvailable",
+                "EndEvent_CharacterNotPromoted",
+                "EndEvent_PromotionsUpdated"
+        );
     }
 
-    private void startProcess() {
-        processEngineRule.getRuntimeService().signalEventReceived("Signal_UpdatePromotions");
+    private ProcessInstance startProcess() {
+        return processEngineRule.getRuntimeService().startProcessInstanceByKey("Process_CalculatePromotions");
+//        processEngineRule.getRuntimeService().signalEventReceived("Signal_UpdatePromotions");
     }
 }

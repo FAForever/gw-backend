@@ -113,7 +113,6 @@ public class PlanetaryAssaultTest {
                 "ExclusiveGateway_AllSlotsOccupied",
                 "ExclusiveGateway_MergeMatchStarting",
                 "EndEvent_MatchStarting",
-                "Task_SetupMatch",
                 "ServiceTask_CreateGameOptions",
                 "ServiceTask_ConsumePlayersReinforcements",
                 "ServiceTask_CommandLobbyServerToSetupMatch");
@@ -278,7 +277,6 @@ public class PlanetaryAssaultTest {
         assertThat(processInstance).hasPassedInOrder(
                 "ServiceTask_SetDefenderAsWinner",
                 "EndEvent_DefendersWon_NoMatch",
-                "Task_SetupMatch",
                 "BoundaryEvent_DefendersWon_NoMatch",
                 "ExclusiveGateway_MergeAssaultFinish",
                 "ServiceTask_CloseAssault",
@@ -349,7 +347,6 @@ public class PlanetaryAssaultTest {
         assertThat(processInstance).hasPassedInOrder(
                 "ServiceTask_SetAtackerAsWinner",
                 "EndEvent_AttackersWon_NoMatch",
-                "Task_SetupMatch",
                 "BoundaryEvent_AttackersWon_NoMatch",
                 "ExclusiveGateway_MergeAssaultFinish",
                 "ServiceTask_CloseAssault",
