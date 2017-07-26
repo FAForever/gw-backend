@@ -1,6 +1,7 @@
 package com.faforever.gw.bpmn;
 
 import com.google.common.collect.ImmutableMap;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.mock.Mocks;
@@ -13,8 +14,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.Arrays;
 
-import static org.camunda.bpm.extension.mockito.DelegateExpressions.verifyJavaDelegateMock;
-import static org.mockito.Mockito.times;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareAssertions.assertThat;
 
 
 public class RegularIncomeTest {
@@ -38,14 +38,24 @@ public class RegularIncomeTest {
     @Test
     @Deployment(resources = "bpmn/regular_income.bpmn")
     public void success() throws Exception {
-        startProcess();
+        ProcessInstance processInstance = startProcess();
 
-        verifyJavaDelegateMock("selectAllActiveCharactersTask").executed(times(1));
-        verifyJavaDelegateMock("giveRegularIncomeTask").executed(times(2));
-        verifyJavaDelegateMock("regularIncomeNotification").executed(times(2));
+        assertThat(processInstance).hasPassedInOrder(
+                "StartEvent_RegularIncomeDue",
+                "ServiceTask_SelectAllActiveCharacters",
+                "StartEvent_GenerateIncomeSub",
+                "ServiceTask_GiveRegularIncome",
+                "EndEvent_GenerateIncomeSub",
+                "StartEvent_GenerateIncomeSub",
+                "ServiceTask_GiveRegularIncome",
+                "EndEvent_GenerateIncomeSub",
+                "EndEvent_RegularIncomeGenerated"
+        ).isEnded();
+
     }
 
-    private void startProcess() {
-        processEngineRule.getRuntimeService().signalEventReceived("Signal_RegularIncomeDue");
+    private ProcessInstance startProcess() {
+        return processEngineRule.getRuntimeService().startProcessInstanceByKey("Process_RegularIncome");
+//        processEngineRule.getRuntimeService().signalEventReceived("Signal_RegularIncomeDue");
     }
 }

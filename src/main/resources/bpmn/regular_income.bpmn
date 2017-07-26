@@ -10,8 +10,8 @@
       <bpmn:outgoing>SequenceFlow_1yit8vw</bpmn:outgoing>
       <bpmn:signalEventDefinition signalRef="Signal_1do7h7b" />
     </bpmn:startEvent>
-    <bpmn:sequenceFlow id="SequenceFlow_1yit8vw" sourceRef="StartEvent_RegularIncomeDue" targetRef="Task_SelectAllActiveCharacters" />
-    <bpmn:serviceTask id="Task_SelectAllActiveCharacters" name="select all active characters" camunda:delegateExpression="${selectAllActiveCharactersTask}">
+    <bpmn:sequenceFlow id="SequenceFlow_1yit8vw" sourceRef="StartEvent_RegularIncomeDue" targetRef="ServiceTask_SelectAllActiveCharacters" />
+    <bpmn:serviceTask id="ServiceTask_SelectAllActiveCharacters" name="select all active characters" camunda:delegateExpression="${selectAllActiveCharactersTask}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:outputParameter name="activeCharacters">#{activeCharacters}</camunda:outputParameter>
@@ -30,9 +30,9 @@
       <bpmn:startEvent id="StartEvent_GenerateIncomeSub">
         <bpmn:outgoing>SequenceFlow_19d0fwa</bpmn:outgoing>
       </bpmn:startEvent>
-      <bpmn:sequenceFlow id="SequenceFlow_19d0fwa" sourceRef="StartEvent_GenerateIncomeSub" targetRef="Task_GiveRegularIncome" />
-      <bpmn:sequenceFlow id="SequenceFlow_1qbpz3u" sourceRef="Task_GiveRegularIncome" targetRef="EndEvent_GenerateIncomeSub" />
-      <bpmn:serviceTask id="Task_GiveRegularIncome" name="give regular income" camunda:delegateExpression="${giveRegularIncomeTask}">
+      <bpmn:sequenceFlow id="SequenceFlow_19d0fwa" sourceRef="StartEvent_GenerateIncomeSub" targetRef="ServiceTask_GiveRegularIncome" />
+      <bpmn:sequenceFlow id="SequenceFlow_1qbpz3u" sourceRef="ServiceTask_GiveRegularIncome" targetRef="EndEvent_GenerateIncomeSub" />
+      <bpmn:serviceTask id="ServiceTask_GiveRegularIncome" name="give regular income" camunda:delegateExpression="${giveRegularIncomeTask}">
         <bpmn:incoming>SequenceFlow_19d0fwa</bpmn:incoming>
         <bpmn:outgoing>SequenceFlow_1qbpz3u</bpmn:outgoing>
       </bpmn:serviceTask>
@@ -41,7 +41,7 @@
         <bpmn:messageEventDefinition camunda:delegateExpression="${regularIncomeNotification}" />
       </bpmn:endEvent>
     </bpmn:subProcess>
-    <bpmn:sequenceFlow id="SequenceFlow_16dj4iv" sourceRef="Task_SelectAllActiveCharacters" targetRef="SubProcess_GenerateIncomePerPlayer" />
+    <bpmn:sequenceFlow id="SequenceFlow_16dj4iv" sourceRef="ServiceTask_SelectAllActiveCharacters" targetRef="SubProcess_GenerateIncomePerPlayer" />
     <bpmn:sequenceFlow id="SequenceFlow_11ovvzt" sourceRef="SubProcess_GenerateIncomePerPlayer" targetRef="EndEvent_RegularIncomeGenerated" />
   </bpmn:process>
   <bpmn:signal id="Signal_1do7h7b" name="Signal_RegularIncomeDue" />
@@ -60,7 +60,7 @@
           <dc:Bounds x="120" y="126" width="0" height="0" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="ServiceTask_11u7hgt_di" bpmnElement="Task_SelectAllActiveCharacters">
+      <bpmndi:BPMNShape id="ServiceTask_11u7hgt_di" bpmnElement="ServiceTask_SelectAllActiveCharacters">
         <dc:Bounds x="176" y="101" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="EndEvent_01o6ail_di" bpmnElement="EndEvent_RegularIncomeGenerated">
@@ -106,7 +106,7 @@
           <dc:Bounds x="633" y="140" width="0" height="0" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="ServiceTask_0zvlajk_di" bpmnElement="Task_GiveRegularIncome">
+      <bpmndi:BPMNShape id="ServiceTask_0zvlajk_di" bpmnElement="ServiceTask_GiveRegularIncome">
         <dc:Bounds x="508" y="115" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="EndEvent_18ihk9n_di" bpmnElement="EndEvent_GenerateIncomeSub">
