@@ -169,5 +169,9 @@ public class DemoDataInitializer {
         System.out.println("-5- Aeon Echo");
         token = JwtHelper.encode("{\"expires\":4102358400, \"authorities\": [], \"user_id\": 5, \"user_name\": \"Aeon Echo\"}", macSigner);
         System.out.println(token.getEncoded());
+
+        System.out.println("-X- Unregistered user");
+        token = JwtHelper.encode("{\"expires\":4102358400, \"authorities\": [], \"user_id\": 99, \"user_name\": \"Unregistered user\"}", macSigner);
+        System.out.println(token.getEncoded());
     }
 }

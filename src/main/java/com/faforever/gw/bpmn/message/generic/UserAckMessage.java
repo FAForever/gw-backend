@@ -29,9 +29,9 @@ public class UserAckMessage implements JavaDelegate {
         UserInteractionProcessAccessor accessor = UserInteractionProcessAccessor.of(execution);
 
         val requestId = accessor.getRequestId();
-        val recipientCharacter = accessor.getRequestCharacter();
+        val fafUserId = accessor.getRequestFafUser();
 
-        gwUserRegistry.getUser(recipientCharacter)
+        gwUserRegistry.getUser(fafUserId)
                 .ifPresent(user -> {
                     log.debug("Sending UserAckMessage (requestId: {})", requestId);
                     messagingService.send(new AckMessage(user, requestId));

@@ -19,7 +19,11 @@ public enum GwErrorType {
     NO_SLOTS_FOR_FACTION("2005", "There are no open slots in this battle for the character's faction"),
     PLANET_PROTECTED_FROM_ASSAULT("2006", "Planet is currently protected from assaults"),
     PLANET_NOT_IN_REACH("2007", "Planet is not in reach of the attacker's faction"),
-    PLANET_OWNED_BY_CHARACTERS_FACTION("2008", "Planet is already owned by characters faction");
+    PLANET_OWNED_BY_CHARACTERS_FACTION("2008", "Planet is already owned by characters faction"),
+    // Character related error
+    NO_CREATION_WITH_ACTIVE_CHARACTER("3001", "You can't create a new character if you have an active one"),
+    NO_CREATION_WITH_FACTION_MISMATCH("3002", "You can't change your faction during the season"),
+    NO_CREATION_WITH_INVALID_SELECTION("3003", "Your chosen character name was not offered");
 
     private final String errorCode;
     private final String errorMessage;

@@ -6,13 +6,29 @@ import java.util.UUID;
 
 /**
  * A general purpose accessor that makes user communication variables accessible
- * (requestId and requestCharacter)
- *
+ * (requestUser, requestId and requestCharacter)
+ * <p>
  * Use it, if you only need access to these variables. Otherwise use a more sophisticated accessor.
  */
-public class UserInteractionProcessAccessor extends BaseAccessor{
+public class UserInteractionProcessAccessor extends BaseAccessor {
     protected UserInteractionProcessAccessor(DelegateExecution processContext) {
         super(processContext);
+    }
+
+    /***
+     * Warning: Only call this, if you are sure, there was a user request before.
+     * @return long of the user who made the request
+     */
+    public long getRequestFafUser() {
+        return (long) get("requestFafUser");
+    }
+
+    /***
+     * Important: the requestFafUser should be passed as a process variable on correlating the message
+     * @param requestFafUser FAF user id of user woh made the client request
+     */
+    public void setRequestFafUser(long requestFafUser) {
+        set("requestFafUser", requestFafUser);
     }
 
     /***
@@ -20,7 +36,7 @@ public class UserInteractionProcessAccessor extends BaseAccessor{
      * @return UUID of the last user request
      */
     public UUID getRequestId() {
-        return (UUID)get("requestId");
+        return (UUID) get("requestId");
     }
 
     /***
@@ -36,12 +52,12 @@ public class UserInteractionProcessAccessor extends BaseAccessor{
      * @return UUID of the character who made the request
      */
     public UUID getRequestCharacter() {
-        return (UUID)get("requestCharacter");
+        return (UUID) get("requestCharacter");
     }
 
     /***
      * Important: the requestCharacter should be passed as a process variable on correlating the message
-     * @param requestCharacter Random requestCharacter of the client request
+     * @param requestCharacter UUID of the GwCharacter who made the client request
      */
     public void setRequestCharacter(UUID requestCharacter) {
         set("requestCharacter", requestCharacter);

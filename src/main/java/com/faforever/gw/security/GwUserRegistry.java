@@ -1,50 +1,51 @@
 package com.faforever.gw.security;
 
 import com.faforever.gw.model.GwCharacter;
+import com.faforever.gw.model.repository.CharacterRepository;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Repository;
 
+import javax.inject.Inject;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
-import static java.util.Optional.of;
-
 @Component
 public class GwUserRegistry {
-    private final BiMap<User, GwCharacter> userCharacterMapping;
+    private final BiMap<User, Long> userCharacterMapping;
+    private final CharacterRepository characterRepository;
 
-    public GwUserRegistry() {
+    @Inject
+    public GwUserRegistry(CharacterRepository characterRepository) {
+        this.characterRepository = characterRepository;
         userCharacterMapping = HashBiMap.create();
     }
 
     public void addConnection(User user) {
-        userCharacterMapping.forcePut(user, user.getActiveCharacter());
+        userCharacterMapping.forcePut(user, user.getId());
     }
 
     public void removeConnection(User user) {
-        userCharacterMapping.remove(user, user.getActiveCharacter());
+        userCharacterMapping.remove(user, user.getId());
     }
 
-    public GwCharacter getCharacter(User user) {
-        return userCharacterMapping.get(user);
+    public Optional<User> getUser(UUID gwCharacterId) {
+        GwCharacter character = characterRepository.findOne(gwCharacterId);
+
+        return getUser(character.getFafId());
     }
 
-    public Optional<User> getUser(UUID characterId) {
-        BiMap<GwCharacter, User> inverse = userCharacterMapping.inverse();
+    public Optional<User> getUser(long fafUserId) {
+        BiMap<Long, User> inverse = userCharacterMapping.inverse();
 
         return inverse.keySet().stream()
-                .filter(gwCharacter -> Objects.equals(gwCharacter.getId(), characterId))
+                .filter(aLong -> Objects.equals(aLong, fafUserId))
                 .findFirst()
                 .map(inverse::get);
     }
 
-    public Optional<User> getUser(GwCharacter character) {
-        return of(userCharacterMapping.inverse().get(character));
-    }
 
     public Collection<User> getConnectedUsers() {
         return userCharacterMapping.keySet();
