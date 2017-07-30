@@ -31,9 +31,9 @@ public class UserErrorMessage implements JavaDelegate {
         val requestId = accessor.getRequestId();
         val errorCode = accessor.getErrorCode();
         val errorMessage = accessor.getErrorMessage();
-        val recipientCharacter = accessor.getRequestCharacter();
+        val requestFafUser = accessor.getRequestFafUser();
 
-        gwUserRegistry.getUser(recipientCharacter)
+        gwUserRegistry.getUser(requestFafUser)
                 .ifPresent(user -> {
                     log.debug("Sending UserErrorMessage (code: {}, message: {})", errorCode, errorMessage);
                     messagingService.send(new ErrorMessage(user, requestId, errorCode, errorMessage));

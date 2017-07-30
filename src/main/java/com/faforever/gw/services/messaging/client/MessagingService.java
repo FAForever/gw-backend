@@ -50,11 +50,13 @@ public class MessagingService {
         }
     }
 
-    public VariableMap createVariables(UUID requestId, UUID requestCharacter) {
+    public VariableMap createVariables(long requestFafUser, UUID requestId, UUID requestCharacter) {
+        log.debug("-> set requestFafUser: {}", requestFafUser);
         log.debug("-> set requestId: {}", requestId);
         log.debug("-> set requestCharacter: {}", requestCharacter);
 
         return Variables.createVariables()
+                .putValue("requestFafUser", requestFafUser)
                 .putValue("requestId", requestId)
                 .putValue("requestCharacter", requestCharacter);
     }

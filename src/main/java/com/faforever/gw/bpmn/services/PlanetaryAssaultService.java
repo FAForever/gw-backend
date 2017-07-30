@@ -65,7 +65,7 @@ public class PlanetaryAssaultService {
 
         // TODO: How do we handle NullPointerException i.e. if planet is null?
 
-        VariableMap variables = messagingService.createVariables(message.getRequestId(), user.getActiveCharacter().getId())
+        VariableMap variables = messagingService.createVariables(user.getId(), message.getRequestId(), user.getActiveCharacter().getId())
                 .putValue("battle", battleUUID)
                 .putValue("planet", planet.getId())
                 .putValue("attackingFaction", character.getFaction())
@@ -83,7 +83,7 @@ public class PlanetaryAssaultService {
     public void onCharacterJoinsAssault(JoinAssaultMessage message, User user) {
         log.debug("onCharacterJoinsAssault for battle {}", message.getBattleId());
 
-        VariableMap variables = messagingService.createVariables(message.getRequestId(), user.getActiveCharacter().getId());
+        VariableMap variables = messagingService.createVariables(user.getId(), message.getRequestId(), user.getActiveCharacter().getId());
 
         try {
             runtimeService.correlateMessage(PLAYER_JOINS_ASSAULT_MESSAGE, message.getBattleId().toString(), variables);
@@ -96,7 +96,7 @@ public class PlanetaryAssaultService {
     public void onCharacterLeavesAssault(LeaveAssaultMessage message, User user) {
         log.debug("onCharacterLeavesAssault for battle {}", message.getBattleId());
 
-        VariableMap variables = messagingService.createVariables(message.getRequestId(), user.getActiveCharacter().getId());
+        VariableMap variables = messagingService.createVariables(user.getId(), message.getRequestId(), user.getActiveCharacter().getId());
 
         try {
             runtimeService.correlateMessage(PLAYER_LEAVES_ASSAULT_MESSAGE, message.getBattleId().toString(), variables);
@@ -129,8 +129,7 @@ public class PlanetaryAssaultService {
         gameResultMessage.getPlayerResults().forEach(
                 playerResult -> {
                     long fafId = playerResult.getPlayerFafId();
-                    // FIXME: What if there is more than one Character for this user?
-                    GwCharacter character = characterRepository.findByFafId(fafId);
+                    GwCharacter character = characterRepository.findActiveCharacterByFafId(fafId);
 
                     if (playerResult.getResult() == BattleParticipantResult.VICTORY) {
                         gameResult.setWinner(character.getFaction());

@@ -1,6 +1,7 @@
 package com.faforever.gw.websocket;
 
 import com.faforever.gw.model.Battle;
+import com.faforever.gw.model.GwCharacter;
 import com.faforever.gw.security.GwUserRegistry;
 import com.faforever.gw.security.User;
 import com.faforever.gw.services.messaging.client.MessageType;
@@ -25,6 +26,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @Slf4j
 @Component
@@ -84,6 +86,7 @@ public class WebSocketInputHandler extends TextWebSocketHandler {
         }
 
         if (actionMapping.containsKey(envelope.getAction())) {
+            log.debug("Processing message: {}", envelope);
             actionMapping.get(envelope.getAction()).processMessage(envelope, webSocketRegistry.getUser(session));
         } else {
             log.error("Unknown action `{}`. Ignoring message.", envelope.getAction());
@@ -100,12 +103,20 @@ public class WebSocketInputHandler extends TextWebSocketHandler {
 
         webSocketRegistry.add(session);
         val user = webSocketRegistry.getUser(session);
-        val character = entityManager.merge(user.getActiveCharacter());
+
+        UUID characterId = null;
+        UUID currentBattleId = null;
+
+        GwCharacter character = user.getActiveCharacter();
+
+        if (character != null) {
+            character = entityManager.merge(character);
+            characterId = character.getId();
+            currentBattleId = character.getCurrentBattle().map(Battle::getId).orElse(null);
+        }
 
         gwUserRegistry.addConnection(user);
-
-        val currentBattleId = character.getCurrentBattle().map(Battle::getId).orElse(null);
-        messagingService.send(new HelloMessage(user, character.getId(), currentBattleId));
+        messagingService.send(new HelloMessage(user, characterId, currentBattleId));
     }
 
     @Override

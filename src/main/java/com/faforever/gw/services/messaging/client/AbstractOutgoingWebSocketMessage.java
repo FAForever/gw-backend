@@ -2,6 +2,7 @@ package com.faforever.gw.services.messaging.client;
 
 import com.faforever.gw.model.Faction;
 import com.faforever.gw.security.User;
+import lombok.val;
 
 import javax.validation.constraints.NotNull;
 import java.util.Arrays;
@@ -29,7 +30,9 @@ public abstract class AbstractOutgoingWebSocketMessage implements OutgoingWebSoc
      */
     public AbstractOutgoingWebSocketMessage(@NotNull User user) {
         recipients = Arrays.asList(user);
-        faction = user.getActiveCharacter().getFaction();
+
+        val activeCharacter = user.getActiveCharacter();
+        faction = activeCharacter == null ? null : activeCharacter.getFaction();
     }
 
     @Override
