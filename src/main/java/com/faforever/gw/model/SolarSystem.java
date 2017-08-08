@@ -17,6 +17,7 @@ public class SolarSystem {
     private long x;
     private long y;
     private long z;
+    private String name;
     private List<Planet> planets;
 
     @Id
@@ -39,6 +40,11 @@ public class SolarSystem {
     @Column(name = "z")
     public long getZ() {
         return z;
+    }
+
+    @Column(name = "name")
+    public String getName() {
+        return name;
     }
 
     @OneToMany(mappedBy = "solarSystem")

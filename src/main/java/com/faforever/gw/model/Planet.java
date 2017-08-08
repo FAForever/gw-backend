@@ -18,6 +18,7 @@ public class Planet implements Serializable {
     private UUID id;
     private List<Battle> battles;
     private int orbitLevel;
+    private String name;
     private int size;
     private boolean habitable;
     private Ground ground;
@@ -46,6 +47,11 @@ public class Planet implements Serializable {
     @Column(name = "orbit_level")
     public int getOrbitLevel() {
         return orbitLevel;
+    }
+
+    @Column(name = "name")
+    public String getName() {
+        return name;
     }
 
     @Column(name = "size")
