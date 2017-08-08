@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd" xmlns:camunda="http://camunda.org/schema/1.0/dmn" id="definitions_06qqxv4" name="definitions" namespace="http://camunda.org/schema/1.0/dmn">
+  <decision id="planet_environment" name="Planet environment">
+    <decisionTable id="decisionTable" hitPolicy="FIRST">
+      <input id="input1" label="orbitLevel" camunda:inputVariable="orbitLevel">
+        <inputExpression id="inputExpression1" typeRef="integer" />
+      </input>
+      <input id="InputClause_1n6emlj" label="randomValue" camunda:inputVariable="randomValue">
+        <inputExpression id="LiteralExpression_02g8hqp" typeRef="long" />
+      </input>
+      <output id="output1" label="ground" name="ground" typeRef="string" />
+      <output id="OutputClause_19f2qok" label="habitable" name="habitable" typeRef="boolean" />
+      <rule id="row-520890282-1">
+        <inputEntry id="UnaryTests_1ehgp50">        <text><![CDATA[<= 5]]></text>
+</inputEntry>
+        <inputEntry id="UnaryTests_1156j8z">        <text><![CDATA[< 80]]></text>
+</inputEntry>
+        <outputEntry id="LiteralExpression_1vrybmf">        <text><![CDATA["LAVA"]]></text>
+</outputEntry>
+        <outputEntry id="LiteralExpression_0oiu92g">        <text>false</text>
+</outputEntry>
+      </rule>
+      <rule id="table-168245562-1">
+        <inputEntry id="UnaryTests_18mksax">        <text><![CDATA[<= 5]]></text>
+</inputEntry>
+        <inputEntry id="UnaryTests_09h8epq">        <text><![CDATA[>= 80]]></text>
+</inputEntry>
+        <outputEntry id="LiteralExpression_0xuqto6">        <text><![CDATA["DESERT"]]></text>
+</outputEntry>
+        <outputEntry id="LiteralExpression_00j7f6j">        <text>false</text>
+</outputEntry>
+      </rule>
+      <rule id="row-520890282-2">
+        <inputEntry id="UnaryTests_0pios13">        <text><![CDATA[<= 10]]></text>
+</inputEntry>
+        <inputEntry id="UnaryTests_0ppqnkk">        <text><![CDATA[< 30]]></text>
+</inputEntry>
+        <outputEntry id="LiteralExpression_0thwdll">        <text><![CDATA["LAVA"]]></text>
+</outputEntry>
+        <outputEntry id="LiteralExpression_1isjxoy">        <text>false</text>
+</outputEntry>
+      </rule>
+      <rule id="row-520890282-3">
+        <inputEntry id="UnaryTests_1sr466d">        <text><![CDATA[<= 10]]></text>
+</inputEntry>
+        <inputEntry id="UnaryTests_0gyjncr">        <text><![CDATA[< 60]]></text>
+</inputEntry>
+        <outputEntry id="LiteralExpression_1dxnvob">        <text><![CDATA["DESERT"]]></text>
+</outputEntry>
+        <outputEntry id="LiteralExpression_0cxkyr4">        <text>false</text>
+</outputEntry>
+      </rule>
+      <rule id="row-520890282-4">
+        <inputEntry id="UnaryTests_1ezq00k">        <text><![CDATA[<= 10]]></text>
+</inputEntry>
+        <inputEntry id="UnaryTests_1scl185">        <text><![CDATA[< 70]]></text>
+</inputEntry>
+        <outputEntry id="LiteralExpression_1oq3sfm">        <text><![CDATA["DESERT"]]></text>
+</outputEntry>
+        <outputEntry id="LiteralExpression_0wif7r7">        <text>true</text>
+</outputEntry>
+      </rule>
+      <rule id="row-520890282-5">
+        <inputEntry id="UnaryTests_03kl21w">        <text><![CDATA[<= 10]]></text>
+</inputEntry>
+        <inputEntry id="UnaryTests_0y8yc1m">        <text><![CDATA[< 80]]></text>
+</inputEntry>
+        <outputEntry id="LiteralExpression_13ghmmd">        <text><![CDATA["WATER"]]></text>
+</outputEntry>
+        <outputEntry id="LiteralExpression_1q3ynz4">        <text>false</text>
+</outputEntry>
+      </rule>
+      <rule id="row-520890282-6">
+        <inputEntry id="UnaryTests_1jc62x5">        <text><![CDATA[<= 10]]></text>
+</inputEntry>
+        <inputEntry id="UnaryTests_0wurp5t">        <text><![CDATA[< 90]]></text>
+</inputEntry>
+        <outputEntry id="LiteralExpression_13uxi9l">        <text><![CDATA["WATER"]]></text>
+</outputEntry>
+        <outputEntry id="LiteralExpression_0xhvpfl">        <text>true</text>
+</outputEntry>
+      </rule>
+      <rule id="row-520890282-7">
+        <inputEntry id="UnaryTests_1g7w88b">        <text><![CDATA[<= 10]]></text>
+</inputEntry>
+        <inputEntry id="UnaryTests_1ujc4eq">        <text><![CDATA[>= 90]]></text>
+</inputEntry>
+        <outputEntry id="LiteralExpression_0htbaca">        <text><![CDATA["SOIL"]]></text>
+</outputEntry>
+        <outputEntry id="LiteralExpression_0wunqwd">        <text>true</text>
+</outputEntry>
+      </rule>
+      <rule id="row-520890282-10">
+        <inputEntry id="UnaryTests_15srsqn">        <text><![CDATA[<= 20]]></text>
+</inputEntry>
+        <inputEntry id="UnaryTests_0pjeklg">        <text><![CDATA[< 15]]></text>
+</inputEntry>
+        <outputEntry id="LiteralExpression_05jbxe0">        <text><![CDATA["DESERT"]]></text>
+</outputEntry>
+        <outputEntry id="LiteralExpression_189f1ug">        <text>true</text>
+</outputEntry>
+      </rule>
+      <rule id="row-520890282-9">
+        <inputEntry id="UnaryTests_0yur6af">        <text><![CDATA[<= 20]]></text>
+</inputEntry>
+        <inputEntry id="UnaryTests_11r1u0x">        <text><![CDATA[< 50]]></text>
+</inputEntry>
+        <outputEntry id="LiteralExpression_0uh2zj8">        <text><![CDATA["WATER"]]></text>
+</outputEntry>
+        <outputEntry id="LiteralExpression_17agzw2">        <text>true</text>
+</outputEntry>
+      </rule>
+      <rule id="row-520890282-11">
+        <inputEntry id="UnaryTests_0tp34ia">        <text><![CDATA[<= 20]]></text>
+</inputEntry>
+        <inputEntry id="UnaryTests_0f6nyt6">        <text><![CDATA[< 90]]></text>
+</inputEntry>
+        <outputEntry id="LiteralExpression_03vgrst">        <text><![CDATA["SOIL"]]></text>
+</outputEntry>
+        <outputEntry id="LiteralExpression_1lvdhv4">        <text>true</text>
+</outputEntry>
+      </rule>
+      <rule id="row-520890282-12">
+        <inputEntry id="UnaryTests_1qvmni0">        <text><![CDATA[<= 20]]></text>
+</inputEntry>
+        <inputEntry id="UnaryTests_10tman8">        <text><![CDATA[>= 90]]></text>
+</inputEntry>
+        <outputEntry id="LiteralExpression_132o7k6">        <text><![CDATA["FROST"]]></text>
+</outputEntry>
+        <outputEntry id="LiteralExpression_1tc5gb4">        <text>true</text>
+</outputEntry>
+      </rule>
+      <rule id="row-520890282-13">
+        <inputEntry id="UnaryTests_1njzgtu">        <text><![CDATA[<= 30]]></text>
+</inputEntry>
+        <inputEntry id="UnaryTests_1n1p91b">        <text><![CDATA[< 30]]></text>
+</inputEntry>
+        <outputEntry id="LiteralExpression_1eduxb1">        <text><![CDATA["SOIL"]]></text>
+</outputEntry>
+        <outputEntry id="LiteralExpression_0llkr1v">        <text>true</text>
+</outputEntry>
+      </rule>
+      <rule id="row-520890282-14">
+        <inputEntry id="UnaryTests_1dv7for">        <text><![CDATA[<= 30]]></text>
+</inputEntry>
+        <inputEntry id="UnaryTests_092juau">        <text><![CDATA[< 60]]></text>
+</inputEntry>
+        <outputEntry id="LiteralExpression_1n149ad">        <text><![CDATA["FROST"]]></text>
+</outputEntry>
+        <outputEntry id="LiteralExpression_08mezbi">        <text>true</text>
+</outputEntry>
+      </rule>
+      <rule id="row-520890282-15">
+        <inputEntry id="UnaryTests_11qd9yx">        <text><![CDATA[<= 30]]></text>
+</inputEntry>
+        <inputEntry id="UnaryTests_0ns6nvb">        <text><![CDATA[>= 60]]></text>
+</inputEntry>
+        <outputEntry id="LiteralExpression_0a7agfq">        <text><![CDATA["FROST"]]></text>
+</outputEntry>
+        <outputEntry id="LiteralExpression_14lc3p3">        <text>false</text>
+</outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>
