@@ -36,7 +36,7 @@ public class DemoDataInitializer {
 
     @Transactional
     public void run() throws SQLException {
-        Collection<SolarSystem> solarSystems = universeGenerator.generate(100L, 100L, 1L, 10, 5, 1);
+        Collection<SolarSystem> solarSystems = universeGenerator.generate(1000L, 1000L, 1L, 300, 5, 1);
 
         generateUserToken();
 

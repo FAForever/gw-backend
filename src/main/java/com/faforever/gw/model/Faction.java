@@ -9,6 +9,7 @@ import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 @AllArgsConstructor
 public enum Faction {
@@ -20,6 +21,7 @@ public enum Faction {
 
     private static final Map<String, Faction> fromDbKey;
     private static final Map<String, Faction> fromName;
+    private static final Random random = new Random();
 
     static {
         fromDbKey = new HashMap<>();
@@ -65,5 +67,4 @@ public enum Faction {
             return Faction.fromDbString(dbData);
         }
     }
-
 }

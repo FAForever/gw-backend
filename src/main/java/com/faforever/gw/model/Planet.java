@@ -49,7 +49,7 @@ public class Planet implements Serializable {
         return orbitLevel;
     }
 
-    @Column(name = "name")
+    @Column(name = "name", unique = true)
     public String getName() {
         return name;
     }
