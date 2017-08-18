@@ -89,4 +89,17 @@ public class SolarSystem {
 
         return uniqueFaction;
     }
+
+    @JsonIgnore
+    public boolean isReachable(Faction faction) {
+
+        for (SolarSystem system : getConnectedSystems()) {
+            if(system.uniqueOwner() == faction) {
+                return true;
+            }
+        }
+
+        return false;
+
+    }
 }
