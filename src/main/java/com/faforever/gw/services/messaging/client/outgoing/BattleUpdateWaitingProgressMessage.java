@@ -2,7 +2,6 @@ package com.faforever.gw.services.messaging.client.outgoing;
 
 import com.faforever.gw.security.User;
 import com.faforever.gw.services.messaging.client.AbstractOutgoingWebSocketMessage;
-import com.faforever.gw.services.messaging.client.MessageType;
 import lombok.Data;
 
 import java.util.Collection;
@@ -18,10 +17,5 @@ public class BattleUpdateWaitingProgressMessage extends AbstractOutgoingWebSocke
 
         this.battleId = battleId;
         this.waitingProgress = waitingProgress;
-    }
-
-    @Override
-    public MessageType getAction() {
-        return MessageType.BATTLE_WAITING_PROGRESS;
     }
 }

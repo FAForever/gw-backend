@@ -2,7 +2,6 @@ package com.faforever.gw.services.messaging.client.outgoing;
 
 import com.faforever.gw.security.User;
 import com.faforever.gw.services.messaging.client.AbstractOutgoingWebSocketMessage;
-import com.faforever.gw.services.messaging.client.MessageType;
 import lombok.Data;
 
 import java.util.Collection;
@@ -17,10 +16,5 @@ public class CharacterPromotionMessage extends AbstractOutgoingWebSocketMessage 
         super(userList, null);
         this.character = characterId;
         this.newRank = newRank;
-    }
-
-    @Override
-    public MessageType getAction() {
-        return MessageType.CHARACTER_PROMOTION;
     }
 }

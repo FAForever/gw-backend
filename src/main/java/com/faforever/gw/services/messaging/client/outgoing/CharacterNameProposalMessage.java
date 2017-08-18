@@ -2,7 +2,6 @@ package com.faforever.gw.services.messaging.client.outgoing;
 
 import com.faforever.gw.security.User;
 import com.faforever.gw.services.messaging.client.AbstractOutgoingWebSocketMessage;
-import com.faforever.gw.services.messaging.client.MessageType;
 import lombok.Data;
 
 import java.util.List;
@@ -18,10 +17,5 @@ public class CharacterNameProposalMessage extends AbstractOutgoingWebSocketMessa
 
         this.requestId = requestId;
         this.proposedNamesList = proposedNamesList;
-    }
-
-    @Override
-    public MessageType getAction() {
-        return MessageType.CHARACTER_NAME_PROPOSAL;
     }
 }
