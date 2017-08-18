@@ -1,12 +1,13 @@
 package com.faforever.gw.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.yahoo.elide.annotation.Include;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -20,9 +21,8 @@ public class SolarSystem {
     private long y;
     private long z;
     private String name;
-    private List<Planet> planets;
-    private List<QuantumGateLink> incomingLinks = new ArrayList<>();
-    private List<QuantumGateLink> outgoingLinks = new ArrayList<>();
+    private Set<Planet> planets = new HashSet<>();
+    private Set<SolarSystem> connectedSystems = new HashSet<>();
 
     @Id
     @GeneratedValue(generator = "uuid2")
@@ -54,7 +54,7 @@ public class SolarSystem {
     }
 
     @OneToMany(mappedBy = "solarSystem")
-    public List<Planet> getPlanets() {
+    public Set<Planet> getPlanets() {
         return planets;
     }
 
@@ -63,13 +63,30 @@ public class SolarSystem {
         return name;
     }
 
-    @OneToMany(mappedBy = "origin")
-    public List<QuantumGateLink> getIncomingLinks() {
-        return incomingLinks;
+    @ManyToMany
+    @JoinTable(name = "gw_quantum_links",
+            joinColumns = @JoinColumn(name = "fk_ss_from"),
+            inverseJoinColumns = @JoinColumn(name = "fk_ss_to"))
+    public Set<SolarSystem> getConnectedSystems() {
+        return connectedSystems;
     }
 
-    @OneToMany(mappedBy = "destination")
-    public List<QuantumGateLink> getOutgoingLinks() {
-        return outgoingLinks;
+    @JsonIgnore
+    public Faction uniqueOwner() {
+        Faction uniqueFaction = null;
+
+        boolean first = true;
+
+        for (Planet p : planets) {
+            if (first) {
+                first = false;
+                uniqueFaction = p.getCurrentOwner();
+            } else {
+                if (uniqueFaction != p.getCurrentOwner())
+                    return null;
+            }
+        }
+
+        return uniqueFaction;
     }
 }

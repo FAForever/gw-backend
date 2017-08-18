@@ -36,7 +36,8 @@ public class DemoDataInitializer {
 
     @Transactional
     public void run() throws SQLException {
-        Collection<SolarSystem> solarSystems = universeGenerator.generate(1000L, 1000L, 1L, 300, 5, 1);
+        Collection<SolarSystem> solarSystems = universeGenerator.generate(100L, 100L, 1L, 300, 5, 1);
+        universeGenerator.persist();
 
         generateUserToken();
 
@@ -119,12 +120,24 @@ public class DemoDataInitializer {
         map.setSize(10);
         map.setTotalSlots(2);
         mapRepository.save(map);
-        for (Faction faction : Faction.values()) {
-            createSolarSystem(faction, map);
-        }
+
+//        List<SolarSystem> solarSystemList = new ArrayList<>();
+//
+//        for (Faction faction : Faction.values()) {
+//            solarSystemList.add(createSolarSystem(faction, map));
+//        }
+//
+//        for(SolarSystem from : solarSystemList) {
+//            for(SolarSystem to : solarSystemList){
+//                if(from == to)
+//                    continue;;
+//
+//                from.getConnectedSystems().add(to);
+//            }
+//        }
     }
 
-    private void createSolarSystem(Faction faction, Map map) {
+    private SolarSystem createSolarSystem(Faction faction, Map map) {
         SolarSystem solarSystem = new SolarSystem();
         solarSystem.setX(ThreadLocalRandom.current().nextLong(0, 100));
         solarSystem.setY(ThreadLocalRandom.current().nextLong(0, 100));
@@ -133,6 +146,8 @@ public class DemoDataInitializer {
 
         createPlanet(solarSystem, faction, map, 5);
         createPlanet(solarSystem, faction, map, 10);
+
+        return solarSystem;
     }
 
     private void createPlanet(SolarSystem solarSystem, Faction faction, Map map, int orbitLevel) {
