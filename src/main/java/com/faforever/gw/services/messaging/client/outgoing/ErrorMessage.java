@@ -2,7 +2,6 @@ package com.faforever.gw.services.messaging.client.outgoing;
 
 import com.faforever.gw.security.User;
 import com.faforever.gw.services.messaging.client.AbstractOutgoingWebSocketMessage;
-import com.faforever.gw.services.messaging.client.MessageType;
 import lombok.Data;
 
 import java.util.UUID;
@@ -18,10 +17,5 @@ public class ErrorMessage extends AbstractOutgoingWebSocketMessage {
         this.requestId = requestId;
         this.errorCode = errorCode;
         this.errorMessage = errorMessage;
-    }
-
-    @Override
-    public MessageType getAction() {
-        return MessageType.ERROR;
     }
 }

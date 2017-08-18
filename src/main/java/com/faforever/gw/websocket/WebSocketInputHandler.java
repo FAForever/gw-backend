@@ -116,6 +116,7 @@ public class WebSocketInputHandler extends TextWebSocketHandler {
         }
 
         gwUserRegistry.addConnection(user);
+        log.debug("Sending HelloMessage (characterId: {}, currentBattleId: {})", characterId, currentBattleId);
         messagingService.send(new HelloMessage(user, characterId, currentBattleId));
     }
 

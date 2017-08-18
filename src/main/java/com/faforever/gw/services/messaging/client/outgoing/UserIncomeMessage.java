@@ -2,7 +2,6 @@ package com.faforever.gw.services.messaging.client.outgoing;
 
 import com.faforever.gw.security.User;
 import com.faforever.gw.services.messaging.client.AbstractOutgoingWebSocketMessage;
-import com.faforever.gw.services.messaging.client.MessageType;
 import lombok.Data;
 
 import java.util.UUID;
@@ -19,10 +18,5 @@ public class UserIncomeMessage extends AbstractOutgoingWebSocketMessage {
         this.character = character;
         this.creditsTotal = creditsTotal;
         this.creditsDelta = creditsDelta;
-    }
-
-    @Override
-    public MessageType getAction() {
-        return MessageType.USER_INCOME;
     }
 }

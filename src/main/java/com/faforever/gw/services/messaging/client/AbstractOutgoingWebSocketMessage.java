@@ -36,9 +36,6 @@ public abstract class AbstractOutgoingWebSocketMessage implements OutgoingWebSoc
     }
 
     @Override
-    public abstract MessageType getAction();
-
-    @Override
     public Faction getFaction() {
         return faction;
     }

@@ -9,8 +9,6 @@ import java.util.Collection;
 
 public interface OutgoingWebSocketMessage extends Serializable {
     @JsonIgnore
-    MessageType getAction();
-    @JsonIgnore
     default Faction getFaction() { return null; }
     @JsonIgnore
     default Collection<User> getRecipients() { return null; }

@@ -28,7 +28,7 @@ public class MessagingService {
     }
 
     public void send(OutgoingWebSocketMessage message) {
-        MessageType channel = message.getAction();
+        MessageType channel = MessageType.getByClass(message.getClass());
 
         switch (channel.getAudience()) {
             case PUBLIC:
@@ -64,7 +64,7 @@ public class MessagingService {
     private TextMessage box(OutgoingWebSocketMessage message) throws JsonProcessingException {
         return new TextMessage(
                 jsonObjectMapper.writeValueAsString(
-                        new WebSocketEnvelope(message.getAction().getName(), jsonObjectMapper.writeValueAsString(message))
+                        new WebSocketEnvelope(MessageType.getByClass(message.getClass()).getName(), jsonObjectMapper.writeValueAsString(message))
                 )
         );
     }

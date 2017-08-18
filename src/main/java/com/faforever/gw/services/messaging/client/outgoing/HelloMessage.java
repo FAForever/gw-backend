@@ -2,7 +2,6 @@ package com.faforever.gw.services.messaging.client.outgoing;
 
 import com.faforever.gw.security.User;
 import com.faforever.gw.services.messaging.client.AbstractOutgoingWebSocketMessage;
-import com.faforever.gw.services.messaging.client.MessageType;
 import lombok.Data;
 
 import java.util.UUID;
@@ -16,10 +15,5 @@ public class HelloMessage extends AbstractOutgoingWebSocketMessage {
         super(user);
         this.characterId = characterId;
         this.currentBattleId = currentBattleId;
-    }
-
-    @Override
-    public MessageType getAction() {
-        return MessageType.HELLO;
     }
 }
