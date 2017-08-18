@@ -55,7 +55,7 @@ public class ValidationHelper {
             throw gwErrorService.getBpmnErrorOf(GwErrorType.PLANET_PROTECTED_FROM_ASSAULT);
         }
 
-        if (false) {// TODO: Implement check whether character's faction can reach planet
+        if (!planet.getSolarSystem().isReachable(character.getFaction())) {
             throw gwErrorService.getBpmnErrorOf(GwErrorType.PLANET_NOT_IN_REACH);
         }
     }
