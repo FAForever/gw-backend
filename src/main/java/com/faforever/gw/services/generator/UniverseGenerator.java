@@ -89,7 +89,7 @@ public class UniverseGenerator {
         PriorityQueue<Faction> factionPriorityQueue = new PriorityQueue<>(Comparator.comparingDouble(planetCounts::get));
 
         java.util.Map<Faction, List<SolarSystem>> candidatesPerFaction = new HashMap<>();
-        java.util.Map<Faction, List<SolarSystem>> assignedPerFaction = new HashMap<>();
+        java.util.Map<Faction, List<SolarSystem>> ignoredPerFaction = new HashMap<>();
 
         List<SolarSystem> universeCorners = findUniverseCorners();
 
@@ -98,37 +98,42 @@ public class UniverseGenerator {
             factionPriorityQueue.offer(f);
             List<SolarSystem> candidateList = new ArrayList<>();
             candidatesPerFaction.put(f, candidateList);
-            assignedPerFaction.put(f, new ArrayList<>());
+            ignoredPerFaction.put(f, new ArrayList<>());
 
             SolarSystem startingLocation = universeCorners.get(random.nextInt(0, universeCorners.size()));
             candidateList.add(startingLocation);
             universeCorners.remove(startingLocation);
         }
 
-
         while (remainingSystems.size() > 0) {
-            Faction currentFaction = factionPriorityQueue.poll();
+            Faction currentFaction = factionPriorityQueue.peek();
 
             List<SolarSystem> candidates = candidatesPerFaction.get(currentFaction);
-            List<SolarSystem> assigned = assignedPerFaction.get(currentFaction);
+            List<SolarSystem> ignored = ignoredPerFaction.get(currentFaction);
 
             if (candidates.size() == 0) {
-                throw new NoSuchElementException("Could not find an assignable candidate!");
+                return;
+//                throw new NoSuchElementException("Could not find an assignable candidate!");
             }
 
             SolarSystem next = candidates.get(0);
+            ignored.add(next);
             candidates.remove(next);
+
+            next.getConnectedSystems().stream()
+                    .filter(solarSystem -> !ignored.contains(solarSystem))
+                    .forEach(candidates::add);
+
+            if (!remainingSystems.contains(next)) {
+                continue;
+            }
+
 
             next.getPlanets().forEach(planet -> planet.setCurrentOwner(currentFaction));
             remainingSystems.remove(next);
-            assigned.add(next);
-
-            next.getConnectedSystems().stream()
-                    .filter(solarSystem -> !assigned.contains(solarSystem))
-                    .forEach(candidates::add);
 
             planetCounts.put(currentFaction, planetCounts.get(currentFaction) + next.getPlanets().size());
-            factionPriorityQueue.offer(currentFaction);
+            factionPriorityQueue.offer(factionPriorityQueue.poll()); // update priorities
         }
     }
 
@@ -204,10 +209,6 @@ public class UniverseGenerator {
                 SolarSystem nearestNeighbor = getNearestNeighbor(solarSystem);
                 if (nearestNeighbor == null) {
                     validCoordinates = true; // it's the first solar system
-                } else if (nearestNeighbor.getX() == solarSystem.getX() && nearestNeighbor.getY() == solarSystem.getY()) {
-                    log.debug("equal comparing ({},{}) with ({},{})", solarSystem.getX(), solarSystem.getY(), nearestNeighbor.getX(), nearestNeighbor.getY());
-                    validCoordinates = SolarSystem.getDistanceBetween(solarSystem, nearestNeighbor) >= 2;
-
                 } else {
                     log.debug("comparing ({},{}) with ({},{})", solarSystem.getX(), solarSystem.getY(), nearestNeighbor.getX(), nearestNeighbor.getY());
                     validCoordinates = SolarSystem.getDistanceBetween(solarSystem, nearestNeighbor) >= 2;
@@ -215,7 +216,7 @@ public class UniverseGenerator {
                 log.debug("Set random coordinates to ({},{},{}) => valid: {}", solarSystem.getX(), solarSystem.getY(), solarSystem.getZ(), validCoordinates);
             }
 
-            int planetCount = random.nextInt(averagePlanetsPerSolarSystem - planetCountMaxDeviation, averagePlanetsPerSolarSystem + planetCountMaxDeviation);
+            int planetCount = random.nextInt(averagePlanetsPerSolarSystem - planetCountMaxDeviation, averagePlanetsPerSolarSystem + planetCountMaxDeviation + 1); // +1 because upper bound is not included
 
             List<Integer> orbitLevels = new ArrayList<>(planetCount);
             for (int j = 0; j < planetCount; j++) {
