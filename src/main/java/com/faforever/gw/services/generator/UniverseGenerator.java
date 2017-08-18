@@ -4,6 +4,7 @@ import com.faforever.gw.model.*;
 import com.faforever.gw.model.Map;
 import com.faforever.gw.model.repository.PlanetRepository;
 import com.faforever.gw.model.repository.SolarSystemRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.variable.Variables;
@@ -11,10 +12,13 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import javax.transaction.Transactional;
+import java.text.MessageFormat;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Service
+@Slf4j
 public class UniverseGenerator {
     private final DecisionService decisionService;
     private final SolarSystemNameGenerator solarSystemNameGenerator;
@@ -30,7 +34,7 @@ public class UniverseGenerator {
     private long height;
     private long depth;
     private int totalSolarSystems;
-    private List<SolarSystem> solarSystems;
+    private List<SolarSystem> solarSystems = new ArrayList<>();
     private int averagePlanetsPerSolarSystem;
     private int planetCountMaxDeviation;
 
@@ -42,10 +46,13 @@ public class UniverseGenerator {
         this.planetRepository = planetRepository;
     }
 
-    public void persist(Collection<SolarSystem> solarSystems) {
-
+    @Transactional
+    public void persist() {
+        for (SolarSystem solarSystem : solarSystems) {
+            solarSystemRepository.save(solarSystem);
+            planetRepository.save(solarSystem.getPlanets());
+        }
     }
-
 
     public Collection<SolarSystem> generate(long width, long height, long depth, int totalSolarSystems, int averagePlanetsPerSolarSystem, int planetCountMaxDeviation) {
         random = ThreadLocalRandom.current();
@@ -65,16 +72,66 @@ public class UniverseGenerator {
     }
 
     private void populateFactions() {
-        List<Planet> planetsInRandomOrder = new ArrayList<>();
-        solarSystems.forEach(solarSystem -> planetsInRandomOrder.addAll(solarSystem.getPlanets()));
-        Collections.shuffle(planetsInRandomOrder);
+//        List<Planet> planetsInRandomOrder = new ArrayList<>();
+//        solarSystems.forEach(solarSystem -> planetsInRandomOrder.addAll(solarSystem.getPlanets()));
+//        Collections.shuffle(planetsInRandomOrder);
+//
+//        int factionIndex = 0;
+//        for (Planet planet : planetsInRandomOrder) {
+//            planet.setCurrentOwner(Faction.values()[factionIndex]);
+//            factionIndex = (factionIndex + 1) % Faction.values().length;
+//        }
 
-        int factionIndex = 0;
-        for (Planet planet : planetsInRandomOrder) {
-            planet.setCurrentOwner(Faction.values()[factionIndex]);
-            factionIndex = (factionIndex + 1) % Faction.values().length;
+        Set<SolarSystem> remainingSystems = new HashSet<>();
+        remainingSystems.addAll(solarSystems);
+
+        java.util.Map<Faction, Long> planetCounts = new HashMap<>();
+        PriorityQueue<Faction> factionPriorityQueue = new PriorityQueue<>(Comparator.comparingDouble(planetCounts::get));
+
+        java.util.Map<Faction, List<SolarSystem>> candidatesPerFaction = new HashMap<>();
+        java.util.Map<Faction, List<SolarSystem>> assignedPerFaction = new HashMap<>();
+
+        List<SolarSystem> universeCorners = findUniverseCorners();
+
+        for (Faction f : Faction.values()) {
+            planetCounts.put(f, 0L);
+            factionPriorityQueue.offer(f);
+            List<SolarSystem> candidateList = new ArrayList<>();
+            candidatesPerFaction.put(f, candidateList);
+            assignedPerFaction.put(f, new ArrayList<>());
+
+            SolarSystem startingLocation = universeCorners.get(random.nextInt(0, universeCorners.size()));
+            candidateList.add(startingLocation);
+            universeCorners.remove(startingLocation);
+        }
+
+
+        while (remainingSystems.size() > 0) {
+            Faction currentFaction = factionPriorityQueue.poll();
+
+            List<SolarSystem> candidates = candidatesPerFaction.get(currentFaction);
+            List<SolarSystem> assigned = assignedPerFaction.get(currentFaction);
+
+            if (candidates.size() == 0) {
+                throw new NoSuchElementException("Could not find an assignable candidate!");
+            }
+
+            SolarSystem next = candidates.get(0);
+            candidates.remove(next);
+
+            next.getPlanets().forEach(planet -> planet.setCurrentOwner(currentFaction));
+            remainingSystems.remove(next);
+            assigned.add(next);
+
+            next.getConnectedSystems().stream()
+                    .filter(solarSystem -> !assigned.contains(solarSystem))
+                    .forEach(candidates::add);
+
+            planetCounts.put(currentFaction, planetCounts.get(currentFaction) + next.getPlanets().size());
+            factionPriorityQueue.offer(currentFaction);
         }
     }
+
 
     // deprecated
     private List<SolarSystem> findUniverseCorners() {
@@ -99,29 +156,32 @@ public class UniverseGenerator {
         bottomRightBehindReference.setY(height);
         bottomRightBehindReference.setZ(depth);
 
-        return Arrays.asList(
-                getNearestNeighbor(topLeftFrontReference),
-                getNearestNeighbor(topRightFrontReference),
-                getNearestNeighbor(bottomLeftBehindReference),
-                getNearestNeighbor(bottomRightBehindReference)
-        );
+        List<SolarSystem> result = new ArrayList<>();
+        result.add(getNearestNeighbor(topLeftFrontReference));
+        result.add(getNearestNeighbor(topRightFrontReference));
+        result.add(getNearestNeighbor(bottomLeftBehindReference));
+        result.add(getNearestNeighbor(bottomRightBehindReference));
+
+        return result;
+    }
+
+    private SortedSet<SolarSystem> getNeighborsSortedByDistance(SolarSystem origin) {
+        SortedSet<SolarSystem> solarSystemSortedSet = new TreeSet<>(Comparator.comparingDouble(neighbor -> SolarSystem.getDistanceBetween(origin, neighbor)));
+        solarSystems.stream()
+                .filter(solarSystem -> solarSystem != origin)
+                .forEach(solarSystemSortedSet::add);
+
+        return solarSystemSortedSet;
     }
 
     private SolarSystem getNearestNeighbor(SolarSystem origin) {
-        double shortestDistance = Long.MAX_VALUE;
-        SolarSystem nearest = null;
+        SortedSet<SolarSystem> neighborsSortedByDistance = getNeighborsSortedByDistance(origin);
 
-        for (SolarSystem solarSystem : solarSystems) {
-            if (solarSystem == origin)
-                continue;
-
-            double distance = SolarSystem.getDistanceBetween(origin, solarSystem);
-
-            if (distance < shortestDistance)
-                nearest = solarSystem;
+        if (neighborsSortedByDistance.size() == 0) {
+            return null;
         }
 
-        return nearest;
+        return neighborsSortedByDistance.first();
     }
 
     @NotNull
@@ -132,10 +192,28 @@ public class UniverseGenerator {
             SolarSystem solarSystem = new SolarSystem();
             solarSystems.add(solarSystem);
 
-            solarSystem.setX(random.nextLong(width));
-            solarSystem.setY(random.nextLong(height));
-            solarSystem.setZ(random.nextLong(depth));
             solarSystem.setName(solarSystemNameGenerator.next());
+            log.trace(MessageFormat.format("Creating SolarSystem #{0} - name: {1}", i + 1), solarSystem.getName());
+
+            boolean validCoordinates = false;
+            while (!validCoordinates) {
+                solarSystem.setX(random.nextLong(width));
+                solarSystem.setY(random.nextLong(height));
+                solarSystem.setZ(random.nextLong(depth));
+
+                SolarSystem nearestNeighbor = getNearestNeighbor(solarSystem);
+                if (nearestNeighbor == null) {
+                    validCoordinates = true; // it's the first solar system
+                } else if (nearestNeighbor.getX() == solarSystem.getX() && nearestNeighbor.getY() == solarSystem.getY()) {
+                    log.debug("equal comparing ({},{}) with ({},{})", solarSystem.getX(), solarSystem.getY(), nearestNeighbor.getX(), nearestNeighbor.getY());
+                    validCoordinates = SolarSystem.getDistanceBetween(solarSystem, nearestNeighbor) >= 2;
+
+                } else {
+                    log.debug("comparing ({},{}) with ({},{})", solarSystem.getX(), solarSystem.getY(), nearestNeighbor.getX(), nearestNeighbor.getY());
+                    validCoordinates = SolarSystem.getDistanceBetween(solarSystem, nearestNeighbor) >= 2;
+                }
+                log.debug("Set random coordinates to ({},{},{}) => valid: {}", solarSystem.getX(), solarSystem.getY(), solarSystem.getZ(), validCoordinates);
+            }
 
             int planetCount = random.nextInt(averagePlanetsPerSolarSystem - planetCountMaxDeviation, averagePlanetsPerSolarSystem + planetCountMaxDeviation);
 
@@ -145,72 +223,37 @@ public class UniverseGenerator {
             }
             Collections.sort(orbitLevels);
 
-            List<Planet> planets = new ArrayList<>(planetCount);
+            log.trace("Generating {0} planets at orbit levels {1}", planetCount, orbitLevels);
+            Set<Planet> planets = new HashSet<>(planetCount);
             for (int planetIndex = 0; planetIndex < planetCount; planetIndex++) {
                 planets.add(createPlanet(solarSystem, planetIndex, orbitLevels.get(planetIndex)));
             }
             solarSystem.setPlanets(planets);
-
         }
+
     }
 
     private void setUpLinks() {
         // requirement: the result must be a connected graph
-        solarSystems.forEach(current -> setUpLinks(current));
+        solarSystems.forEach(this::setUpLinks);
     }
 
     private void setUpLinks(SolarSystem current) {
         // The algorithm uses brute force instead of some fancy geometry algorithms, because we run it just once per season
         // FIXME: the result is not necessary connected
-        List<SolarSystem> innerCircle = new ArrayList<>();
-        List<SolarSystem> outerCircle = new ArrayList<>();
 
-        double shortestDistance = Long.MAX_VALUE;
-        SolarSystem nearestSystem = null;
+        SortedSet<SolarSystem> neighbors = getNeighborsSortedByDistance(current);
 
-        for (SolarSystem possibleNeighbor : solarSystems) {
-            if (current == possibleNeighbor)
-                continue;
+        int counter = 0;
 
-            double distanceToCurrent = SolarSystem.getDistanceBetween(current, possibleNeighbor);
+        for (SolarSystem neighbor : neighbors) {
+            if (counter >= 3)
+                return;
 
-            if (distanceToCurrent < shortestDistance) {
-                shortestDistance = distanceToCurrent;
-                nearestSystem = possibleNeighbor;
-            }
+            current.getConnectedSystems().add(neighbor);
+            neighbor.getConnectedSystems().add(current);
 
-            if (distanceToCurrent <= INNER_CIRCLE_DISTANCE)
-                innerCircle.add(possibleNeighbor);
-
-            if (distanceToCurrent <= OUTER_CIRCLE_DISTANCE)
-                outerCircle.add(possibleNeighbor);
-        }
-
-        if (innerCircle.size() < OUTER_CIRCLE_MIN_COUNT) {
-            // if there are not enough planets in the inner circle, we use an "enhanced" quantum gateway and include the outer circle
-            innerCircle.addAll(outerCircle);
-            innerCircle.forEach(solarSystem -> {
-                QuantumGateLink quantumGateLink = new QuantumGateLink();
-                quantumGateLink.setOrigin(current);
-                quantumGateLink.setDestination(solarSystem);
-                current.getOutgoingLinks().add(quantumGateLink);
-                solarSystem.getIncomingLinks().add(quantumGateLink);
-            });
-        }
-
-        if (innerCircle.size() == 0) {
-            // if still no planet in reach, we bidirectional connect to the nearest planet, wherever it is
-            QuantumGateLink outgoingLink = new QuantumGateLink();
-            outgoingLink.setOrigin(current);
-            outgoingLink.setDestination(nearestSystem);
-            current.getOutgoingLinks().add(outgoingLink);
-            nearestSystem.getIncomingLinks().add(outgoingLink);
-
-            QuantumGateLink incomingLink = new QuantumGateLink();
-            incomingLink.setOrigin(nearestSystem);
-            incomingLink.setDestination(current);
-            nearestSystem.getOutgoingLinks().add(incomingLink);
-            current.getIncomingLinks().add(incomingLink);
+            counter++;
         }
     }
 
