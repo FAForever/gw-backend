@@ -261,4 +261,74 @@ public class ValidationHelperTest {
 //            throw new RuntimeException("user not authorized");
 //        }
     }
+
+    @Test
+    public void validateAssaultOnPlanet_enemyFaction() {
+
+        GwCharacter character = mock(GwCharacter.class);
+        when(character.getFaction()).thenReturn(Faction.AEON);
+
+        Planet planet = mock(Planet.class);
+        SolarSystem solarSystem = mock(SolarSystem.class);
+
+        when(solarSystem.isReachable(Faction.AEON)).thenReturn(true);
+        when(planet.getCurrentOwner()).thenReturn(Faction.CYBRAN);
+
+        when(planet.getSolarSystem()).thenReturn(solarSystem);
+
+        validationHelper.validateAssaultOnPlanet(character, planet);
+
+    }
+
+    @Test(expected = BpmnError.class)
+    public void validateAssaultOnPlanet_ownFaction() {
+
+        GwCharacter character = mock(GwCharacter.class);
+        when(character.getFaction()).thenReturn(Faction.AEON);
+
+        SolarSystem solarSystem = mock(SolarSystem.class);
+        when(solarSystem.isReachable(Faction.AEON)).thenReturn(true);
+
+        Planet planet = mock(Planet.class);
+        when(planet.getCurrentOwner()).thenReturn(Faction.AEON);
+        when(planet.getSolarSystem()).thenReturn(solarSystem);
+
+        validationHelper.validateAssaultOnPlanet(character, planet);
+
+    }
+
+    @Test(expected = BpmnError.class)
+    public void validateAssaultOnPlanet_unreachableSolarSystem() {
+
+        GwCharacter character = mock(GwCharacter.class);
+        when(character.getFaction()).thenReturn(Faction.AEON);
+
+        SolarSystem system = mock(SolarSystem.class);
+        when(system.isReachable(Faction.AEON)).thenReturn(false);
+
+        Planet planet = mock(Planet.class);
+        when(planet.getSolarSystem()).thenReturn(system);
+        when(planet.getCurrentOwner()).thenReturn(Faction.CYBRAN);
+
+        validationHelper.validateAssaultOnPlanet(character, planet);
+
+    }
+
+    @Test
+    public void validateAssaultOnPlanet_reachableSolarSystem() {
+
+        GwCharacter character = mock(GwCharacter.class);
+        when(character.getFaction()).thenReturn(Faction.AEON);
+
+        SolarSystem system = mock(SolarSystem.class);
+        when(system.isReachable(Faction.AEON)).thenReturn(true);
+
+        Planet planet = mock(Planet.class);
+        when(planet.getSolarSystem()).thenReturn(system);
+        when(planet.getCurrentOwner()).thenReturn(Faction.CYBRAN);
+
+        validationHelper.validateAssaultOnPlanet(character, planet);
+
+    }
+
 }
