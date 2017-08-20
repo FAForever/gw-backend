@@ -9,10 +9,11 @@ spring:
 #    username: ${DATABASE_USERNAME:postgres}
 #    password: ${DATABASE_PASSWORD:banana}
   jpa:
-    show-sql: true
+    show-sql: false
   h2:
     console:
       enabled: true
 logging:
   level:
     com.faforever.gw: debug
+    org.springframework.web.socket: info

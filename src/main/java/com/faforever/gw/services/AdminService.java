@@ -73,6 +73,11 @@ public class AdminService {
     public void onSetPlanetFaction(SetPlanetFactionRequestMessage message, User user) {
         Planet planet = planetRepository.findOne(message.getPlanetId());
 
+        if (planet == null) {
+            sendErrorToUser(user, message.getRequestId(), GwErrorType.PLANET_DOES_NOT_EXIST);
+            return;
+        }
+
         planet.setCurrentOwner(message.getNewOwner());
         sendAckToUser(user, message.getRequestId());
         messagingService.send(new PlanetOwnerChangedMessage(gwUserRegistry.getConnectedUsers(), planet.getId(), message.getNewOwner()));
