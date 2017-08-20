@@ -90,11 +90,21 @@ public class SolarSystem {
         return uniqueFaction;
     }
 
+    /*
+     * SolarSystem is reachable by a given Faction if it is connected to a SolarSystem uniquely owned by that Faction or a Planet within this SolarSystem is owned by that Faction.
+     * ! This function only works for bidirectional SolarSystem-linking !
+     */
     @JsonIgnore
     public boolean isReachable(Faction faction) {
 
         for (SolarSystem system : getConnectedSystems()) {
             if(system.uniqueOwner() == faction) {
+                return true;
+            }
+        }
+
+        for (Planet planet : planets) {
+            if(planet.getCurrentOwner() == faction) {
                 return true;
             }
         }
