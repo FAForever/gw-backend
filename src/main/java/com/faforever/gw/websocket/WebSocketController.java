@@ -6,6 +6,7 @@ import com.faforever.gw.model.repository.BattleRepository;
 import com.faforever.gw.model.repository.CharacterRepository;
 import com.faforever.gw.model.repository.PlanetRepository;
 import com.faforever.gw.security.User;
+import com.faforever.gw.services.AdminService;
 import com.faforever.gw.services.messaging.client.incoming.*;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.RuntimeService;
@@ -18,16 +19,18 @@ import javax.inject.Inject;
 public class WebSocketController {
     private final PlanetaryAssaultService planetaryAssaultService;
     private final CharacterCreationService characterCreationService;
+    private final AdminService adminService;
 
     private final RuntimeService runtimeService;
     private final CharacterRepository characterRepository;
 
     @Inject
-    public WebSocketController(PlanetaryAssaultService planetaryAssaultService, RuntimeService runtimeService, CharacterRepository characterRepository, PlanetRepository planetRepository, BattleRepository battleRepository, CharacterCreationService characterCreationService) {
+    public WebSocketController(PlanetaryAssaultService planetaryAssaultService, RuntimeService runtimeService, CharacterRepository characterRepository, PlanetRepository planetRepository, BattleRepository battleRepository, CharacterCreationService characterCreationService, AdminService adminService) {
         this.planetaryAssaultService = planetaryAssaultService;
         this.runtimeService = runtimeService;
         this.characterRepository = characterRepository;
         this.characterCreationService = characterCreationService;
+        this.adminService = adminService;
     }
 
     @ActionMapping("initiateAssault")
@@ -59,6 +62,26 @@ public class WebSocketController {
         log.trace("received selectCharacterName, message: {}, user: {}", message, user);
         characterCreationService.onSelectCharacterName(message, user);
     }
+
+    @ActionMapping("linkSolarSystemsRequest")
+    public void linkSolarSystemsRequest(LinkSolarSystemsRequestMessage message, User user) throws Exception {
+        log.trace("received linkSolarSystemsRequest, message: {}, user: {}", message, user);
+        adminService.onAddSolarSystemLink(message, user);
+    }
+
+    @ActionMapping("unlinkSolarSystemsRequest")
+    public void unlinkSolarSystemsRequest(UnlinkSolarSystemsRequestMessage message, User user) throws Exception {
+        log.trace("received linkSolarSystemsRequest, message: {}, user: {}", message, user);
+        adminService.onRemoveSolarSystemLink(message, user);
+    }
+
+    @ActionMapping("setPlanetFactionRequest")
+    public void setPlanetFactionRequest(SetPlanetFactionRequestMessage message, User user) throws Exception {
+        log.trace("received setPlanetFactionRequest, message: {}, user: {}", message, user);
+        adminService.onSetPlanetFaction(message, user);
+    }
+
+
 
 //    @ActionMapping("debug/fakeGameResult")
 //    public void fakeGameResult(JoinAssaultMessage message, User user){

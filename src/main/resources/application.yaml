@@ -21,6 +21,8 @@ camunda:
     metrics:
       enabled: false
       db-reporter-activate: false
-
+logging:
+  level:
+    com.faforever.gw: debug
 
 #camunda.bpm.auto-deployment-enabled: false
