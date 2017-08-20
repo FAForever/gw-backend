@@ -71,6 +71,7 @@ public class WebSocketInputHandler extends TextWebSocketHandler {
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         WebSocketEnvelope envelope;
+        log.trace("Incoming websocket message: {}", message.getPayload());
 
         try {
             envelope = jsonObjectMapper.readValue(message.getPayload(), WebSocketEnvelope.class);
@@ -86,7 +87,7 @@ public class WebSocketInputHandler extends TextWebSocketHandler {
         }
 
         if (actionMapping.containsKey(envelope.getAction())) {
-            log.debug("Processing message: {}", envelope);
+            log.debug("Processing envelope: {}", envelope);
             actionMapping.get(envelope.getAction()).processMessage(envelope, webSocketRegistry.getUser(session));
         } else {
             log.error("Unknown action `{}`. Ignoring message.", envelope.getAction());

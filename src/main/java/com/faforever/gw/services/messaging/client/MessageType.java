@@ -28,13 +28,19 @@ public enum MessageType {
     //    FACTION_CHAT_MESSAGE("faction.chat_message", Audience.FACTION),
     USER_INCOME("user.income", Audience.PRIVATE, UserIncomeMessage.class),
 //    USER_XP("user.xp", Audience.PRIVATE);
+SOLAR_SYSTEMS_LINKED("universe.solar_systems_linked", Audience.PUBLIC, SolarSystemsLinkedMessage.class),
+    SOLAR_SYSTEMS_UNLINKED("universe.solar_systems_unlinked", Audience.PUBLIC, SolarSystemsUnlinkedMessage.class),
+    PLANET_OWNER_CHANGED("universe.planet_owner_changed", Audience.PUBLIC, PlanetOwnerChangedMessage.class),
 
     // Incoming messages (User actions) -->
     ACTION_INITIATE_ASSAULT("initiateAssault", null, InitiateAssaultMessage.class),
     ACTION_JOIN_ASSAULT("joinAssault", null, JoinAssaultMessage.class),
     ACTION_LEAVE_ASSAULT("leaveAssault", null, LeaveAssaultMessage.class),
     ACTION_REQUEST_CHARACTER("requestCharacter", null, RequestCharacterMessage.class),
-    ACTION_SELECT_CHARACTER_NAME("selectCharacterName", null, SelectCharacterNameMessage.class);
+    ACTION_SELECT_CHARACTER_NAME("selectCharacterName", null, SelectCharacterNameMessage.class),
+    ADMIN_LINK_SOLAR_SYSTEMS_REQUEST("linkSolarSystemsRequest", null, LinkSolarSystemsRequestMessage.class),
+    ADMIN_UNLINK_SOLAR_SYSTEMS_REQUEST("unlinkSolarSystemsRequest", null, UnlinkSolarSystemsRequestMessage.class),
+    ADMIN_SET_PLANET_FACTION_REQUEST("setPlanetFactionRequest", null, SetPlanetFactionRequestMessage.class);
 
     @Getter(value = AccessLevel.NONE)
     private static final Map<String, Class> messageTypeByAction = new HashMap<>();

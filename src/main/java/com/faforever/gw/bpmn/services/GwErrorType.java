@@ -23,7 +23,9 @@ public enum GwErrorType {
     // Character related error
     NO_CREATION_WITH_ACTIVE_CHARACTER("3001", "You can't create a new character if you have an active one"),
     NO_CREATION_WITH_FACTION_MISMATCH("3002", "You can't change your faction during the season"),
-    NO_CREATION_WITH_INVALID_SELECTION("3003", "Your chosen character name was not offered");
+    NO_CREATION_WITH_INVALID_SELECTION("3003", "Your chosen character name was not offered"),
+    ALREADY_LINKED("4001", "The given solar systems are already linked"),
+    NOT_LINKED("4002", "The given solar systems aren't linked");
 
     private final String errorCode;
     private final String errorMessage;

@@ -13,12 +13,12 @@ import java.util.Collection;
 public class User extends UsernamePasswordAuthenticationToken {
 
     private final long id;
-  private GwCharacter activeCharacter;
+    private GwCharacter activeCharacter;
 
     public User(long id, GwCharacter activeCharacter, Object principal, Object credentials, Collection<? extends GrantedAuthority> authorities) {
-    super(principal, credentials, authorities);
-    this.id = id;
-    this.activeCharacter = activeCharacter;
-  }
+        super(principal, credentials, authorities);
+        this.id = id;
+        this.activeCharacter = activeCharacter;
+    }
 
 }
