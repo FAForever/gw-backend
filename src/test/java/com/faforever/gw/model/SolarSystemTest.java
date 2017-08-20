@@ -58,9 +58,18 @@ public class SolarSystemTest {
     }
 
     @Test
-    public void isReachableTest_reachableByAEON() {
+    public void isReachableTest_reachableThroughPlanet() {
+        planetA.setCurrentOwner(Faction.AEON);
+        Assert.assertTrue("A planet within the system is owned by AEON, AEON should reach the planet", system.isReachable(Faction.AEON));
+        Assert.assertFalse(system.isReachable(Faction.CYBRAN));
+        Assert.assertFalse(system.isReachable(Faction.UEF));
+        Assert.assertFalse(system.isReachable(Faction.SERAPHIM));
+    }
+
+    @Test
+    public void isReachableTest_reachableThroughConnectedSystem() {
         planetConnectedSystem.setCurrentOwner(Faction.AEON);
-        Assert.assertTrue("Connected system owned by AEON, aoen should reach the planet", system.isReachable(Faction.AEON));
+        Assert.assertTrue("Connected system owned by AEON, AEON should reach the planet", system.isReachable(Faction.AEON));
         Assert.assertFalse(system.isReachable(Faction.CYBRAN));
         Assert.assertFalse(system.isReachable(Faction.UEF));
         Assert.assertFalse(system.isReachable(Faction.SERAPHIM));
