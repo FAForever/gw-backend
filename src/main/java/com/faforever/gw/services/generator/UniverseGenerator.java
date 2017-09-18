@@ -1,7 +1,9 @@
 package com.faforever.gw.services.generator;
 
-import com.faforever.gw.model.*;
-import com.faforever.gw.model.Map;
+import com.faforever.gw.model.Faction;
+import com.faforever.gw.model.Ground;
+import com.faforever.gw.model.Planet;
+import com.faforever.gw.model.SolarSystem;
 import com.faforever.gw.model.repository.PlanetRepository;
 import com.faforever.gw.model.repository.SolarSystemRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +26,7 @@ public class UniverseGenerator {
     private final SolarSystemNameGenerator solarSystemNameGenerator;
     private final SolarSystemRepository solarSystemRepository;
     private final PlanetRepository planetRepository;
+    private final MapSelectorService mapSelectorService;
     private ThreadLocalRandom random;
 
     private static final double INNER_CIRCLE_DISTANCE = 15L;
@@ -39,11 +42,12 @@ public class UniverseGenerator {
     private int planetCountMaxDeviation;
 
     @Inject
-    public UniverseGenerator(DecisionService decisionService, SolarSystemNameGenerator solarSystemNameGenerator, SolarSystemRepository solarSystemRepository, PlanetRepository planetRepository) {
+    public UniverseGenerator(DecisionService decisionService, SolarSystemNameGenerator solarSystemNameGenerator, SolarSystemRepository solarSystemRepository, PlanetRepository planetRepository, MapSelectorService mapSelectorService) {
         this.decisionService = decisionService;
         this.solarSystemNameGenerator = solarSystemNameGenerator;
         this.solarSystemRepository = solarSystemRepository;
         this.planetRepository = planetRepository;
+        this.mapSelectorService = mapSelectorService;
     }
 
     @Transactional
@@ -264,7 +268,7 @@ public class UniverseGenerator {
         planet.setOrbitLevel(orbitLevel);
         planet.setName(solarSystem.getName() + " " + Util.convertIntToRoman(index + 1));
         planet.setSize(getRandomSize());
-        planet.setMap(chooseRandomFittingMap(planet));
+        planet.setMap(mapSelectorService.chooseMapFor(planet));
 
         DmnDecisionTableResult planetParameter = decisionService.evaluateDecisionTableByKey("planet_environment",
                 Variables.createVariables()
@@ -278,11 +282,6 @@ public class UniverseGenerator {
         planet.setGround(ground);
         planet.setHabitable(isHabitable);
         return planet;
-    }
-
-
-    private Map chooseRandomFittingMap(Planet planet) {
-        return null; // FIXME: implement logic
     }
 
     /**

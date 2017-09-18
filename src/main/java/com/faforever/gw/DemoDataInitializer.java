@@ -11,7 +11,8 @@ import org.springframework.stereotype.Component;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import java.sql.SQLException;
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -36,8 +37,8 @@ public class DemoDataInitializer {
 
     @Transactional
     public void run() throws SQLException {
-        Collection<SolarSystem> solarSystems = universeGenerator.generate(100L, 100L, 1L, 300, 5, 1);
-        universeGenerator.persist();
+//        Collection<SolarSystem> solarSystems = universeGenerator.generate(100L, 100L, 1L, 300, 5, 1);
+//        universeGenerator.persist();
 
         generateUserToken();
 
@@ -121,20 +122,21 @@ public class DemoDataInitializer {
         map.setTotalSlots(2);
         mapRepository.save(map);
 
-//        List<SolarSystem> solarSystemList = new ArrayList<>();
-//
-//        for (Faction faction : Faction.values()) {
-//            solarSystemList.add(createSolarSystem(faction, map));
-//        }
-//
-//        for(SolarSystem from : solarSystemList) {
-//            for(SolarSystem to : solarSystemList){
-//                if(from == to)
-//                    continue;;
-//
-//                from.getConnectedSystems().add(to);
-//            }
-//        }
+        List<SolarSystem> solarSystemList = new ArrayList<>();
+
+        for (Faction faction : Faction.values()) {
+            solarSystemList.add(createSolarSystem(faction, map));
+        }
+
+        for (SolarSystem from : solarSystemList) {
+            for (SolarSystem to : solarSystemList) {
+                if (from == to)
+                    continue;
+                ;
+
+                from.getConnectedSystems().add(to);
+            }
+        }
     }
 
     private SolarSystem createSolarSystem(Faction faction, Map map) {
