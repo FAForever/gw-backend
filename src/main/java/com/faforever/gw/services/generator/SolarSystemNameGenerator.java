@@ -10,17 +10,21 @@ public class SolarSystemNameGenerator {
     private Random rand = new Random();
 	private Set<String> names = new HashSet<String>();
     private long index = 1;
-    
-    private String[] greekLetters = { "Alpha", "Beta", "Gamma", "Delta", "Epsilon", "Zeta", "Eta", "Theta", "Iota",
+	
+	private final static String[] greekLetters
+    private final static String[] constellations
+	private final static String[] astronomers
+		
+    greekLetters = { "Alpha", "Beta", "Gamma", "Delta", "Epsilon", "Zeta", "Eta", "Theta", "Iota",
 			"Kappa", "Lambda", "Mu", "Nu", "Xi", "Omicron", "pi", "Rho", "Sigma", "Tau", "Upsilon", "Phi", "Chi", "Psi",
 			"Omega" };
 
-	private String[] constellations = { "Andromedae", "Antilae", "Apodis", "Aquarii", "Aquilae", "Arae", "Arietis",
+	constellations = { "Andromedae", "Antilae", "Apodis", "Aquarii", "Aquilae", "Arae", "Arietis",
 			"Aurigae", "Boötis", "Camelopardis", "Canis Majoris", "Canis Minoris", "Eridani", "Herculis", "Leonis",
 			"Lyrae", "Octanis", "Orionis", "Pegasi", "Persei", "Phoenicis", "Ursae Majoris", "Ursae Minoris",
-	"Volantis" };
+			"Volantis" };
 	
-	private String[] astronomers = { "Galilea", "Copernicus", "Kepler", "Hubble", "Tyson", "Ptolemy", "Sagan",
+	astronomers = { "Galilea", "Copernicus", "Kepler", "Hubble", "Tyson", "Ptolemy", "Sagan",
 			"Herschel", "Halley", "Messier", "Kuiper", "Laplace", "Brahe", "Huygens", "Cassini"};
 
     public String next() {
@@ -42,6 +46,6 @@ public class SolarSystemNameGenerator {
 			return name;
 		}
 		
-		return "solar system #" + index++; // FIXME: Implement actual logic
+		return "solar system #" + index++; // FIXME: Implement survey based systems
 	}
 }
