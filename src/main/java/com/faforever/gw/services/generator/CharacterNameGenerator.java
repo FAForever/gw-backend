@@ -238,13 +238,9 @@ public class CharacterNameGenerator {
 		return null;
 	}
 
-	/* Creates a list of names for a certain faction. Obviously takes a faction argument to determine the faction, and 
-	 * takes an integer argument to determine the size of the output list. Can be used to offer a list of names for
-	 * selection during GW character creation.	
-	 */
-	public String[] generateNames(Faction faction, int amount){
-		String[] list = new String[amount];
-		for(int i = 0; i < amount; i++){
+	public String[] generateNames(Faction faction){
+		String[] list = new String[5];
+		for(int i = 0; i < list.length; i++){
 			list[i] = generateName(faction);
 		}
 		return list;
