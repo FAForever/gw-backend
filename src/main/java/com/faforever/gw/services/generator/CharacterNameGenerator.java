@@ -159,7 +159,7 @@ public class CharacterNameGenerator {
 				"Jonas", "Johannas", "Paeris", "Faelyn", "Rhun", "Caerau", "Medyr", "Eurion", "Gawain", "Aidan",
 				"Dabriel", "Zachriel", "Haniel", "Forcas", "Ezekiel", "Tagas", "Ithuriel", "Arioch", "Tadhiel",
 				"Alaion", "Maul", "Aron", "Sheelin", "Aodh", 
-		}
+		};
 
 		//Index 0 = epithets, index 1 = virtues ([0] " of "  [1])
 		aeonEpithets = new String[][]{
