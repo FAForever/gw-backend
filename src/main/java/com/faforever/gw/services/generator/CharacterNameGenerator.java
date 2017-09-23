@@ -235,6 +235,7 @@ public class CharacterNameGenerator {
 		case SERAPHIM:
 			return (makeSeraphimName() + "-" + makeSeraphimName());
 		}
+		return null;
 	}
 
 	/* Creates a list of names for a certain faction. Obviously takes a faction argument to determine the faction, and 
