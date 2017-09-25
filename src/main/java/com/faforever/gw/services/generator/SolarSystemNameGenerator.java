@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class SolarSystemNameGenerator {
     private Random rand = new Random();
-	private Set<String> names = new HashSet<String>();
+	private Set<String> currentNames = new HashSet<String>();
     
     
     private final static String[] greekLetters = { "Alpha", "Beta", "Gamma", "Delta", "Epsilon", "Zeta", "Eta", "Theta", "Iota",
