@@ -12,29 +12,30 @@ public class CharacterNameGenerator {
 	private final static String[] symbiontAI;
 	private final static String[] aeonNames;
 	private final static String[][] aeonEpithets;
+	private final static String[] blacklistNames;
 
 	static {
 		earthNames = new String[]{
 				//Male names
 				"Alexander", "Albert", "Arnold", "August",//A
-				"Brad", "Bernard", "Bruce", "Baird",//B
+				"Brad", "Bernard", "Bruce", "Baird", "Brian",//B
 				"Charles", "Cole", "Christopher",//C
 				"David", "Daniel", "Dominic", "Donald",//D
 				"Edward", "Evan", "Eric", "Erich",//E
 				"Frederick", "Felix",//F
 				"Gavin", "Gregory", "Gunther", "George", "Grant", "Gordon",//G
-				"Henry", "Harrison", "Hewlett", "Hall",//H
+				"Henry", "Harrison", "Hewlett", "Hall", "Howard",//H
 				"Isaac",
 				"Jackson", "Jacob", "Johnathan", "James",//J
 				"Kevin", "Kendall",//K
 				"Lewis", "Logan", "Lucius", "Leonard",//L
-				"Marcus", "Maddox", "Maverick", "Mathias", "Matthew", "Michael","Mitchel", //M
+				"Marcus", "Maverick", "Mathias", "Matthew", "Michael","Mitchel", //M
 				"Nicholai", "Nadir", "Noah", "Nigel",//N
 				"Octavius", "Oberon",//O
 				"Paul", "Percival", "Percius", "Peter",//P
 				"Quentin", "Quinlan",//Q
 				"Randall", "Raymond", "Richard", "Robin",//R
-				"Stephen", "Sergey", "Stanislav", "Steven", "Samuel","Scott",//S
+				"Stephen", "Sergey", "Stanislav", "Steven", "Samuel","Scott", "Shane",//S
 				"Tony", "Trent", "Tyler", "Thomas", "Terrence",//T
 				"Umberto",//U
 				"Victor", "Vladimir",//V
@@ -72,7 +73,7 @@ public class CharacterNameGenerator {
 				"Shelby", "Sessions", "Begich", "McCain", "Flake", "Pryor", "Bozeman", "Udall", "Bennett", "Blumenthal",
 				"Murphy", "Carper", "Coons", "Nelson", "Rubio", "Chambliss", "Isakson", "Crapo", "Risch",
 				"Kirk", "Donnelly", "Grassley", "Harkin", "Moran", "O'Connell", "Paul", "Vitter", "King", "Cardin",
-				"Warren", "Cowan", "Levin", "Franklin", "Cochran", "Wicker", "Blunt", "Baucus", "Trump", "Tester", "Johanns", "Reid",
+				"Warren", "Cowan", "Levin", "Franklin", "Cochran", "Wicker", "Blunt", "Baucus", "Tester", "Johanns", "Reid",
 				"Heller", "Burr", "Hoeven", "Portman", "Grayson", "Porter", "Perry", "McGuire", "Gardner", "Tusk", "Tustin",
 				"Coburn", "Wyden", "Merkley", "Casey", "Jr.", "Reed", "Whitehouse", "Scott", "Johnson", "Washington", "Mae",
 				"Thune", "Corker", "Cornyn", "Cruz", "Lee", "Leahy", "Warner", "Kaine", "Manchin", "Johnson",
@@ -150,7 +151,7 @@ public class CharacterNameGenerator {
 				"Herewardred", "Elfricne", "Eardic", "Leofri", "Ealdg", "Osgaric", "Ealdrarht", "Aesc",
 				"Elflaht", "Elfriae", "Aelfwric", "Leofgy", "Hild", "Eadmae", "Eadwinurg", "Aelfgiild",
 				"Rianna", "Marxon", "Katherine", "Niobe", "Gael", "Stelios", "Thrace", "Enzi", "Enel",
-				"Irime", "Miriel", "Thalia", "Aeron", "Andras", "Brenin", "Bedwyr", "Delwyn", "Emyr", "Elis",
+				"Irime", "Miriel", "Aeron", "Andras", "Brenin", "Bedwyr", "Delwyn", "Emyr", "Elis",
 				"Garreth", "Glynn", "Harri", "Iwan", "Loyd", "Macsen", "Marlin", "Teigan", "Tristore", "Anika", 
 				"Wilona", "Ioanna", "Kyros", "Maris", "Thea", "Thanos", "Theo", "Yanni", "Cara", "Emrys", "Mavis",
 				"Muriel", "Morrigan", "Neale", "Nyle", "Orin", "Reagan", "Sloan", "Tristian", "Teyrnon", "Wynne",
@@ -158,7 +159,7 @@ public class CharacterNameGenerator {
 				"Naxos", "Mace", "Halmar", "Horus", "Neldor", "Cormac", "Taog", "Maol", "Arailt", "Tanovar", "Eirmer",
 				"Jonas", "Johannas", "Paeris", "Faelyn", "Rhun", "Caerau", "Medyr", "Eurion", "Gawain", "Aidan",
 				"Dabriel", "Zachriel", "Haniel", "Forcas", "Ezekiel", "Tagas", "Ithuriel", "Arioch", "Tadhiel",
-				"Alaion", "Maul", "Aron", "Sheelin", "Aodh", 
+				"Alaion", "Maul", "Aron", "Sheelin", "Aodh", "Levi",
 		};
 
 		//Index 0 = epithets, index 1 = virtues ([0] " of "  [1])
@@ -176,7 +177,19 @@ public class CharacterNameGenerator {
 				"the Ethereal", "Righteousness", "Redemption", "Deliverence", "Discipline", "Sacrifice", "Judgement", "Rectitude",
 				"Virtue", "Absolution", 
 			}
-		}; 
+		};
+		
+		//Full names and surnames from characters in Supreme Commander plot that are blacklisted for GW
+		blacklistNames = new String[]{
+			//Supreme Commander
+			"Min", "Jericho", "Mach", "Berry", "Eris", "Riley", "Arnold", "Clarke", "Ariel", "Brackman", "Dostya", "Eliott", "QAI",
+			"Aiko", "Toth", "Burke", "Marxon", 
+			//Supreme Commander Forged Alliance
+			"Hex5", "Hex 5", "Hex-5", "Seth-Iavow", "Shun-Ullevash", "Thel-Uuthow", "Zan-Aishahesh", "Oum-Eoshi",
+			"Kael", "Rhiza", "Hall", "Fletcher", 
+			//Supreme Commander 2
+			"Maddox", "Gauge", "Rodgers",
+		};
 	}
 
 
@@ -202,44 +215,60 @@ public class CharacterNameGenerator {
 		}
 		return str;
 	}
+	
+	// A simple helper-method to see if a string exists in a given array of strings.
+	public static boolean findString(String str, String[] list){
+		for(int i = 0; i < list.length; i++){
+			if(list[i].equals(str)) return true;
+		}
+		return false;
+	}
 
 	/* Returns a String of a random name for a given faction. Human factions have roughly a 50/50 chance of being male or female
 	 * UEF names consist of a name and surname, pulled from a pool of western culture names (with a balance of male and female names).
 	 * Cybran names have a 50/50 chance of being (human name, human surname), or (Machine name - ID number). Human cybran names come from Russian and German
-	 * cultures. Aeon names consist of a single name and epithet  in the format "(name), (epithet) of (virtue)" to vary them from other other the human factions 
+	 * cultures. Aeon names consist of a single name and epithet in the format "(name), (epithet) of (virtue)" to vary them from other other the human factions 
 	 * and to emphasize their fanaticism. Seraphim names are generated from scratch in two pieces in the format  "(name)-(name)".
 	 */
 	public String generateName(Faction faction) {
 		int index1, index2, index3;
 		switch (faction) {
 		case UEF:
-			index1 = (int) (Math.random() * earthNames.length);
-			index2 = (int) (Math.random() * earthSurnames.length);
-			return earthNames[index1] + " " + earthSurnames[index2];
+			name = earthNames[(int) (Math.random() * earthNames.length)];
+			surname = earthSurnames[(int) (Math.random() * earthSurnames.length)];
+			if(findString(surname, blacklistNames) return generateName(faction);
+			return name + " " + surname;
 		case CYBRAN:
 			double humanName = Math.random();
 			if (humanName < 0.5) {
-				index1 = (int) (Math.random() * symbiontNames.length);
-				index2 = (int) (Math.random() * symbiontSurnames.length);
-				return symbiontNames[index1] + " " + symbiontSurnames[index2];
+				name = symbiontNames[(int) (Math.random() * symbiontNames.length)];
+				surname = symbiontSurnames[(int) (Math.random() * symbiontSurnames.length)];
+				if(findString(surname, blacklistNames) return generateName(faction);
+				return name + " " + surname;
 			} else {
-				index1 = (int) (Math.random() * symbiontAI.length);
-				index2 = (int) (5 + Math.random() * 15);
-				return symbiontAI[index1] + "-" + index2;
+				machineName = symbionyAI[(int) (Math.random() * symbiontAI.length)];
+				idNumber = (int) (5 + Math.random() * 15);
+				name = machineName + "-" + idNumber;
+				if(findString(name, blacklistNames) return generateName(faction);
+				return name;
 			}
 		case AEON:
-			index1 = (int) (Math.random() * aeonNames.length);
-			index2 = (int) (Math.random() * aeonEpithets[0].length);
-			index3 = (int) (Math.random() * aeonEpithets[1].length);
-			return aeonNames[index1] + ", " + aeonEpithets[0][index2] + " of " + aeonEpithets[1][index3];
+			name = aeonNames[(int) (Math.random() * aeonNames.length)];
+			epithet = aeonEpithets[0][(int) (Math.random() * aeonEpithets[0].length)];
+			virtue = aeonEpithets[1][(int) (Math.random() * aeonEpithets[1].length)];
+			if(findString(name, blacklistNames)) return generateName(faction);
+			return name + ", " + epithet + " of " + virtue;
 		case SERAPHIM:
-			return (makeSeraphimName() + "-" + makeSeraphimName());
+			name = makeSeraphimName() + "-" + makeSeraphimName();
+			if(findString(name, blacklistNames)) return generateName(faction);
+			return name;
 		}
 		return null;
 	}
 
+	
 	public String[] generateNames(Faction faction){
-		String[] list = new String[5];
+		String[] list = new String[5];  
 		for(int i = 0; i < list.length; i++){
 			list[i] = generateName(faction);
 		}
