@@ -236,20 +236,20 @@ public class CharacterNameGenerator {
 		case UEF:
 			name = earthNames[(int) (Math.random() * earthNames.length)];
 			surname = earthSurnames[(int) (Math.random() * earthSurnames.length)];
-			if(findString(surname, blacklistNames) return generateName(faction);
+			if(findString(surname, blacklistNames)) return generateName(faction);
 			return name + " " + surname;
 		case CYBRAN:
 			double humanName = Math.random();
 			if (humanName < 0.5) {
 				name = symbiontNames[(int) (Math.random() * symbiontNames.length)];
 				surname = symbiontSurnames[(int) (Math.random() * symbiontSurnames.length)];
-				if(findString(surname, blacklistNames) return generateName(faction);
+				if(findString(surname, blacklistNames)) return generateName(faction);
 				return name + " " + surname;
 			} else {
 				machineName = symbionyAI[(int) (Math.random() * symbiontAI.length)];
 				idNumber = (int) (5 + Math.random() * 15);
 				name = machineName + "-" + idNumber;
-				if(findString(name, blacklistNames) return generateName(faction);
+				if(findString(name, blacklistNames)) return generateName(faction);
 				return name;
 			}
 		case AEON:
