@@ -241,25 +241,25 @@ public class CharacterNameGenerator {
 		case CYBRAN:
 			double humanName = Math.random();
 			if (humanName < 0.5) {
-				String name = symbiontNames[(int) (Math.random() * symbiontNames.length)];
-				String surname = symbiontSurnames[(int) (Math.random() * symbiontSurnames.length)];
+				name = symbiontNames[(int) (Math.random() * symbiontNames.length)];
+				surname = symbiontSurnames[(int) (Math.random() * symbiontSurnames.length)];
 				if(findString(surname, blacklistNames)) return generateName(faction);
 				return name + " " + surname;
 			} else {
-				String machineName = symbionyAI[(int) (Math.random() * symbiontAI.length)];
+				String machineName = symbiontAI[(int) (Math.random() * symbiontAI.length)];
 				int idNumber = (int) (5 + Math.random() * 15);
-				String name = machineName + "-" + idNumber;
+				name = machineName + "-" + idNumber;
 				if(findString(name, blacklistNames)) return generateName(faction);
 				return name;
 			}
 		case AEON:
-			String name = aeonNames[(int) (Math.random() * aeonNames.length)];
+			name = aeonNames[(int) (Math.random() * aeonNames.length)];
 			String epithet = aeonEpithets[0][(int) (Math.random() * aeonEpithets[0].length)];
 			String virtue = aeonEpithets[1][(int) (Math.random() * aeonEpithets[1].length)];
 			if(findString(name, blacklistNames)) return generateName(faction);
 			return name + ", " + epithet + " of " + virtue;
 		case SERAPHIM:
-			String name = makeSeraphimName() + "-" + makeSeraphimName();
+			name = makeSeraphimName() + "-" + makeSeraphimName();
 			if(findString(name, blacklistNames)) return generateName(faction);
 			return name;
 		}
