@@ -1,9 +1,10 @@
 package com.faforever.gw.services.generator;
 
+import org.springframework.stereotype.Service;
+
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
-import org.springframework.stereotype.Service;
 
 @Service
 public class SolarSystemNameGenerator {
