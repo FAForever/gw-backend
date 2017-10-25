@@ -97,14 +97,14 @@ public class CharacterNameGenerator {
 
 		symbiontNames = new String[]{
 				//German Male
-				"Oskar", "Konstantin", "Hans", "Heinrich", "Joseph", "Martin", "Konrad", "Hendrik", "Ludwig", "Archibald", "Arik", "Balwin",
-				"Baron", "Christoffer", "Dedrick", "Dolphus", "Eberhardt", "Emmett", "Eldwin", "Erich", "Eugen", "Frederic", "Garen", "Georg", "Gregor", "Griswold",
-				"Godfrey", "Gustav", "Gunther", "Hewlett", "Hildemar", "Hildagarde", "Ernst", "Otto", "Karl", "Ludolf", "Felix", "Hermann", "Artur", "Broder",
-				"Wilhelm", "Erich", "Rudolph", "Walter", "Werner", "Kurtis", "Imfried", "Rolf", "Ulrich", "Alfons", "Christoph", "Nikolaus", "Theodor", "Leopold",
+				"Oskar", "Konstantin", "Hans", "Heinrich", "Joseph", "Martin", "Konrad", "Hendrik", "Ludwig", "Anton", "Arik", "Bartholomäus",
+				"Berthold", "Christian", "Dennis", "Domninik", "Eberhart", "Emanuel", "Elias", "Eugen", "Frederich", "Gabriel", "Georg", "Gregor", "Gustl",
+				"Godfrey", "Gustav", "Gunter", "Harald", "Hieronymus", "Hildagarde", "Ernst", "Otto", "Karl", "Lukas", "Felix", "Hermann", "Artur", "Bruno",
+				"Wilhelm", "Erich", "Rudolph", "Walter", "Werner", "Kurt", "Immanuel", "Rolf", "Ulrich", "Alfons", "Christoph", "Nikolaus", "Theodor", "Leopold",
 				//German Female
-                "Greta", "Frieda", "Mathilda", "Dietrich", "Angela", "Adolpha", "Adele", "Angelika", "Ava", "Mathilda", "Erika", "Ethelinda", "Genevieve", "Grisella",
-                "Harriet", "Wilma", "Irmina", "Karlina", "Karoline", "Brita", "Madeline", "Margret", "Marlene", "Monika", "Odelina", "Olinda", "Roderika", "Selma",
-				"Ulva", "Wendeline", "Wilma", "Zelma",
+                "Greta", "Frieda", "Mathilda", "Dietrich", "Angela", "Ada", "Adele", "Angelika", "Ava", "Mathilda", "Erika", "Ethelinda", "Genevieve", "Grisella",
+                "Heidemaria", "Wilma", "Irmina", "Karlina", "Karoline", "Brigitte", "Magdalene", "Margarite", "Marlene", "Monika", "Odelina", "Olinda", "Roderika", "Selma",
+				"Ulrike", "Wendeline", "Wilma", "Zeta",
 				//Russian Male
 				"Abram", "Aleksy","Ivan", "Peter", "Artem", "Artyom", "Borislav", "Bronislav", "David", "Dmitri", "Nikolai", "Evgeny", "Grigori", "Isidor",
 				"Konstantin", "Leonid", "Luka", "Makar", "Mark", "Maxim", "Miron", "Miroslav", "Nestor", "Pavel", "Radimir", "Radovid", "Rolan", "Samuil", "Sergei",
