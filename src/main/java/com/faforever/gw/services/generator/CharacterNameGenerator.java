@@ -97,14 +97,14 @@ public class CharacterNameGenerator {
 
 		symbiontNames = new String[]{
 				//German Male
-				"Oskar", "Konstantin", "Hans", "Heinrich", "Joseph", "Martin", "Konrad", "Hendrik", "Ludwig", "Archibald", "Arik", "Balwin",
-				"Baron", "Christoffer", "Dedrick", "Dolphus", "Eberhardt", "Emmett", "Eldwin", "Erich", "Eugen", "Frederic", "Garen", "Georg", "Gregor", "Griswold",
-				"Godfrey", "Gustav", "Gunther", "Hewlett", "Hildemar", "Hildagarde", "Ernst", "Otto", "Karl", "Ludolf", "Felix", "Hermann", "Artur", "Broder",
-				"Wilhelm", "Erich", "Rudolph", "Walter", "Werner", "Kurtis", "Imfried", "Rolf", "Ulrich", "Alfons", "Christoph", "Nikolaus", "Theodor", "Leopold",
+				"Oskar", "Konstantin", "Hans", "Heinrich", "Joseph", "Martin", "Konrad", "Hendrik", "Ludwig", "Anton", "Arik", "Bartholomäus",
+				"Berthold", "Christian", "Dennis", "Domninik", "Eberhart", "Emanuel", "Elias", "Eugen", "Frederich", "Gabriel", "Georg", "Gregor", "Gustl",
+				"Godfrey", "Gustav", "Gunter", "Harald", "Hieronymus", "Hildagarde", "Ernst", "Otto", "Karl", "Lukas", "Felix", "Hermann", "Artur", "Bruno",
+				"Wilhelm", "Erich", "Rudolph", "Walter", "Werner", "Kurt", "Immanuel", "Rolf", "Ulrich", "Alfons", "Christoph", "Nikolaus", "Theodor", "Leopold",
 				//German Female
-                "Greta", "Frieda", "Mathilda", "Dietrich", "Angela", "Adolpha", "Adele", "Angelika", "Ava", "Mathilda", "Erika", "Ethelinda", "Genevieve", "Grisella",
-                "Harriet", "Wilma", "Irmina", "Karlina", "Karoline", "Brita", "Madeline", "Margret", "Marlene", "Monika", "Odelina", "Olinda", "Roderika", "Selma",
-				"Ulva", "Wendeline", "Wilma", "Zelma",
+                "Greta", "Frieda", "Mathilda", "Dietrich", "Angela", "Ada", "Adele", "Angelika", "Ava", "Mathilda", "Erika", "Ethelinda", "Genevieve", "Grisella",
+                "Heidemaria", "Wilma", "Irmina", "Karlina", "Karoline", "Brigitte", "Magdalene", "Margarite", "Marlene", "Monika", "Odelina", "Olinda", "Roderika", "Selma",
+				"Ulrike", "Wendeline", "Wilma", "Zeta",
 				//Russian Male
 				"Abram", "Aleksy","Ivan", "Peter", "Artem", "Artyom", "Borislav", "Bronislav", "David", "Dmitri", "Nikolai", "Evgeny", "Grigori", "Isidor",
 				"Konstantin", "Leonid", "Luka", "Makar", "Mark", "Maxim", "Miron", "Miroslav", "Nestor", "Pavel", "Radimir", "Radovid", "Rolan", "Samuil", "Sergei",
@@ -118,7 +118,7 @@ public class CharacterNameGenerator {
 
 		symbiontSurnames = new String[]{
                 //German names:
-                "von Manstein", "Wagner", "Wolff", "Bauer", "Hofmann", "Gunther", "Albrecht", "Baumann", "Friedrich", "Jager", "Pietsch",
+                "Wagner", "Wolff", "Bauer", "Hofmann", "Gunther", "Albrecht", "Baumann", "Friedrich", "Jager", "Pietsch",
                 "Altergott", "Andelman", "Brecher", "Beckendorf", "Beissel", "Breslau", "Ehrhardt", "Junker", "Kanitz", "Kaiser", "Kauffman",
                 "Klock", "Klaus", "Kreuzer", "Lehr", "Lentz", "Meissner", "Moldenhauer", "Prinz", "Reichman", "Reinhardt", "Radunz", "Rossman", "Schult",
                 "Schwarzkopf", "Selig", "Sohn", "Stauben", "Steiner", "Strobl", "Sulz", "Thalberg", "Trager", "Voss", "Vogel", "Wachter", "Wahrmann", "Wohl",
@@ -205,7 +205,7 @@ public class CharacterNameGenerator {
 		boolean rand = Math.random() > 0.5;
 		if(rand) str+= firstVowel[(int) (firstVowel.length*Math.random())];
 		else str+= firstConsonant[(int) (firstConsonant.length*Math.random())];
-		rand = !rand;	
+		rand = !rand;
 		for(int i = 0; i < size; i++){
 			if(rand) str +=  vowel[(int) (vowel.length*Math.random())];
 			else str += consonant[(int) (consonant.length*Math.random())];
@@ -213,7 +213,7 @@ public class CharacterNameGenerator {
 		}
 		return str;
 	}
-	
+
 	// A simple helper-method to see if a string exists in a given array of strings.
 	public static boolean findString(String str, String[] list){
 		for(int i = 0; i < list.length; i++){
@@ -225,7 +225,7 @@ public class CharacterNameGenerator {
 	/* Returns a String of a random name for a given faction. Human factions have roughly a 50/50 chance of being male or female
 	 * UEF names consist of a name and surname, pulled from a pool of western culture names (with a balance of male and female names).
 	 * Cybran names have a 50/50 chance of being (human name, human surname), or (Machine name - ID number). Human cybran names come from Russian and German
-	 * cultures. Aeon names consist of a single name and epithet in the format "(name), (epithet) of (virtue)" to vary them from other other the human factions 
+	 * cultures. Aeon names consist of a single name and epithet in the format "(name), (epithet) of (virtue)" to vary them from other other the human factions
 	 * and to emphasize their fanaticism. Seraphim names are generated from scratch in two pieces in the format  "(name)-(name)".
 	 */
 	public String generateName(Faction faction) {
@@ -264,13 +264,12 @@ public class CharacterNameGenerator {
 		return null;
 	}
 
-	
+
 	public String[] generateNames(Faction faction){
-		String[] list = new String[5];  
+		String[] list = new String[5];
 		for(int i = 0; i < list.length; i++){
 			list[i] = generateName(faction);
 		}
 		return list;
 	}
 }
-
