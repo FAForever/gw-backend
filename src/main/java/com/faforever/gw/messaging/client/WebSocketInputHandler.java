@@ -5,25 +5,22 @@ import com.faforever.gw.messaging.client.outbound.HelloMessage;
 import com.faforever.gw.model.Battle;
 import com.faforever.gw.model.GwCharacter;
 import com.faforever.gw.security.GwUserRegistry;
-import com.faforever.gw.security.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 @Slf4j
@@ -32,36 +29,18 @@ public class WebSocketInputHandler extends TextWebSocketHandler {
     private final EntityManager entityManager;
     private final WebSocketRegistry webSocketRegistry;
     private final GwUserRegistry gwUserRegistry;
-    private final WebSocketController webSocketController;
     private final ClientMessagingService clientMessagingService;
     private final ObjectMapper jsonObjectMapper;
-    private final Map<Class<?>, ActionFunc> actionMapping = new HashMap<>();
+    private final ApplicationEventPublisher eventPublisher;
 
     @Inject
-    public WebSocketInputHandler(EntityManager entityManager, WebSocketRegistry webSocketRegistry, GwUserRegistry gwUserRegistry, WebSocketController webSocketController, ClientMessagingService clientMessagingService, ObjectMapper jsonObjectMapper) {
+    public WebSocketInputHandler(EntityManager entityManager, WebSocketRegistry webSocketRegistry, GwUserRegistry gwUserRegistry, ClientMessagingService clientMessagingService, ObjectMapper jsonObjectMapper, ApplicationEventPublisher eventPublisher) {
         this.entityManager = entityManager;
         this.webSocketRegistry = webSocketRegistry;
         this.gwUserRegistry = gwUserRegistry;
-        this.webSocketController = webSocketController;
         this.clientMessagingService = clientMessagingService;
         this.jsonObjectMapper = jsonObjectMapper;
-    }
-
-    @PostConstruct
-    public void init() {
-        Arrays.stream(webSocketController.getClass().getDeclaredMethods())
-                .filter(method -> method.isAnnotationPresent(ActionMapping.class))
-                .forEach(method -> {
-                    val annotation = method.getAnnotation(ActionMapping.class);
-
-                    actionMapping.put(annotation.value(), (ClientMessage message, User user) -> {
-                        try {
-                            method.invoke(webSocketController, message, user);
-                        } catch (IllegalAccessException | InvocationTargetException e) {
-                            log.error("ActionMapping for `{}` failed", annotation.value(), e);
-                        }
-                    });
-                });
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -69,24 +48,23 @@ public class WebSocketInputHandler extends TextWebSocketHandler {
         log.trace("Incoming websocket message: {}", message.getPayload());
         ClientMessage clientMessage;
 
-        try {
-            ClientMessageWrapper wrapper = jsonObjectMapper.readValue(message.getPayload(), ClientMessageWrapper.class);
-            clientMessage = wrapper.getData();
-        } catch (IOException e) {
-            log.error("Invalid message envelope. Ignoring message.");
-            clientMessagingService.send(session, new ErrorMessage(null,
-                    "E_INVALID",
-                    "Invalid message envelope. Ignoring message.."));
-            return;
-        }
+        SecurityContextHolder.getContext().setAuthentication((Authentication) session.getPrincipal());
 
-        if (actionMapping.containsKey(clientMessage.getClass())) {
-            actionMapping.get(clientMessage.getClass()).processMessage(clientMessage, webSocketRegistry.getUser(session));
-        } else {
-            log.error("Unmapped action class `{}`. Ignoring message.", clientMessage.getClass());
-            clientMessagingService.send(session, new ErrorMessage(null,
-                    "E_INVALID",
-                    "Unknown action. Ignoring message."));
+        try {
+            try {
+                ClientMessageWrapper wrapper = jsonObjectMapper.readValue(message.getPayload(), ClientMessageWrapper.class);
+                clientMessage = wrapper.getData();
+            } catch (IOException e) {
+                log.error("Invalid message envelope. Ignoring message.");
+                clientMessagingService.send(session, new ErrorMessage(null,
+                        "E_INVALID",
+                        "Invalid message envelope. Ignoring message.."));
+                return;
+            }
+
+            eventPublisher.publishEvent(clientMessage);
+        } finally {
+            SecurityContextHolder.getContext().setAuthentication(null);
         }
     }
 
@@ -119,9 +97,5 @@ public class WebSocketInputHandler extends TextWebSocketHandler {
         log.debug("User `{}` has closed the WebSocket", session.getPrincipal().getName());
         gwUserRegistry.removeConnection(webSocketRegistry.getUser(session));
         webSocketRegistry.remove(session);
-    }
-
-    private interface ActionFunc {
-        void processMessage(ClientMessage message, User user);
     }
 }

@@ -10,6 +10,7 @@ import com.faforever.gw.model.*;
 import com.faforever.gw.model.repository.CharacterRepository;
 import com.faforever.gw.model.repository.PlanetRepository;
 import com.faforever.gw.security.User;
+import com.faforever.gw.services.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.engine.DecisionService;
@@ -23,7 +24,6 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import javax.inject.Inject;
 import javax.transaction.Transactional;
 import java.text.MessageFormat;
 import java.util.*;
@@ -45,22 +45,25 @@ public class PlanetaryAssaultService {
     private final ClientMessagingService clientMessagingService;
     private final PlanetRepository planetRepository;
     private final CharacterRepository characterRepository;
+    private final UserService userService;
 
-    @Inject
-    public PlanetaryAssaultService(ProcessEngine processEngine, RuntimeService runtimeService, ClientMessagingService clientMessagingService, PlanetRepository planetRepository, CharacterRepository characterRepository) {
+    public PlanetaryAssaultService(ProcessEngine processEngine, RuntimeService runtimeService, ClientMessagingService clientMessagingService, PlanetRepository planetRepository, CharacterRepository characterRepository, UserService userService) {
         this.processEngine = processEngine;
         this.runtimeService = runtimeService;
         this.clientMessagingService = clientMessagingService;
         this.planetRepository = planetRepository;
         this.characterRepository = characterRepository;
+        this.userService = userService;
     }
 
     @Transactional(dontRollbackOn = BpmnError.class)
-    public void onCharacterInitiatesAssault(InitiateAssaultMessage message, User user) {
+    @EventListener
+    public void onCharacterInitiatesAssault(InitiateAssaultMessage message) {
+        User user = userService.getUserFromContext();
         log.debug("onCharacterInitiatesAssault by user {}", user.getId());
         UUID battleUUID = UUID.randomUUID();
 
-        GwCharacter character = user.getActiveCharacter();
+        GwCharacter character = userService.getActiveCharacter(user);
         Planet planet = planetRepository.findOne(message.getPlanetId());
 
         // TODO: How do we handle NullPointerException i.e. if planet is null?
@@ -80,10 +83,12 @@ public class PlanetaryAssaultService {
         runtimeService.startProcessInstanceByMessage(INITIATE_ASSAULT_MESSAGE, battleUUID.toString(), variables);
     }
 
-    public void onCharacterJoinsAssault(JoinAssaultMessage message, User user) {
+    @EventListener
+    public void onCharacterJoinsAssault(JoinAssaultMessage message) {
+        User user = userService.getUserFromContext();
         log.debug("onCharacterJoinsAssault for battle {}", message.getBattleId());
 
-        VariableMap variables = clientMessagingService.createVariables(user.getId(), message.getRequestId(), user.getActiveCharacter().getId());
+        VariableMap variables = clientMessagingService.createVariables(user.getId(), message.getRequestId(), userService.getActiveCharacter(user).getId());
 
         try {
             runtimeService.correlateMessage(PLAYER_JOINS_ASSAULT_MESSAGE, message.getBattleId().toString(), variables);
@@ -93,10 +98,12 @@ public class PlanetaryAssaultService {
         }
     }
 
-    public void onCharacterLeavesAssault(LeaveAssaultMessage message, User user) {
+    @EventListener
+    public void onCharacterLeavesAssault(LeaveAssaultMessage message) {
+        User user = userService.getUserFromContext();
         log.debug("onCharacterLeavesAssault for battle {}", message.getBattleId());
 
-        VariableMap variables = clientMessagingService.createVariables(user.getId(), message.getRequestId(), user.getActiveCharacter().getId());
+        VariableMap variables = clientMessagingService.createVariables(user.getId(), message.getRequestId(), userService.getActiveCharacter(user).getId());
 
         try {
             runtimeService.correlateMessage(PLAYER_LEAVES_ASSAULT_MESSAGE, message.getBattleId().toString(), variables);

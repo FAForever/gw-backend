@@ -5,9 +5,7 @@ import com.faforever.gw.messaging.client.ClientMessagingService;
 import com.faforever.gw.messaging.client.inbound.RequestCharacterMessage;
 import com.faforever.gw.messaging.client.inbound.SelectCharacterNameMessage;
 import com.faforever.gw.model.Faction;
-import com.faforever.gw.model.repository.CharacterRepository;
 import com.faforever.gw.security.User;
-import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
@@ -26,13 +24,11 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class CharacterCreationServiceTest {
     @Mock
-    private ProcessEngine processEngine;
-    @Mock
     private RuntimeService runtimeService;
     @Mock
     private ClientMessagingService clientMessagingService;
     @Mock
-    private CharacterRepository characterRepository;
+    private UserService userService;
     @Mock
     private User user;
 
@@ -40,9 +36,10 @@ public class CharacterCreationServiceTest {
 
     @Before
     public void setUp() throws Exception {
+        when(userService.getUserFromContext()).thenReturn(user);
         when(user.getId()).thenReturn(5L);
 
-        service = new CharacterCreationService(processEngine, runtimeService, clientMessagingService, characterRepository);
+        service = new CharacterCreationService(runtimeService, clientMessagingService, userService);
     }
 
     @Test
@@ -53,7 +50,7 @@ public class CharacterCreationServiceTest {
         VariableMap map = Variables.createVariables();
         when(clientMessagingService.createVariables(anyLong(), any(), any())).thenReturn(map);
 
-        service.onRequestCharacter(message, user);
+        service.onRequestCharacter(message);
 
         verify(clientMessagingService).createVariables(user.getId(), message.getRequestId(), null);
         verify(runtimeService).correlateMessage(eq(CharacterCreationService.REQUEST_CHARACTER_MESSAGE), anyString(), any());
@@ -66,7 +63,7 @@ public class CharacterCreationServiceTest {
         SelectCharacterNameMessage message = new SelectCharacterNameMessage(
                 "newName");
 
-        service.onSelectCharacterName(message, user);
+        service.onSelectCharacterName(message);
 
         verify(runtimeService).correlateMessage(eq(CharacterCreationService.RECEIVE_CHARACTER_NAME_SELECTION_MESSAGE), anyString(), any());
     }

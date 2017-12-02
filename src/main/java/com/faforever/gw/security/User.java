@@ -20,5 +20,4 @@ public class User extends UsernamePasswordAuthenticationToken {
         this.id = id;
         this.activeCharacter = activeCharacter;
     }
-
 }

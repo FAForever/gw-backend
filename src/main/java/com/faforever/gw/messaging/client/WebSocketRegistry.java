@@ -4,6 +4,7 @@ import com.faforever.gw.security.User;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketSession;
@@ -24,6 +25,20 @@ public class WebSocketRegistry {
     }
 
     public void add(WebSocketSession session) {
+        Principal sessionPrincipal = session.getPrincipal();
+
+        if (sessionPrincipal.getClass() == OAuth2Authentication.class) {
+            OAuth2Authentication oauth = (OAuth2Authentication) sessionPrincipal;
+            User user = (User) oauth.getUserAuthentication();
+
+            userIdToWebSocketSession.put(user.getId(), session);
+            webSocketSessionIdToUser.put(session.getId(), user);
+        } else {
+            log.warn("unexpected principal");
+        }
+    }
+
+    public void addxxxx(WebSocketSession session) {
         Principal principal = session.getPrincipal();
 
         boolean principalError = false;

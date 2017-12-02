@@ -37,7 +37,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.anyLong;
-import static org.mockito.Mockito.anyMap;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -54,6 +53,8 @@ public class PlanetaryAssaultServiceTest {
     private PlanetRepository planetRepository;
     @Mock
     private CharacterRepository characterRepository;
+    @Mock
+    private UserService userService;
 
     @Mock
     private User user;
@@ -62,11 +63,22 @@ public class PlanetaryAssaultServiceTest {
     @Mock
     private Planet planet;
 
+    private VariableMap map;
     private PlanetaryAssaultService service;
 
     @Before
     public void setUp() throws Exception {
-        service = new PlanetaryAssaultService(processEngine, runtimeService, clientMessagingService, planetRepository, characterRepository);
+        when(userService.getUserFromContext()).thenReturn(user);
+        when(userService.getActiveCharacter(user)).thenReturn(character);
+        when(planetRepository.findOne(any(UUID.class))).thenReturn(planet);
+
+        when(user.getId()).thenReturn(5L);
+        when(user.getActiveCharacter()).thenReturn(character);
+
+        map = Variables.createVariables();
+        when(clientMessagingService.createVariables(anyLong(), any(), any())).thenReturn(map);
+
+        service = new PlanetaryAssaultService(processEngine, runtimeService, clientMessagingService, planetRepository, characterRepository, userService);
     }
 
     @Test
@@ -75,19 +87,15 @@ public class PlanetaryAssaultServiceTest {
                 UUID.fromString("22222222-2222-2222-2222-222222222222")
         );
 
-        when(user.getId()).thenReturn(5L);
-        when(user.getActiveCharacter()).thenReturn(character);
+
         when(character.getId()).thenReturn(UUID.fromString("33333333-3333-3333-3333-333333333333"));
         when(character.getFaction()).thenReturn(Faction.UEF);
 
         when(planet.getId()).thenReturn(UUID.fromString("44444444-4444-4444-4444-444444444444"));
         when(planet.getCurrentOwner()).thenReturn(Faction.CYBRAN);
 
-        VariableMap map = Variables.createVariables();
-        when(clientMessagingService.createVariables(anyLong(), any(), any())).thenReturn(map);
-        when(planetRepository.findOne(any(UUID.class))).thenReturn(planet);
 
-        service.onCharacterInitiatesAssault(message, user);
+        service.onCharacterInitiatesAssault(message);
 
         verify(clientMessagingService).createVariables(user.getId(), message.getRequestId(), character.getId());
         verify(runtimeService).startProcessInstanceByMessage(eq(PlanetaryAssaultService.INITIATE_ASSAULT_MESSAGE), anyString(), any());
@@ -108,14 +116,7 @@ public class PlanetaryAssaultServiceTest {
                 UUID.fromString("22222222-2222-2222-2222-222222222222")
         );
 
-        when(user.getId()).thenReturn(5L);
-        when(user.getActiveCharacter()).thenReturn(character);
-
-        VariableMap map = Variables.createVariables();
-        when(clientMessagingService.createVariables(anyLong(), any(), any())).thenReturn(map);
-        when(planetRepository.findOne(any(UUID.class))).thenReturn(planet);
-
-        service.onCharacterJoinsAssault(message, user);
+        service.onCharacterJoinsAssault(message);
 
         verify(clientMessagingService).createVariables(user.getId(), message.getRequestId(), character.getId());
         verify(runtimeService).correlateMessage(eq(PlanetaryAssaultService.PLAYER_JOINS_ASSAULT_MESSAGE), anyString(), any());
@@ -127,19 +128,12 @@ public class PlanetaryAssaultServiceTest {
                 UUID.fromString("22222222-2222-2222-2222-222222222222")
         );
 
-        when(user.getId()).thenReturn(5L);
-        when(user.getActiveCharacter()).thenReturn(character);
-
-        VariableMap map = Variables.createVariables();
-        when(clientMessagingService.createVariables(anyLong(), any(), any())).thenReturn(map);
-        when(planetRepository.findOne(any(UUID.class))).thenReturn(planet);
-
         doThrow(MismatchingMessageCorrelationException.class).when(runtimeService).correlateMessage(anyString(), anyString(), any());
 
         UserErrorMessage userErrorMessage = new UserErrorMessage(clientMessagingService, mock(GwUserRegistry.class));
         when(applicationContext.getBean(UserErrorMessage.class)).thenReturn(userErrorMessage);
 
-        service.onCharacterJoinsAssault(message, user);
+        service.onCharacterJoinsAssault(message);
 
         verify(clientMessagingService).createVariables(user.getId(), message.getRequestId(), character.getId());
         verify(runtimeService).correlateMessage(eq(PlanetaryAssaultService.PLAYER_JOINS_ASSAULT_MESSAGE), anyString(), any());
@@ -152,14 +146,7 @@ public class PlanetaryAssaultServiceTest {
                 UUID.fromString("22222222-2222-2222-2222-222222222222")
         );
 
-        when(user.getId()).thenReturn(5L);
-        when(user.getActiveCharacter()).thenReturn(character);
-
-        VariableMap map = Variables.createVariables();
-        when(clientMessagingService.createVariables(anyLong(), any(), any())).thenReturn(map);
-        when(planetRepository.findOne(any(UUID.class))).thenReturn(planet);
-
-        service.onCharacterLeavesAssault(message, user);
+        service.onCharacterLeavesAssault(message);
 
         verify(clientMessagingService).createVariables(user.getId(), message.getRequestId(), character.getId());
         verify(runtimeService).correlateMessage(eq(PlanetaryAssaultService.PLAYER_LEAVES_ASSAULT_MESSAGE), anyString(), any());
@@ -172,19 +159,12 @@ public class PlanetaryAssaultServiceTest {
                 UUID.fromString("22222222-2222-2222-2222-222222222222")
         );
 
-        when(user.getId()).thenReturn(5L);
-        when(user.getActiveCharacter()).thenReturn(character);
-
-        VariableMap map = Variables.createVariables();
-        when(clientMessagingService.createVariables(anyLong(), any(), any())).thenReturn(map);
-        when(planetRepository.findOne(any(UUID.class))).thenReturn(planet);
-
         doThrow(MismatchingMessageCorrelationException.class).when(runtimeService).correlateMessage(anyString(), anyString(), any());
 
         UserErrorMessage userErrorMessage = new UserErrorMessage(clientMessagingService, mock(GwUserRegistry.class));
         when(applicationContext.getBean(UserErrorMessage.class)).thenReturn(userErrorMessage);
 
-        service.onCharacterLeavesAssault(message, user);
+        service.onCharacterLeavesAssault(message);
 
         verify(clientMessagingService).createVariables(user.getId(), message.getRequestId(), character.getId());
         verify(runtimeService).correlateMessage(eq(PlanetaryAssaultService.PLAYER_LEAVES_ASSAULT_MESSAGE), anyString(), any());
@@ -210,6 +190,6 @@ public class PlanetaryAssaultServiceTest {
                 ImmutableList.of(new GamePlayerResult(fafId, BattleParticipantResult.VICTORY, -1L))
         );
         service.onGameResult(result);
-        verify(runtimeService).correlateMessage(eq(PlanetaryAssaultService.GAME_RESULT_MESSAGE), anyString(), anyMap());
+        verify(runtimeService).correlateMessage(eq(PlanetaryAssaultService.GAME_RESULT_MESSAGE), anyString(), any());
     }
 }

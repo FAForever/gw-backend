@@ -34,7 +34,7 @@ public class DataController {
             produces = JSON_API_MEDIA_TYPE,
             value = {"/{entity}", "/{entity}/{id}/relationships/{entity2}", "/{entity}/{id}/{child}", "/{entity}/{id}"})
     @Transactional(readOnly = true)
-    @PreAuthorize("permitAll()")
+//    @PreAuthorize("permitAll()")
     public ResponseEntity<String> get(@RequestParam final Map<String, String> allRequestParams,
                                       final HttpServletRequest request,
                                       final Principal principal) {

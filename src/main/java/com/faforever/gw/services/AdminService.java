@@ -12,6 +12,7 @@ import com.faforever.gw.model.repository.PlanetRepository;
 import com.faforever.gw.model.repository.SolarSystemRepository;
 import com.faforever.gw.security.User;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -24,16 +25,22 @@ public class AdminService {
     private final ClientMessagingService clientMessagingService;
     private final SolarSystemRepository solarSystemRepository;
     private final PlanetRepository planetRepository;
+    private final UserService userService;
 
     @Inject
-    public AdminService(ClientMessagingService clientMessagingService, SolarSystemRepository solarSystemRepository, PlanetRepository planetRepository) {
+    public AdminService(ClientMessagingService clientMessagingService, SolarSystemRepository solarSystemRepository, PlanetRepository planetRepository, UserService userService) {
         this.clientMessagingService = clientMessagingService;
         this.solarSystemRepository = solarSystemRepository;
         this.planetRepository = planetRepository;
+        this.userService = userService;
     }
 
+    @EventListener
     @Transactional
-    public void onAddSolarSystemLink(LinkSolarSystemsRequestMessage message, User user) {
+    public void onAddSolarSystemLink(LinkSolarSystemsRequestMessage message) {
+        User user = userService.getUserFromContext();
+        log.debug("onAddSolarSystemLink by user {}", user.getId());
+
         SolarSystem from = solarSystemRepository.findOne(message.getSolarSystemFrom());
         SolarSystem to = solarSystemRepository.findOne(message.getSolarSystemTo());
 
@@ -49,8 +56,11 @@ public class AdminService {
         }
     }
 
+    @EventListener
     @Transactional
-    public void onRemoveSolarSystemLink(UnlinkSolarSystemsRequestMessage message, User user) {
+    public void onRemoveSolarSystemLink(UnlinkSolarSystemsRequestMessage message) {
+        User user = userService.getUserFromContext();
+        log.debug("onRemoveSolarSystemLink by user {}", user.getId());
         SolarSystem from = solarSystemRepository.findOne(message.getSolarSystemFrom());
         SolarSystem to = solarSystemRepository.findOne(message.getSolarSystemTo());
 
@@ -66,8 +76,11 @@ public class AdminService {
         }
     }
 
+    @EventListener
     @Transactional
-    public void onSetPlanetFaction(SetPlanetFactionRequestMessage message, User user) {
+    public void onSetPlanetFaction(SetPlanetFactionRequestMessage message) {
+        User user = userService.getUserFromContext();
+        log.debug("onSetPlanetFaction by user {}", user.getId());
         Planet planet = planetRepository.findOne(message.getPlanetId());
 
         if (planet == null) {

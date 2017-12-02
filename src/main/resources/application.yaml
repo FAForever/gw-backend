@@ -8,6 +8,9 @@ spring:
     properties:
       hibernate:
         current_session_context_class: org.springframework.orm.hibernate5.SpringSessionContext
+  oauth2:
+    resource:
+      filter-order: 3
 camunda:
   bpm:
     application:

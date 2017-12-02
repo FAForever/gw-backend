@@ -1,3 +1,6 @@
+faf-gw:
+  jwt:
+    secret: secret
 spring:
   datasource:
     url: jdbc:h2:mem:camunda
@@ -16,4 +19,5 @@ spring:
 logging:
   level:
     com.faforever.gw: debug
+#    org.springframework: debug
     org.springframework.web.socket: info
