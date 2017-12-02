@@ -1,9 +1,8 @@
 package com.faforever.gw.bpmn.message.planetary_assault;
 
 import com.faforever.gw.bpmn.accessors.PlanetaryAssaultAccessor;
-import com.faforever.gw.security.GwUserRegistry;
-import com.faforever.gw.services.messaging.client.MessagingService;
-import com.faforever.gw.services.messaging.client.outgoing.PlanetDefendedMessage;
+import com.faforever.gw.messaging.client.ClientMessagingService;
+import com.faforever.gw.messaging.client.outbound.PlanetDefendedMessage;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -15,13 +14,11 @@ import javax.inject.Inject;
 @Slf4j
 @Component
 public class PlanetDefendedNotification implements JavaDelegate {
-    private final MessagingService messagingService;
-    private final GwUserRegistry gwUserRegistry;
+    private final ClientMessagingService clientMessagingService;
 
     @Inject
-    public PlanetDefendedNotification(MessagingService messagingService, GwUserRegistry gwUserRegistry) {
-        this.messagingService = messagingService;
-        this.gwUserRegistry = gwUserRegistry;
+    public PlanetDefendedNotification(ClientMessagingService clientMessagingService) {
+        this.clientMessagingService = clientMessagingService;
     }
 
     @Override
@@ -35,7 +32,7 @@ public class PlanetDefendedNotification implements JavaDelegate {
 
         log.debug("Sending PlanetDefendedMessage (planetId: {}, battleId: {}, attackingFaction: {}, defendingFaction: {})",
                 planetId, battleId, attackingFaction, defendingFaction);
-        messagingService.send(new PlanetDefendedMessage(gwUserRegistry.getConnectedUsers(), planetId, battleId, attackingFaction, defendingFaction));
+        clientMessagingService.sendToPublic(new PlanetDefendedMessage(planetId, battleId, attackingFaction, defendingFaction));
 
     }
 }

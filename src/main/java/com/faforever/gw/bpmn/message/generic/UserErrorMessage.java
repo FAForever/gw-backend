@@ -1,9 +1,9 @@
 package com.faforever.gw.bpmn.message.generic;
 
 import com.faforever.gw.bpmn.accessors.PlanetaryAssaultAccessor;
+import com.faforever.gw.messaging.client.ClientMessagingService;
+import com.faforever.gw.messaging.client.outbound.ErrorMessage;
 import com.faforever.gw.security.GwUserRegistry;
-import com.faforever.gw.services.messaging.client.MessagingService;
-import com.faforever.gw.services.messaging.client.outgoing.ErrorMessage;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -15,12 +15,12 @@ import javax.inject.Inject;
 @Slf4j
 @Component
 public class UserErrorMessage implements JavaDelegate {
-    private final MessagingService messagingService;
+    private final ClientMessagingService clientMessagingService;
     private final GwUserRegistry gwUserRegistry;
 
     @Inject
-    public UserErrorMessage(MessagingService messagingService, GwUserRegistry gwUserRegistry) {
-        this.messagingService = messagingService;
+    public UserErrorMessage(ClientMessagingService clientMessagingService, GwUserRegistry gwUserRegistry) {
+        this.clientMessagingService = clientMessagingService;
         this.gwUserRegistry = gwUserRegistry;
     }
 
@@ -36,7 +36,7 @@ public class UserErrorMessage implements JavaDelegate {
         gwUserRegistry.getUser(requestFafUser)
                 .ifPresent(user -> {
                     log.debug("Sending UserErrorMessage (code: {}, message: {})", errorCode, errorMessage);
-                    messagingService.send(new ErrorMessage(user, requestId, errorCode, errorMessage));
+                    clientMessagingService.sendToUser(new ErrorMessage(requestId, errorCode, errorMessage), user);
                 });
     }
 }

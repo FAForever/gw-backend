@@ -1,10 +1,10 @@
 package com.faforever.gw.services;
 
 import com.faforever.gw.bpmn.services.CharacterCreationService;
+import com.faforever.gw.messaging.client.ClientMessagingService;
 import com.faforever.gw.model.Faction;
 import com.faforever.gw.model.repository.CharacterRepository;
 import com.faforever.gw.security.User;
-import com.faforever.gw.services.messaging.client.MessagingService;
 import com.faforever.gw.services.messaging.client.incoming.RequestCharacterMessage;
 import com.faforever.gw.services.messaging.client.incoming.SelectCharacterNameMessage;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -32,7 +32,7 @@ public class CharacterCreationServiceTest {
     @Mock
     private RuntimeService runtimeService;
     @Mock
-    private MessagingService messagingService;
+    private ClientMessagingService clientMessagingService;
     @Mock
     private CharacterRepository characterRepository;
     @Mock
@@ -44,7 +44,7 @@ public class CharacterCreationServiceTest {
     public void setUp() throws Exception {
         when(user.getId()).thenReturn(5L);
 
-        service = new CharacterCreationService(processEngine, runtimeService, messagingService, characterRepository);
+        service = new CharacterCreationService(processEngine, runtimeService, clientMessagingService, characterRepository);
     }
 
     @Test
@@ -54,11 +54,11 @@ public class CharacterCreationServiceTest {
                 Faction.UEF);
 
         VariableMap map = Variables.createVariables();
-        when(messagingService.createVariables(anyLong(), any(), any())).thenReturn(map);
+        when(clientMessagingService.createVariables(anyLong(), any(), any())).thenReturn(map);
 
         service.onRequestCharacter(message, user);
 
-        verify(messagingService).createVariables(user.getId(), message.getRequestId(), null);
+        verify(clientMessagingService).createVariables(user.getId(), message.getRequestId(), null);
         verify(runtimeService).correlateMessage(eq(CharacterCreationService.REQUEST_CHARACTER_MESSAGE), anyString(), any());
 
         assertEquals(map.get("requestedFaction"), message.getFaction());

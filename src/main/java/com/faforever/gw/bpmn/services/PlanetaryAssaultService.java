@@ -1,14 +1,14 @@
 package com.faforever.gw.bpmn.services;
 
+import com.faforever.gw.messaging.client.ClientMessagingService;
+import com.faforever.gw.messaging.client.outbound.ErrorMessage;
 import com.faforever.gw.model.*;
 import com.faforever.gw.model.repository.CharacterRepository;
 import com.faforever.gw.model.repository.PlanetRepository;
 import com.faforever.gw.security.User;
-import com.faforever.gw.services.messaging.client.MessagingService;
 import com.faforever.gw.services.messaging.client.incoming.InitiateAssaultMessage;
 import com.faforever.gw.services.messaging.client.incoming.JoinAssaultMessage;
 import com.faforever.gw.services.messaging.client.incoming.LeaveAssaultMessage;
-import com.faforever.gw.services.messaging.client.outgoing.ErrorMessage;
 import com.faforever.gw.services.messaging.lobby_server.incoming.GameResultMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
@@ -42,15 +42,15 @@ public class PlanetaryAssaultService {
     public static final Long XP_MALUS_FOR_RECALL = 5L;
     private final ProcessEngine processEngine;
     private final RuntimeService runtimeService;
-    private final MessagingService messagingService;
+    private final ClientMessagingService clientMessagingService;
     private final PlanetRepository planetRepository;
     private final CharacterRepository characterRepository;
 
     @Inject
-    public PlanetaryAssaultService(ProcessEngine processEngine, RuntimeService runtimeService, MessagingService messagingService, PlanetRepository planetRepository, CharacterRepository characterRepository) {
+    public PlanetaryAssaultService(ProcessEngine processEngine, RuntimeService runtimeService, ClientMessagingService clientMessagingService, PlanetRepository planetRepository, CharacterRepository characterRepository) {
         this.processEngine = processEngine;
         this.runtimeService = runtimeService;
-        this.messagingService = messagingService;
+        this.clientMessagingService = clientMessagingService;
         this.planetRepository = planetRepository;
         this.characterRepository = characterRepository;
     }
@@ -65,7 +65,7 @@ public class PlanetaryAssaultService {
 
         // TODO: How do we handle NullPointerException i.e. if planet is null?
 
-        VariableMap variables = messagingService.createVariables(user.getId(), message.getRequestId(), user.getActiveCharacter().getId())
+        VariableMap variables = clientMessagingService.createVariables(user.getId(), message.getRequestId(), user.getActiveCharacter().getId())
                 .putValue("battle", battleUUID)
                 .putValue("planet", planet.getId())
                 .putValue("attackingFaction", character.getFaction())
@@ -83,7 +83,7 @@ public class PlanetaryAssaultService {
     public void onCharacterJoinsAssault(JoinAssaultMessage message, User user) {
         log.debug("onCharacterJoinsAssault for battle {}", message.getBattleId());
 
-        VariableMap variables = messagingService.createVariables(user.getId(), message.getRequestId(), user.getActiveCharacter().getId());
+        VariableMap variables = clientMessagingService.createVariables(user.getId(), message.getRequestId(), user.getActiveCharacter().getId());
 
         try {
             runtimeService.correlateMessage(PLAYER_JOINS_ASSAULT_MESSAGE, message.getBattleId().toString(), variables);
@@ -96,7 +96,7 @@ public class PlanetaryAssaultService {
     public void onCharacterLeavesAssault(LeaveAssaultMessage message, User user) {
         log.debug("onCharacterLeavesAssault for battle {}", message.getBattleId());
 
-        VariableMap variables = messagingService.createVariables(user.getId(), message.getRequestId(), user.getActiveCharacter().getId());
+        VariableMap variables = clientMessagingService.createVariables(user.getId(), message.getRequestId(), user.getActiveCharacter().getId());
 
         try {
             runtimeService.correlateMessage(PLAYER_LEAVES_ASSAULT_MESSAGE, message.getBattleId().toString(), variables);
@@ -107,7 +107,7 @@ public class PlanetaryAssaultService {
     }
 
     private void sendErrorToUser(User user, UUID requestId, GwErrorType errorType) {
-        messagingService.send(new ErrorMessage(user, requestId, errorType.getErrorCode(), errorType.getErrorMessage()));
+        clientMessagingService.sendToUser(new ErrorMessage(requestId, errorType.getErrorCode(), errorType.getErrorMessage()), user);
     }
 
     @Scheduled(fixedDelay = 60000)

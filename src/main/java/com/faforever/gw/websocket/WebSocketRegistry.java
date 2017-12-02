@@ -57,6 +57,10 @@ public class WebSocketRegistry {
         return webSocketSessionIdToUser.getOrDefault(session.getId(), null);
     }
 
+    public Collection<WebSocketSession> getSession(long fafUserId) {
+        return userIdToWebSocketSession.get(fafUserId);
+    }
+
     public Collection<WebSocketSession> getSession(User user) {
         return userIdToWebSocketSession.get(user.getId());
     }

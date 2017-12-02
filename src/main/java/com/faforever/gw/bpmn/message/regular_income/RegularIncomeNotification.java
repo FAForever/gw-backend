@@ -1,9 +1,9 @@
 package com.faforever.gw.bpmn.message.regular_income;
 
 import com.faforever.gw.bpmn.accessors.RegularIncomeAccessor;
+import com.faforever.gw.messaging.client.ClientMessagingService;
+import com.faforever.gw.messaging.client.outbound.UserIncomeMessage;
 import com.faforever.gw.security.GwUserRegistry;
-import com.faforever.gw.services.messaging.client.MessagingService;
-import com.faforever.gw.services.messaging.client.outgoing.UserIncomeMessage;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -15,12 +15,12 @@ import javax.inject.Inject;
 @Slf4j
 @Component
 public class RegularIncomeNotification implements JavaDelegate {
-    private final MessagingService messagingService;
+    private final ClientMessagingService clientMessagingService;
     private final GwUserRegistry gwUserRegistry;
 
     @Inject
-    public RegularIncomeNotification(MessagingService messagingService, GwUserRegistry gwUserRegistry) {
-        this.messagingService = messagingService;
+    public RegularIncomeNotification(ClientMessagingService clientMessagingService, GwUserRegistry gwUserRegistry) {
+        this.clientMessagingService = clientMessagingService;
         this.gwUserRegistry = gwUserRegistry;
     }
 
@@ -35,7 +35,7 @@ public class RegularIncomeNotification implements JavaDelegate {
         gwUserRegistry.getUser(characterId)
                 .ifPresent(user -> {
                     log.debug("Sending UserIncomeMessage (characterId: {}, creditsTotal: {}, creditsDelta {})", characterId, creditsTotal, creditsDelta);
-                    messagingService.send(new UserIncomeMessage(user, characterId, creditsTotal, creditsDelta));
+                    clientMessagingService.sendToUser(new UserIncomeMessage(characterId, creditsTotal, creditsDelta), user);
                 });
     }
 }

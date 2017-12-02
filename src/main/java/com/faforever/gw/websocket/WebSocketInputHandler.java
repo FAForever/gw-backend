@@ -1,13 +1,13 @@
 package com.faforever.gw.websocket;
 
+import com.faforever.gw.messaging.client.ClientMessagingService;
+import com.faforever.gw.messaging.client.outbound.ErrorMessage;
+import com.faforever.gw.messaging.client.outbound.HelloMessage;
 import com.faforever.gw.model.Battle;
 import com.faforever.gw.model.GwCharacter;
 import com.faforever.gw.security.GwUserRegistry;
 import com.faforever.gw.security.User;
 import com.faforever.gw.services.messaging.client.MessageType;
-import com.faforever.gw.services.messaging.client.MessagingService;
-import com.faforever.gw.services.messaging.client.outgoing.ErrorMessage;
-import com.faforever.gw.services.messaging.client.outgoing.HelloMessage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -35,17 +35,17 @@ public class WebSocketInputHandler extends TextWebSocketHandler {
     private final WebSocketRegistry webSocketRegistry;
     private final GwUserRegistry gwUserRegistry;
     private final WebSocketController webSocketController;
-    private final MessagingService messagingService;
+    private final ClientMessagingService clientMessagingService;
     private final ObjectMapper jsonObjectMapper;
     private final Map<String, ActionFunc> actionMapping = new HashMap<>();
 
     @Inject
-    public WebSocketInputHandler(EntityManager entityManager, WebSocketRegistry webSocketRegistry, GwUserRegistry gwUserRegistry, WebSocketController webSocketController, MessagingService messagingService, ObjectMapper jsonObjectMapper) {
+    public WebSocketInputHandler(EntityManager entityManager, WebSocketRegistry webSocketRegistry, GwUserRegistry gwUserRegistry, WebSocketController webSocketController, ClientMessagingService clientMessagingService, ObjectMapper jsonObjectMapper) {
         this.entityManager = entityManager;
         this.webSocketRegistry = webSocketRegistry;
         this.gwUserRegistry = gwUserRegistry;
         this.webSocketController = webSocketController;
-        this.messagingService = messagingService;
+        this.clientMessagingService = clientMessagingService;
         this.jsonObjectMapper = jsonObjectMapper;
     }
 
@@ -80,7 +80,7 @@ public class WebSocketInputHandler extends TextWebSocketHandler {
                 throw new IOException();
         } catch (Exception e) {
             log.error("Invalid message envelope. Ignoring message.");
-            messagingService.send(session, new ErrorMessage(null, null,
+            clientMessagingService.send(session, new ErrorMessage(null,
                     "E_INVALID",
                     "Invalid message envelope. Ignoring message.."));
             return;
@@ -91,7 +91,7 @@ public class WebSocketInputHandler extends TextWebSocketHandler {
             actionMapping.get(envelope.getAction()).processMessage(envelope, webSocketRegistry.getUser(session));
         } else {
             log.error("Unknown action `{}`. Ignoring message.", envelope.getAction());
-            messagingService.send(session, new ErrorMessage(null, null,
+            clientMessagingService.send(session, new ErrorMessage(null,
                     "E_INVALID",
                     String.format("Unknown action `%s`. Ignoring message.", envelope.getAction())));
         }
@@ -118,7 +118,7 @@ public class WebSocketInputHandler extends TextWebSocketHandler {
 
         gwUserRegistry.addConnection(user);
         log.debug("Sending HelloMessage (characterId: {}, currentBattleId: {})", characterId, currentBattleId);
-        messagingService.send(new HelloMessage(user, characterId, currentBattleId));
+        clientMessagingService.sendToUser(new HelloMessage(characterId, currentBattleId), user);
     }
 
     @Override

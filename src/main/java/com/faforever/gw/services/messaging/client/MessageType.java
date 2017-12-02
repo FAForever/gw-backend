@@ -1,7 +1,7 @@
 package com.faforever.gw.services.messaging.client;
 
+import com.faforever.gw.messaging.client.outbound.*;
 import com.faforever.gw.services.messaging.client.incoming.*;
-import com.faforever.gw.services.messaging.client.outgoing.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,8 +27,8 @@ public enum MessageType {
     CHARACTER_JOINED_GW("character.new", Audience.PUBLIC, CharacterJoinedGwMessage.class),
     //    FACTION_CHAT_MESSAGE("faction.chat_message", Audience.FACTION),
     USER_INCOME("user.income", Audience.PRIVATE, UserIncomeMessage.class),
-//    USER_XP("user.xp", Audience.PRIVATE);
-SOLAR_SYSTEMS_LINKED("universe.solar_systems_linked", Audience.PUBLIC, SolarSystemsLinkedMessage.class),
+    //    USER_XP("user.xp", Audience.PRIVATE);
+    SOLAR_SYSTEMS_LINKED("universe.solar_systems_linked", Audience.PUBLIC, SolarSystemsLinkedMessage.class),
     SOLAR_SYSTEMS_UNLINKED("universe.solar_systems_unlinked", Audience.PUBLIC, SolarSystemsUnlinkedMessage.class),
     PLANET_OWNER_CHANGED("universe.planet_owner_changed", Audience.PUBLIC, PlanetOwnerChangedMessage.class),
 

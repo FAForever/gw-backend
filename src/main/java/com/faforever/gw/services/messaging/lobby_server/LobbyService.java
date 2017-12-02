@@ -119,7 +119,7 @@ public class LobbyService {
     }
 
     private CompletableFuture<WebSocketSession> connect(String uri) {
-        return connect(uri, 20);
+        return connect(uri, 1);
     }
 
     private CompletableFuture<WebSocketSession> connect(String uri, int reconnectAttemptsLeft) {

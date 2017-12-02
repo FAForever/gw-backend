@@ -1,9 +1,8 @@
 package com.faforever.gw.bpmn.message.calculate_promotions;
 
 import com.faforever.gw.bpmn.accessors.CalculatePromotionsAccessor;
-import com.faforever.gw.security.GwUserRegistry;
-import com.faforever.gw.services.messaging.client.MessagingService;
-import com.faforever.gw.services.messaging.client.outgoing.CharacterPromotionMessage;
+import com.faforever.gw.messaging.client.ClientMessagingService;
+import com.faforever.gw.messaging.client.outbound.CharacterPromotionMessage;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -15,13 +14,11 @@ import javax.inject.Inject;
 @Slf4j
 @Component
 public class CharacterPromotionNotification implements JavaDelegate {
-    private final MessagingService messagingService;
-    private final GwUserRegistry gwUserRegistry;
+    private final ClientMessagingService clientMessagingService;
 
     @Inject
-    public CharacterPromotionNotification(MessagingService messagingService, GwUserRegistry gwUserRegistry) {
-        this.messagingService = messagingService;
-        this.gwUserRegistry = gwUserRegistry;
+    public CharacterPromotionNotification(ClientMessagingService clientMessagingService) {
+        this.clientMessagingService = clientMessagingService;
     }
 
     @Override
@@ -32,6 +29,6 @@ public class CharacterPromotionNotification implements JavaDelegate {
         val newRank = accessor.getNewRank_Local();
 
         log.debug("Sending CharacterPromotionMessage (characterId: {}, newRank: {})", characterId, newRank);
-        messagingService.send(new CharacterPromotionMessage(gwUserRegistry.getConnectedUsers(), characterId, newRank));
+        clientMessagingService.sendToPublic(new CharacterPromotionMessage(characterId, newRank));
     }
 }

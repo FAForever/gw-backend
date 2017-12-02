@@ -1,11 +1,11 @@
 package com.faforever.gw.bpmn.message.character_creation;
 
 import com.faforever.gw.bpmn.accessors.CharacterCreationAccessor;
+import com.faforever.gw.messaging.client.ClientMessagingService;
+import com.faforever.gw.messaging.client.outbound.HelloMessage;
 import com.faforever.gw.model.GwCharacter;
 import com.faforever.gw.model.repository.CharacterRepository;
 import com.faforever.gw.security.GwUserRegistry;
-import com.faforever.gw.services.messaging.client.MessagingService;
-import com.faforever.gw.services.messaging.client.outgoing.HelloMessage;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -17,13 +17,13 @@ import javax.inject.Inject;
 @Slf4j
 @Component
 public class HelloNotification implements JavaDelegate {
-    private final MessagingService messagingService;
+    private final ClientMessagingService clientMessagingService;
     private final GwUserRegistry gwUserRegistry;
     private final CharacterRepository characterRepository;
 
     @Inject
-    public HelloNotification(MessagingService messagingService, GwUserRegistry gwUserRegistry, CharacterRepository characterRepository) {
-        this.messagingService = messagingService;
+    public HelloNotification(ClientMessagingService clientMessagingService, GwUserRegistry gwUserRegistry, CharacterRepository characterRepository) {
+        this.clientMessagingService = clientMessagingService;
         this.gwUserRegistry = gwUserRegistry;
         this.characterRepository = characterRepository;
     }
@@ -42,7 +42,7 @@ public class HelloNotification implements JavaDelegate {
                     GwCharacter character = characterRepository.findOne(accessor.getNewCharacterId());
                     user.setActiveCharacter(character);
 
-                    messagingService.send(new HelloMessage(user, character.getId(), null));
+                    clientMessagingService.sendToUser(new HelloMessage(character.getId(), null), user);
                 });
     }
 }

@@ -1,12 +1,11 @@
 package com.faforever.gw.bpmn.message.planetary_assault;
 
 import com.faforever.gw.bpmn.accessors.PlanetaryAssaultAccessor;
+import com.faforever.gw.messaging.client.ClientMessagingService;
+import com.faforever.gw.messaging.client.outbound.BattleParticipantJoinedAssaultMessage;
 import com.faforever.gw.model.GwCharacter;
 import com.faforever.gw.model.repository.BattleRepository;
 import com.faforever.gw.model.repository.CharacterRepository;
-import com.faforever.gw.security.GwUserRegistry;
-import com.faforever.gw.services.messaging.client.MessagingService;
-import com.faforever.gw.services.messaging.client.outgoing.BattleParticipantJoinedAssaultMessage;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -20,15 +19,13 @@ import javax.inject.Inject;
 public class BattleParticipantJoinedAssaultNotification implements JavaDelegate {
     private final CharacterRepository characterRepository;
     private final BattleRepository battleRepository;
-    private final MessagingService messagingService;
-    private final GwUserRegistry gwUserRegistry;
+    private final ClientMessagingService clientMessagingService;
 
     @Inject
-    public BattleParticipantJoinedAssaultNotification(CharacterRepository characterRepository, BattleRepository battleRepository, MessagingService messagingService, GwUserRegistry gwUserRegistry) {
+    public BattleParticipantJoinedAssaultNotification(CharacterRepository characterRepository, BattleRepository battleRepository, ClientMessagingService clientMessagingService) {
         this.characterRepository = characterRepository;
         this.battleRepository = battleRepository;
-        this.messagingService = messagingService;
-        this.gwUserRegistry = gwUserRegistry;
+        this.clientMessagingService = clientMessagingService;
     }
 
     @Override
@@ -42,6 +39,6 @@ public class BattleParticipantJoinedAssaultNotification implements JavaDelegate 
         val defendingFaction = battleRepository.getOne(battleId).getDefendingFaction();
 
         log.debug("Sending BattleParticipantJoinedAssaultMessage (characterId: {}, battleId: {}, characterFaction: {}, defendingFaction: {})", characterId, battleId, attackingFaction, defendingFaction);
-        messagingService.send(new BattleParticipantJoinedAssaultMessage(gwUserRegistry.getConnectedUsers(), characterId, battleId, attackingFaction, defendingFaction));
+        clientMessagingService.sendToPublic(new BattleParticipantJoinedAssaultMessage(characterId, battleId, attackingFaction, defendingFaction));
     }
 }

@@ -1,17 +1,16 @@
 package com.faforever.gw.services;
 
 import com.faforever.gw.bpmn.services.GwErrorType;
+import com.faforever.gw.messaging.client.ClientMessagingService;
+import com.faforever.gw.messaging.client.outbound.*;
 import com.faforever.gw.model.Planet;
 import com.faforever.gw.model.SolarSystem;
 import com.faforever.gw.model.repository.PlanetRepository;
 import com.faforever.gw.model.repository.SolarSystemRepository;
-import com.faforever.gw.security.GwUserRegistry;
 import com.faforever.gw.security.User;
-import com.faforever.gw.services.messaging.client.MessagingService;
 import com.faforever.gw.services.messaging.client.incoming.LinkSolarSystemsRequestMessage;
 import com.faforever.gw.services.messaging.client.incoming.SetPlanetFactionRequestMessage;
 import com.faforever.gw.services.messaging.client.incoming.UnlinkSolarSystemsRequestMessage;
-import com.faforever.gw.services.messaging.client.outgoing.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -22,15 +21,13 @@ import java.util.UUID;
 @Service
 @Slf4j
 public class AdminService {
-    private final GwUserRegistry gwUserRegistry;
-    private final MessagingService messagingService;
+    private final ClientMessagingService clientMessagingService;
     private final SolarSystemRepository solarSystemRepository;
     private final PlanetRepository planetRepository;
 
     @Inject
-    public AdminService(GwUserRegistry gwUserRegistry, MessagingService messagingService, SolarSystemRepository solarSystemRepository, PlanetRepository planetRepository) {
-        this.gwUserRegistry = gwUserRegistry;
-        this.messagingService = messagingService;
+    public AdminService(ClientMessagingService clientMessagingService, SolarSystemRepository solarSystemRepository, PlanetRepository planetRepository) {
+        this.clientMessagingService = clientMessagingService;
         this.solarSystemRepository = solarSystemRepository;
         this.planetRepository = planetRepository;
     }
@@ -48,7 +45,7 @@ public class AdminService {
             from.getConnectedSystems().add(to);
             to.getConnectedSystems().add(from);
             sendAckToUser(user, message.getRequestId());
-            messagingService.send(new SolarSystemsLinkedMessage(gwUserRegistry.getConnectedUsers(), from.getId(), to.getId()));
+            clientMessagingService.sendToPublic(new SolarSystemsLinkedMessage(from.getId(), to.getId()));
         }
     }
 
@@ -65,7 +62,7 @@ public class AdminService {
             from.getConnectedSystems().remove(to);
             to.getConnectedSystems().remove(from);
             sendAckToUser(user, message.getRequestId());
-            messagingService.send(new SolarSystemsUnlinkedMessage(gwUserRegistry.getConnectedUsers(), from.getId(), to.getId()));
+            clientMessagingService.sendToPublic(new SolarSystemsUnlinkedMessage(from.getId(), to.getId()));
         }
     }
 
@@ -80,14 +77,14 @@ public class AdminService {
 
         planet.setCurrentOwner(message.getNewOwner());
         sendAckToUser(user, message.getRequestId());
-        messagingService.send(new PlanetOwnerChangedMessage(gwUserRegistry.getConnectedUsers(), planet.getId(), message.getNewOwner()));
+        clientMessagingService.sendToPublic(new PlanetOwnerChangedMessage(planet.getId(), message.getNewOwner()));
     }
 
     private void sendErrorToUser(User user, UUID requestId, GwErrorType errorType) {
-        messagingService.send(new ErrorMessage(user, requestId, errorType.getErrorCode(), errorType.getErrorMessage()));
+        clientMessagingService.sendToUser(new ErrorMessage(requestId, errorType.getErrorCode(), errorType.getErrorMessage()), user);
     }
 
     private void sendAckToUser(User user, UUID requestId) {
-        messagingService.send(new AckMessage(user, requestId));
+        clientMessagingService.sendToUser(new AckMessage(requestId), user);
     }
 }

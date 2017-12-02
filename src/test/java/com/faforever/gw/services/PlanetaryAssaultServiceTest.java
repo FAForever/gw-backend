@@ -2,6 +2,7 @@ package com.faforever.gw.services;
 
 import com.faforever.gw.bpmn.message.generic.UserErrorMessage;
 import com.faforever.gw.bpmn.services.PlanetaryAssaultService;
+import com.faforever.gw.messaging.client.ClientMessagingService;
 import com.faforever.gw.model.BattleParticipantResult;
 import com.faforever.gw.model.Faction;
 import com.faforever.gw.model.GwCharacter;
@@ -10,7 +11,6 @@ import com.faforever.gw.model.repository.CharacterRepository;
 import com.faforever.gw.model.repository.PlanetRepository;
 import com.faforever.gw.security.GwUserRegistry;
 import com.faforever.gw.security.User;
-import com.faforever.gw.services.messaging.client.MessagingService;
 import com.faforever.gw.services.messaging.client.incoming.InitiateAssaultMessage;
 import com.faforever.gw.services.messaging.client.incoming.JoinAssaultMessage;
 import com.faforever.gw.services.messaging.client.incoming.LeaveAssaultMessage;
@@ -49,7 +49,7 @@ public class PlanetaryAssaultServiceTest {
     @Mock
     private RuntimeService runtimeService;
     @Mock
-    private MessagingService messagingService;
+    private ClientMessagingService clientMessagingService;
     @Mock
     private PlanetRepository planetRepository;
     @Mock
@@ -66,7 +66,7 @@ public class PlanetaryAssaultServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        service = new PlanetaryAssaultService(processEngine, runtimeService, messagingService, planetRepository, characterRepository);
+        service = new PlanetaryAssaultService(processEngine, runtimeService, clientMessagingService, planetRepository, characterRepository);
     }
 
     @Test
@@ -85,12 +85,12 @@ public class PlanetaryAssaultServiceTest {
         when(planet.getCurrentOwner()).thenReturn(Faction.CYBRAN);
 
         VariableMap map = Variables.createVariables();
-        when(messagingService.createVariables(anyLong(), any(), any())).thenReturn(map);
+        when(clientMessagingService.createVariables(anyLong(), any(), any())).thenReturn(map);
         when(planetRepository.findOne(any(UUID.class))).thenReturn(planet);
 
         service.onCharacterInitiatesAssault(message, user);
 
-        verify(messagingService).createVariables(user.getId(), message.getRequestId(), character.getId());
+        verify(clientMessagingService).createVariables(user.getId(), message.getRequestId(), character.getId());
         verify(runtimeService).startProcessInstanceByMessage(eq(PlanetaryAssaultService.INITIATE_ASSAULT_MESSAGE), anyString(), any());
 
         assertEquals(map.get("planet"), planet.getId());
@@ -114,12 +114,12 @@ public class PlanetaryAssaultServiceTest {
         when(user.getActiveCharacter()).thenReturn(character);
 
         VariableMap map = Variables.createVariables();
-        when(messagingService.createVariables(anyLong(), any(), any())).thenReturn(map);
+        when(clientMessagingService.createVariables(anyLong(), any(), any())).thenReturn(map);
         when(planetRepository.findOne(any(UUID.class))).thenReturn(planet);
 
         service.onCharacterJoinsAssault(message, user);
 
-        verify(messagingService).createVariables(user.getId(), message.getRequestId(), character.getId());
+        verify(clientMessagingService).createVariables(user.getId(), message.getRequestId(), character.getId());
         verify(runtimeService).correlateMessage(eq(PlanetaryAssaultService.PLAYER_JOINS_ASSAULT_MESSAGE), anyString(), any());
     }
 
@@ -134,19 +134,19 @@ public class PlanetaryAssaultServiceTest {
         when(user.getActiveCharacter()).thenReturn(character);
 
         VariableMap map = Variables.createVariables();
-        when(messagingService.createVariables(anyLong(), any(), any())).thenReturn(map);
+        when(clientMessagingService.createVariables(anyLong(), any(), any())).thenReturn(map);
         when(planetRepository.findOne(any(UUID.class))).thenReturn(planet);
 
         doThrow(MismatchingMessageCorrelationException.class).when(runtimeService).correlateMessage(anyString(), anyString(), any());
 
-        UserErrorMessage userErrorMessage = new UserErrorMessage(messagingService, mock(GwUserRegistry.class));
+        UserErrorMessage userErrorMessage = new UserErrorMessage(clientMessagingService, mock(GwUserRegistry.class));
         when(applicationContext.getBean(UserErrorMessage.class)).thenReturn(userErrorMessage);
 
         service.onCharacterJoinsAssault(message, user);
 
-        verify(messagingService).createVariables(user.getId(), message.getRequestId(), character.getId());
+        verify(clientMessagingService).createVariables(user.getId(), message.getRequestId(), character.getId());
         verify(runtimeService).correlateMessage(eq(PlanetaryAssaultService.PLAYER_JOINS_ASSAULT_MESSAGE), anyString(), any());
-        verify(messagingService).send(any());
+        verify(clientMessagingService).sendToUser(any(), any());
     }
 
     @Test
@@ -160,12 +160,12 @@ public class PlanetaryAssaultServiceTest {
         when(user.getActiveCharacter()).thenReturn(character);
 
         VariableMap map = Variables.createVariables();
-        when(messagingService.createVariables(anyLong(), any(), any())).thenReturn(map);
+        when(clientMessagingService.createVariables(anyLong(), any(), any())).thenReturn(map);
         when(planetRepository.findOne(any(UUID.class))).thenReturn(planet);
 
         service.onCharacterLeavesAssault(message, user);
 
-        verify(messagingService).createVariables(user.getId(), message.getRequestId(), character.getId());
+        verify(clientMessagingService).createVariables(user.getId(), message.getRequestId(), character.getId());
         verify(runtimeService).correlateMessage(eq(PlanetaryAssaultService.PLAYER_LEAVES_ASSAULT_MESSAGE), anyString(), any());
         verify(applicationContext, never()).getBean(UserErrorMessage.class);
     }
@@ -181,19 +181,19 @@ public class PlanetaryAssaultServiceTest {
         when(user.getActiveCharacter()).thenReturn(character);
 
         VariableMap map = Variables.createVariables();
-        when(messagingService.createVariables(anyLong(), any(), any())).thenReturn(map);
+        when(clientMessagingService.createVariables(anyLong(), any(), any())).thenReturn(map);
         when(planetRepository.findOne(any(UUID.class))).thenReturn(planet);
 
         doThrow(MismatchingMessageCorrelationException.class).when(runtimeService).correlateMessage(anyString(), anyString(), any());
 
-        UserErrorMessage userErrorMessage = new UserErrorMessage(messagingService, mock(GwUserRegistry.class));
+        UserErrorMessage userErrorMessage = new UserErrorMessage(clientMessagingService, mock(GwUserRegistry.class));
         when(applicationContext.getBean(UserErrorMessage.class)).thenReturn(userErrorMessage);
 
         service.onCharacterLeavesAssault(message, user);
 
-        verify(messagingService).createVariables(user.getId(), message.getRequestId(), character.getId());
+        verify(clientMessagingService).createVariables(user.getId(), message.getRequestId(), character.getId());
         verify(runtimeService).correlateMessage(eq(PlanetaryAssaultService.PLAYER_LEAVES_ASSAULT_MESSAGE), anyString(), any());
-        verify(messagingService).send(any());
+        verify(clientMessagingService).sendToUser(any(), any());
     }
 
     @Test
