@@ -1,11 +1,11 @@
 package com.faforever.gw.bpmn.services;
 
 import com.faforever.gw.messaging.client.ClientMessagingService;
+import com.faforever.gw.messaging.client.inbound.RequestCharacterMessage;
+import com.faforever.gw.messaging.client.inbound.SelectCharacterNameMessage;
 import com.faforever.gw.messaging.client.outbound.ErrorMessage;
 import com.faforever.gw.model.repository.CharacterRepository;
 import com.faforever.gw.security.User;
-import com.faforever.gw.services.messaging.client.incoming.RequestCharacterMessage;
-import com.faforever.gw.services.messaging.client.incoming.SelectCharacterNameMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;

@@ -2,15 +2,15 @@ package com.faforever.gw.services;
 
 import com.faforever.gw.bpmn.services.GwErrorType;
 import com.faforever.gw.messaging.client.ClientMessagingService;
+import com.faforever.gw.messaging.client.inbound.LinkSolarSystemsRequestMessage;
+import com.faforever.gw.messaging.client.inbound.SetPlanetFactionRequestMessage;
+import com.faforever.gw.messaging.client.inbound.UnlinkSolarSystemsRequestMessage;
 import com.faforever.gw.messaging.client.outbound.*;
 import com.faforever.gw.model.Planet;
 import com.faforever.gw.model.SolarSystem;
 import com.faforever.gw.model.repository.PlanetRepository;
 import com.faforever.gw.model.repository.SolarSystemRepository;
 import com.faforever.gw.security.User;
-import com.faforever.gw.services.messaging.client.incoming.LinkSolarSystemsRequestMessage;
-import com.faforever.gw.services.messaging.client.incoming.SetPlanetFactionRequestMessage;
-import com.faforever.gw.services.messaging.client.incoming.UnlinkSolarSystemsRequestMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

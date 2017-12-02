@@ -2,12 +2,12 @@ package com.faforever.gw.websocket;
 
 import com.faforever.gw.bpmn.services.CharacterCreationService;
 import com.faforever.gw.bpmn.services.PlanetaryAssaultService;
+import com.faforever.gw.messaging.client.inbound.*;
 import com.faforever.gw.model.repository.BattleRepository;
 import com.faforever.gw.model.repository.CharacterRepository;
 import com.faforever.gw.model.repository.PlanetRepository;
 import com.faforever.gw.security.User;
 import com.faforever.gw.services.AdminService;
-import com.faforever.gw.services.messaging.client.incoming.*;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.RuntimeService;
 import org.springframework.stereotype.Controller;
@@ -33,49 +33,49 @@ public class WebSocketController {
         this.adminService = adminService;
     }
 
-    @ActionMapping("initiateAssault")
+    @ActionMapping(InitiateAssaultMessage.class)
     public void initiateAssault(InitiateAssaultMessage message, User user) throws Exception {
         log.trace("received initiateAssault, message: {}, user: {}", message, user);
         planetaryAssaultService.onCharacterInitiatesAssault(message, user);
     }
 
-    @ActionMapping("joinAssault")
+    @ActionMapping(JoinAssaultMessage.class)
     public void joinAssault(JoinAssaultMessage message, User user) throws Exception {
         log.trace("received joinAssault, message: {}, user: {}", message, user);
         planetaryAssaultService.onCharacterJoinsAssault(message, user);
     }
 
-    @ActionMapping("leaveAssault")
+    @ActionMapping(LeaveAssaultMessage.class)
     public void leaveAssault(LeaveAssaultMessage message, User user) throws Exception {
         log.trace("received leaveAssault, message: {}, user: {}", message, user);
         planetaryAssaultService.onCharacterLeavesAssault(message, user);
     }
 
-    @ActionMapping("requestCharacter")
+    @ActionMapping(RequestCharacterMessage.class)
     public void requestCharacter(RequestCharacterMessage message, User user) throws Exception {
         log.trace("received requestCharacter, message: {}, user: {}", message, user);
         characterCreationService.onRequestCharacter(message, user);
     }
 
-    @ActionMapping("selectCharacterName")
+    @ActionMapping(SelectCharacterNameMessage.class)
     public void selectCharacterName(SelectCharacterNameMessage message, User user) throws Exception {
         log.trace("received selectCharacterName, message: {}, user: {}", message, user);
         characterCreationService.onSelectCharacterName(message, user);
     }
 
-    @ActionMapping("linkSolarSystemsRequest")
+    @ActionMapping(LinkSolarSystemsRequestMessage.class)
     public void linkSolarSystemsRequest(LinkSolarSystemsRequestMessage message, User user) throws Exception {
         log.trace("received linkSolarSystemsRequest, message: {}, user: {}", message, user);
         adminService.onAddSolarSystemLink(message, user);
     }
 
-    @ActionMapping("unlinkSolarSystemsRequest")
+    @ActionMapping(UnlinkSolarSystemsRequestMessage.class)
     public void unlinkSolarSystemsRequest(UnlinkSolarSystemsRequestMessage message, User user) throws Exception {
         log.trace("received linkSolarSystemsRequest, message: {}, user: {}", message, user);
         adminService.onRemoveSolarSystemLink(message, user);
     }
 
-    @ActionMapping("setPlanetFactionRequest")
+    @ActionMapping(SetPlanetFactionRequestMessage.class)
     public void setPlanetFactionRequest(SetPlanetFactionRequestMessage message, User user) throws Exception {
         log.trace("received setPlanetFactionRequest, message: {}, user: {}", message, user);
         adminService.onSetPlanetFaction(message, user);

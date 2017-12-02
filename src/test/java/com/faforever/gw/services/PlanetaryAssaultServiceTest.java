@@ -3,6 +3,9 @@ package com.faforever.gw.services;
 import com.faforever.gw.bpmn.message.generic.UserErrorMessage;
 import com.faforever.gw.bpmn.services.PlanetaryAssaultService;
 import com.faforever.gw.messaging.client.ClientMessagingService;
+import com.faforever.gw.messaging.client.inbound.InitiateAssaultMessage;
+import com.faforever.gw.messaging.client.inbound.JoinAssaultMessage;
+import com.faforever.gw.messaging.client.inbound.LeaveAssaultMessage;
 import com.faforever.gw.model.BattleParticipantResult;
 import com.faforever.gw.model.Faction;
 import com.faforever.gw.model.GwCharacter;
@@ -11,9 +14,6 @@ import com.faforever.gw.model.repository.CharacterRepository;
 import com.faforever.gw.model.repository.PlanetRepository;
 import com.faforever.gw.security.GwUserRegistry;
 import com.faforever.gw.security.User;
-import com.faforever.gw.services.messaging.client.incoming.InitiateAssaultMessage;
-import com.faforever.gw.services.messaging.client.incoming.JoinAssaultMessage;
-import com.faforever.gw.services.messaging.client.incoming.LeaveAssaultMessage;
 import com.faforever.gw.services.messaging.lobby_server.incoming.GamePlayerResult;
 import com.faforever.gw.services.messaging.lobby_server.incoming.GameResultMessage;
 import com.google.common.collect.ImmutableList;
@@ -72,7 +72,6 @@ public class PlanetaryAssaultServiceTest {
     @Test
     public void onCharacterInitiatesAssaultTest() throws Exception {
         InitiateAssaultMessage message = new InitiateAssaultMessage(
-                UUID.fromString("11111111-1111-1111-1111-111111111111"),
                 UUID.fromString("22222222-2222-2222-2222-222222222222")
         );
 
@@ -106,7 +105,6 @@ public class PlanetaryAssaultServiceTest {
     @Test
     public void onCharacterJoinsAssault_Success() throws Exception {
         JoinAssaultMessage message = new JoinAssaultMessage(
-                UUID.fromString("11111111-1111-1111-1111-111111111111"),
                 UUID.fromString("22222222-2222-2222-2222-222222222222")
         );
 
@@ -126,7 +124,6 @@ public class PlanetaryAssaultServiceTest {
     @Test
     public void onCharacterJoinsAssault_Fail() throws Exception {
         JoinAssaultMessage message = new JoinAssaultMessage(
-                UUID.fromString("11111111-1111-1111-1111-111111111111"),
                 UUID.fromString("22222222-2222-2222-2222-222222222222")
         );
 
@@ -152,7 +149,6 @@ public class PlanetaryAssaultServiceTest {
     @Test
     public void onCharacterLeaveAssault_Success() throws Exception {
         LeaveAssaultMessage message = new LeaveAssaultMessage(
-                UUID.fromString("11111111-1111-1111-1111-111111111111"),
                 UUID.fromString("22222222-2222-2222-2222-222222222222")
         );
 
@@ -173,7 +169,6 @@ public class PlanetaryAssaultServiceTest {
     @Test
     public void onCharacterLeaveAssault_Fail() throws Exception {
         LeaveAssaultMessage message = new LeaveAssaultMessage(
-                UUID.fromString("11111111-1111-1111-1111-111111111111"),
                 UUID.fromString("22222222-2222-2222-2222-222222222222")
         );
 

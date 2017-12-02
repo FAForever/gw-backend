@@ -1,14 +1,14 @@
 package com.faforever.gw.bpmn.services;
 
 import com.faforever.gw.messaging.client.ClientMessagingService;
+import com.faforever.gw.messaging.client.inbound.InitiateAssaultMessage;
+import com.faforever.gw.messaging.client.inbound.JoinAssaultMessage;
+import com.faforever.gw.messaging.client.inbound.LeaveAssaultMessage;
 import com.faforever.gw.messaging.client.outbound.ErrorMessage;
 import com.faforever.gw.model.*;
 import com.faforever.gw.model.repository.CharacterRepository;
 import com.faforever.gw.model.repository.PlanetRepository;
 import com.faforever.gw.security.User;
-import com.faforever.gw.services.messaging.client.incoming.InitiateAssaultMessage;
-import com.faforever.gw.services.messaging.client.incoming.JoinAssaultMessage;
-import com.faforever.gw.services.messaging.client.incoming.LeaveAssaultMessage;
 import com.faforever.gw.services.messaging.lobby_server.incoming.GameResultMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;

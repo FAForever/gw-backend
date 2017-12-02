@@ -1,5 +1,7 @@
 package com.faforever.gw.websocket;
 
+import com.faforever.gw.messaging.client.ClientMessage;
+import com.faforever.gw.messaging.client.ClientMessageWrapper;
 import com.faforever.gw.messaging.client.ClientMessagingService;
 import com.faforever.gw.messaging.client.outbound.ErrorMessage;
 import com.faforever.gw.messaging.client.outbound.HelloMessage;
@@ -7,7 +9,6 @@ import com.faforever.gw.model.Battle;
 import com.faforever.gw.model.GwCharacter;
 import com.faforever.gw.security.GwUserRegistry;
 import com.faforever.gw.security.User;
-import com.faforever.gw.services.messaging.client.MessageType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -37,7 +38,7 @@ public class WebSocketInputHandler extends TextWebSocketHandler {
     private final WebSocketController webSocketController;
     private final ClientMessagingService clientMessagingService;
     private final ObjectMapper jsonObjectMapper;
-    private final Map<String, ActionFunc> actionMapping = new HashMap<>();
+    private final Map<Class<?>, ActionFunc> actionMapping = new HashMap<>();
 
     @Inject
     public WebSocketInputHandler(EntityManager entityManager, WebSocketRegistry webSocketRegistry, GwUserRegistry gwUserRegistry, WebSocketController webSocketController, ClientMessagingService clientMessagingService, ObjectMapper jsonObjectMapper) {
@@ -56,12 +57,10 @@ public class WebSocketInputHandler extends TextWebSocketHandler {
                 .forEach(method -> {
                     val annotation = method.getAnnotation(ActionMapping.class);
 
-                    actionMapping.put(annotation.value(), (WebSocketEnvelope envelope, User user) -> {
+                    actionMapping.put(annotation.value(), (ClientMessage message, User user) -> {
                         try {
-                            val messageClass = MessageType.getByAction(envelope.getAction());
-                            Object message = jsonObjectMapper.readValue(envelope.getData(), messageClass);
                             method.invoke(webSocketController, message, user);
-                        } catch (IllegalAccessException | InvocationTargetException | IOException e) {
+                        } catch (IllegalAccessException | InvocationTargetException e) {
                             log.error("ActionMapping for `{}` failed", annotation.value(), e);
                         }
                     });
@@ -69,16 +68,14 @@ public class WebSocketInputHandler extends TextWebSocketHandler {
     }
 
     @Override
-    public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        WebSocketEnvelope envelope;
+    public void handleTextMessage(WebSocketSession session, TextMessage message) {
         log.trace("Incoming websocket message: {}", message.getPayload());
+        ClientMessage clientMessage;
 
         try {
-            envelope = jsonObjectMapper.readValue(message.getPayload(), WebSocketEnvelope.class);
-
-            if (envelope.getAction() == null)
-                throw new IOException();
-        } catch (Exception e) {
+            ClientMessageWrapper wrapper = jsonObjectMapper.readValue(message.getPayload(), ClientMessageWrapper.class);
+            clientMessage = wrapper.getData();
+        } catch (IOException e) {
             log.error("Invalid message envelope. Ignoring message.");
             clientMessagingService.send(session, new ErrorMessage(null,
                     "E_INVALID",
@@ -86,14 +83,13 @@ public class WebSocketInputHandler extends TextWebSocketHandler {
             return;
         }
 
-        if (actionMapping.containsKey(envelope.getAction())) {
-            log.debug("Processing envelope: {}", envelope);
-            actionMapping.get(envelope.getAction()).processMessage(envelope, webSocketRegistry.getUser(session));
+        if (actionMapping.containsKey(clientMessage.getClass())) {
+            actionMapping.get(clientMessage.getClass()).processMessage(clientMessage, webSocketRegistry.getUser(session));
         } else {
-            log.error("Unknown action `{}`. Ignoring message.", envelope.getAction());
+            log.error("Unmapped action class `{}`. Ignoring message.", clientMessage.getClass());
             clientMessagingService.send(session, new ErrorMessage(null,
                     "E_INVALID",
-                    String.format("Unknown action `%s`. Ignoring message.", envelope.getAction())));
+                    "Unknown action. Ignoring message."));
         }
     }
 
@@ -129,6 +125,6 @@ public class WebSocketInputHandler extends TextWebSocketHandler {
     }
 
     private interface ActionFunc {
-        void processMessage(WebSocketEnvelope envelope, User user);
+        void processMessage(ClientMessage message, User user);
     }
 }
