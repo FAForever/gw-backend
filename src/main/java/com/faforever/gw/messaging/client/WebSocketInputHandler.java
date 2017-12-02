@@ -1,8 +1,5 @@
-package com.faforever.gw.websocket;
+package com.faforever.gw.messaging.client;
 
-import com.faforever.gw.messaging.client.ClientMessage;
-import com.faforever.gw.messaging.client.ClientMessageWrapper;
-import com.faforever.gw.messaging.client.ClientMessagingService;
 import com.faforever.gw.messaging.client.outbound.ErrorMessage;
 import com.faforever.gw.messaging.client.outbound.HelloMessage;
 import com.faforever.gw.model.Battle;

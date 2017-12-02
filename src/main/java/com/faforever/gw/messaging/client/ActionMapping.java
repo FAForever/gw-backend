@@ -1,4 +1,4 @@
-package com.faforever.gw.websocket;
+package com.faforever.gw.messaging.client;
 
 import java.lang.annotation.*;
 

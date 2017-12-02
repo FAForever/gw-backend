@@ -1,12 +1,9 @@
-package com.faforever.gw.services.messaging.lobby_server;
+package com.faforever.gw.messaging.lobby;
 
-import com.faforever.gw.services.messaging.lobby_server.outgoing.CreateGameMessage;
-import com.faforever.gw.services.messaging.lobby_server.outgoing.OutgoingLobbyMessage;
-import com.faforever.gw.websocket.WebSocketEnvelope;
+import com.faforever.gw.messaging.lobby.outbound.CreateGameMessage;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
@@ -22,9 +19,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -38,7 +33,6 @@ public class LobbyService {
     private final BlockingQueue<WebSocketMessage> messageQueue;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final ObjectMapper jsonObjectMapper;
-    private final Map<String, ActionFunc> actionMapping = new HashMap<>();
     private final WebSocketClient webSocketClient;
     private final TextWebSocketHandler webSocketHandler;
     private ThreadPoolTaskExecutor taskExecutor;
@@ -54,38 +48,29 @@ public class LobbyService {
 
         this.webSocketHandler = new TextWebSocketHandler() {
             @Override
-            public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+            public void afterConnectionEstablished(WebSocketSession session) {
                 log.debug("Lobby server connection established");
                 taskExecutor.execute(sendingTask);
             }
 
             @Override
-            protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+            protected void handleTextMessage(WebSocketSession session, TextMessage message) {
+                log.trace("Incoming lobby message: {}", message.getPayload());
+                LobbyMessage lobbyMessage;
+
                 try {
-                    WebSocketEnvelope envelope;
+                    LobbyMessageWrapper wrapper = jsonObjectMapper.readValue(message.getPayload(), LobbyMessageWrapper.class);
+                    lobbyMessage = wrapper.getData();
 
-                    try {
-                        envelope = jsonObjectMapper.readValue(message.getPayload(), WebSocketEnvelope.class);
-
-                        if (envelope.getAction() == null)
-                            throw new IOException();
-                    } catch (Exception e) {
-                        log.error("Invalid message envelope. Ignoring message.");
-                        return;
-                    }
-
-                    val messageClass = LobbyServerMessageType.getByAction(envelope.getAction());
-                    Object convertedMessage = jsonObjectMapper.readValue(envelope.getData(), messageClass);
-                    log.debug("New message with type {} published", messageClass.getTypeName());
-                    applicationEventPublisher.publishEvent(convertedMessage);
-                } catch (Exception e) {
+                    log.debug("New message with type {} published", lobbyMessage.getClass());
+                    applicationEventPublisher.publishEvent(lobbyMessage);
+                } catch (IOException e) {
                     log.error("An error occured on message handling: ", e);
-                    throw e;
                 }
             }
 
             @Override
-            public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+            public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
                 log.debug("Lobby server connection closed, trying to reconnect");
                 resetTaskExecutor();
                 connect(LOBBY_SERVER_WEBSOCKET_URI);
@@ -157,15 +142,11 @@ public class LobbyService {
         return completableFuture;
     }
 
-    private TextMessage box(OutgoingLobbyMessage message) throws JsonProcessingException {
-        return new TextMessage(
-                jsonObjectMapper.writeValueAsString(
-                        new WebSocketEnvelope(message.getAction().getName(), jsonObjectMapper.writeValueAsString(message))
-                )
-        );
+    private TextMessage box(LobbyMessage message) throws JsonProcessingException {
+        return new TextMessage(jsonObjectMapper.writeValueAsString(new LobbyMessageWrapper(message)));
     }
 
-    private void enqueue(OutgoingLobbyMessage message) {
+    private void enqueue(LobbyMessage message) {
         try {
             messageQueue.add(box(message));
         } catch (JsonProcessingException e) {
@@ -174,10 +155,6 @@ public class LobbyService {
     }
 
     public void createGame(UUID battleId, List<Long> participants) {
-        enqueue(new CreateGameMessage(UUID.randomUUID(), battleId, participants));
-    }
-
-    private interface ActionFunc {
-        void processMessage(WebSocketEnvelope envelope);
+        enqueue(new CreateGameMessage(battleId, participants));
     }
 }

@@ -1,6 +1,6 @@
 package com.faforever.gw.config;
 
-import com.faforever.gw.websocket.WebSocketInputHandler;
+import com.faforever.gw.messaging.client.WebSocketInputHandler;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;

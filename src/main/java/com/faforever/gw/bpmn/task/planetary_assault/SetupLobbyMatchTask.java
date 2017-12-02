@@ -1,9 +1,9 @@
 package com.faforever.gw.bpmn.task.planetary_assault;
 
 import com.faforever.gw.bpmn.accessors.PlanetaryAssaultAccessor;
+import com.faforever.gw.messaging.lobby.LobbyService;
 import com.faforever.gw.model.Battle;
 import com.faforever.gw.model.repository.BattleRepository;
-import com.faforever.gw.services.messaging.lobby_server.LobbyService;
 import com.google.common.collect.ImmutableList;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.BpmnError;

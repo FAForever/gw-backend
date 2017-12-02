@@ -4,7 +4,6 @@ import com.faforever.gw.messaging.client.outbound.OutboundClientMessage;
 import com.faforever.gw.model.GwCharacter;
 import com.faforever.gw.model.repository.CharacterRepository;
 import com.faforever.gw.security.User;
-import com.faforever.gw.websocket.WebSocketRegistry;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
