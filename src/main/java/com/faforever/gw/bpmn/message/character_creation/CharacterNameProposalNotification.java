@@ -3,36 +3,39 @@ package com.faforever.gw.bpmn.message.character_creation;
 import com.faforever.gw.bpmn.accessors.CharacterCreationAccessor;
 import com.faforever.gw.messaging.client.ClientMessagingService;
 import com.faforever.gw.messaging.client.outbound.CharacterNameProposalMessage;
-import com.faforever.gw.security.GwUserRegistry;
+import com.faforever.gw.security.User;
+import com.faforever.gw.services.UserService;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Service
 public class CharacterNameProposalNotification implements JavaDelegate {
     private final ClientMessagingService clientMessagingService;
-    private final GwUserRegistry gwUserRegistry;
+    private final UserService userService;
 
     @Inject
-    public CharacterNameProposalNotification(ClientMessagingService clientMessagingService, GwUserRegistry gwUserRegistry) {
+    public CharacterNameProposalNotification(ClientMessagingService clientMessagingService, UserService userService) {
         this.clientMessagingService = clientMessagingService;
-        this.gwUserRegistry = gwUserRegistry;
+        this.userService = userService;
     }
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {
         CharacterCreationAccessor accessor = CharacterCreationAccessor.of(execution);
 
-        val requestId = accessor.getRequestId();
-        val user = gwUserRegistry.getUser(accessor.getRequestFafUser()).orElseThrow(() -> new IllegalStateException("fafUser already logged out"));
-        val proposedNamesList = accessor.getProposedNamesList();
+        UUID requestId = accessor.getRequestId();
+        User user = userService.getOnlineUserByFafId(accessor.getRequestFafUser())
+                .orElseThrow(() -> new IllegalStateException("fafUser already logged out"));
+        List<String> proposedNamesList = accessor.getProposedNamesList();
 
-        log.debug("Sending CharacterNameProposalMessage (fafUser: {}, requestId: {}, proposedNamesList: {})", user.getId(), requestId, proposedNamesList);
+        log.debug("Sending CharacterNameProposalMessage (requestId: {}, proposedNamesList: {})", requestId, proposedNamesList);
         clientMessagingService.sendToUser(new CharacterNameProposalMessage(requestId, proposedNamesList), user);
     }
 }

@@ -4,6 +4,7 @@ import com.faforever.gw.messaging.client.outbound.OutboundClientMessage;
 import com.faforever.gw.model.GwCharacter;
 import com.faforever.gw.model.repository.CharacterRepository;
 import com.faforever.gw.security.User;
+import com.faforever.gw.services.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -17,18 +18,21 @@ import org.springframework.web.socket.WebSocketSession;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
 @Service
 public class ClientMessagingService {
     private final WebSocketRegistry webSocketRegistry;
+    private final UserService userService;
     private final ObjectMapper jsonObjectMapper;
     private final CharacterRepository characterRepository;
 
     @Inject
-    public ClientMessagingService(WebSocketRegistry webSocketRegistry, ObjectMapper jsonObjectMapper, CharacterRepository characterRepository) {
+    public ClientMessagingService(WebSocketRegistry webSocketRegistry, UserService userService, ObjectMapper jsonObjectMapper, CharacterRepository characterRepository) {
         this.webSocketRegistry = webSocketRegistry;
+        this.userService = userService;
         this.jsonObjectMapper = jsonObjectMapper;
         this.characterRepository = characterRepository;
     }
@@ -39,6 +43,11 @@ public class ClientMessagingService {
         log.trace("Sending public message");
         webSocketRegistry.getSessions()
                 .forEach(session -> send(session, message));
+    }
+
+    public void sendToUser(OutboundClientMessage message, Optional<User> userOptional) {
+        Assert.isTrue(userOptional.isPresent(), "Can't send message to null-user");
+        sendToUser(message, userOptional.get());
     }
 
     public void sendToUser(OutboundClientMessage message, User user) {

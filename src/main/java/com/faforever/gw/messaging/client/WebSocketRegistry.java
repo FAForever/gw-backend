@@ -5,7 +5,6 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
-import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -35,32 +34,6 @@ public class WebSocketRegistry {
             webSocketSessionIdToUser.put(session.getId(), user);
         } else {
             log.warn("unexpected principal");
-        }
-    }
-
-    public void addxxxx(WebSocketSession session) {
-        Principal principal = session.getPrincipal();
-
-        boolean principalError = false;
-        // WTF Spring? - PreAuthentication has the principal nested inside
-        if (principal.getClass() == PreAuthenticatedAuthenticationToken.class) {
-            PreAuthenticatedAuthenticationToken token = (PreAuthenticatedAuthenticationToken) principal;
-
-            if (token.getPrincipal().getClass() == User.class) {
-                User user = (User) token.getPrincipal();
-
-                userIdToWebSocketSession.put(user.getId(), session);
-                webSocketSessionIdToUser.put(session.getId(), user);
-            } else
-                principalError = true;
-        } else {
-            principalError = true;
-        }
-
-        if (principalError) {
-            RuntimeException e = new RuntimeException("The user is not authenticated as expected.");
-            log.error(e.getMessage(), e);
-            throw e;
         }
     }
 

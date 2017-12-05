@@ -3,7 +3,8 @@ package com.faforever.gw.bpmn.message.generic;
 import com.faforever.gw.bpmn.accessors.PlanetaryAssaultAccessor;
 import com.faforever.gw.messaging.client.ClientMessagingService;
 import com.faforever.gw.messaging.client.outbound.ErrorMessage;
-import com.faforever.gw.security.GwUserRegistry;
+import com.faforever.gw.security.User;
+import com.faforever.gw.services.UserService;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -16,12 +17,12 @@ import javax.inject.Inject;
 @Component
 public class UserErrorMessage implements JavaDelegate {
     private final ClientMessagingService clientMessagingService;
-    private final GwUserRegistry gwUserRegistry;
+    private final UserService userService;
 
     @Inject
-    public UserErrorMessage(ClientMessagingService clientMessagingService, GwUserRegistry gwUserRegistry) {
+    public UserErrorMessage(ClientMessagingService clientMessagingService, UserService userService) {
         this.clientMessagingService = clientMessagingService;
-        this.gwUserRegistry = gwUserRegistry;
+        this.userService = userService;
     }
 
     @Override
@@ -33,10 +34,10 @@ public class UserErrorMessage implements JavaDelegate {
         val errorMessage = accessor.getErrorMessage();
         val requestFafUser = accessor.getRequestFafUser();
 
-        gwUserRegistry.getUser(requestFafUser)
-                .ifPresent(user -> {
-                    log.debug("Sending UserErrorMessage (code: {}, message: {})", errorCode, errorMessage);
-                    clientMessagingService.sendToUser(new ErrorMessage(requestId, errorCode, errorMessage), user);
-                });
+        User user = userService.getOnlineUserByFafId(requestFafUser)
+                .orElseThrow(() -> new IllegalStateException("fafUser already logged out"));
+
+        log.debug("Sending UserErrorMessage (code: {}, message: {})", errorCode, errorMessage);
+        clientMessagingService.sendToUser(new ErrorMessage(requestId, errorCode, errorMessage), user);
     }
 }

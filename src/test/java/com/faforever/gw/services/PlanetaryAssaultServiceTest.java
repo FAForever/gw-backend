@@ -14,7 +14,6 @@ import com.faforever.gw.model.GwCharacter;
 import com.faforever.gw.model.Planet;
 import com.faforever.gw.model.repository.CharacterRepository;
 import com.faforever.gw.model.repository.PlanetRepository;
-import com.faforever.gw.security.GwUserRegistry;
 import com.faforever.gw.security.User;
 import com.google.common.collect.ImmutableList;
 import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
@@ -130,14 +129,14 @@ public class PlanetaryAssaultServiceTest {
 
         doThrow(MismatchingMessageCorrelationException.class).when(runtimeService).correlateMessage(anyString(), anyString(), any());
 
-        UserErrorMessage userErrorMessage = new UserErrorMessage(clientMessagingService, mock(GwUserRegistry.class));
+        UserErrorMessage userErrorMessage = new UserErrorMessage(clientMessagingService, userService);
         when(applicationContext.getBean(UserErrorMessage.class)).thenReturn(userErrorMessage);
 
         service.onCharacterJoinsAssault(message);
 
         verify(clientMessagingService).createVariables(user.getId(), message.getRequestId(), character.getId());
         verify(runtimeService).correlateMessage(eq(PlanetaryAssaultService.PLAYER_JOINS_ASSAULT_MESSAGE), anyString(), any());
-        verify(clientMessagingService).sendToUser(any(), any());
+        verify(clientMessagingService).sendToUser(any(), any(User.class));
     }
 
     @Test
@@ -161,14 +160,14 @@ public class PlanetaryAssaultServiceTest {
 
         doThrow(MismatchingMessageCorrelationException.class).when(runtimeService).correlateMessage(anyString(), anyString(), any());
 
-        UserErrorMessage userErrorMessage = new UserErrorMessage(clientMessagingService, mock(GwUserRegistry.class));
+        UserErrorMessage userErrorMessage = new UserErrorMessage(clientMessagingService, userService);
         when(applicationContext.getBean(UserErrorMessage.class)).thenReturn(userErrorMessage);
 
         service.onCharacterLeavesAssault(message);
 
         verify(clientMessagingService).createVariables(user.getId(), message.getRequestId(), character.getId());
         verify(runtimeService).correlateMessage(eq(PlanetaryAssaultService.PLAYER_LEAVES_ASSAULT_MESSAGE), anyString(), any());
-        verify(clientMessagingService).sendToUser(any(), any());
+        verify(clientMessagingService).sendToUser(any(), any(User.class));
     }
 
     @Test
