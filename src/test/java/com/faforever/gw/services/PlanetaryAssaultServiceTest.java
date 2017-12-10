@@ -8,10 +8,8 @@ import com.faforever.gw.messaging.client.inbound.JoinAssaultMessage;
 import com.faforever.gw.messaging.client.inbound.LeaveAssaultMessage;
 import com.faforever.gw.messaging.lobby.inbound.GamePlayerResult;
 import com.faforever.gw.messaging.lobby.inbound.GameResultMessage;
-import com.faforever.gw.model.BattleParticipantResult;
-import com.faforever.gw.model.Faction;
-import com.faforever.gw.model.GwCharacter;
-import com.faforever.gw.model.Planet;
+import com.faforever.gw.model.*;
+import com.faforever.gw.model.repository.BattleRepository;
 import com.faforever.gw.model.repository.CharacterRepository;
 import com.faforever.gw.model.repository.PlanetRepository;
 import com.faforever.gw.security.User;
@@ -28,10 +26,10 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.context.ApplicationContext;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -54,6 +52,8 @@ public class PlanetaryAssaultServiceTest {
     private CharacterRepository characterRepository;
     @Mock
     private UserService userService;
+    @Mock
+    private BattleRepository battleRepository;
 
     @Mock
     private User user;
@@ -61,6 +61,8 @@ public class PlanetaryAssaultServiceTest {
     private GwCharacter character;
     @Mock
     private Planet planet;
+    @Mock
+    private Battle battle;
 
     private VariableMap map;
     private PlanetaryAssaultService service;
@@ -71,13 +73,16 @@ public class PlanetaryAssaultServiceTest {
         when(userService.getActiveCharacter(user)).thenReturn(character);
         when(planetRepository.findOne(any(UUID.class))).thenReturn(planet);
 
+        when(battleRepository.findOneByFafGameId(anyLong())).thenReturn(Optional.of(battle));
+        when(battle.getId()).thenReturn(UUID.randomUUID());
+
         when(user.getId()).thenReturn(5L);
         when(user.getActiveCharacter()).thenReturn(character);
 
         map = Variables.createVariables();
         when(clientMessagingService.createVariables(anyLong(), any(), any())).thenReturn(map);
 
-        service = new PlanetaryAssaultService(processEngine, runtimeService, clientMessagingService, planetRepository, characterRepository, userService);
+        service = new PlanetaryAssaultService(processEngine, runtimeService, clientMessagingService, battleRepository, planetRepository, characterRepository, userService);
     }
 
     @Test
@@ -106,7 +111,6 @@ public class PlanetaryAssaultServiceTest {
         assertEquals(map.get("defenderCount"), 0);
         assertEquals(map.get("gameFull"), false);
         assertEquals(map.get("waitingProgress"), 0.0d);
-        assertTrue(map.get("winner").equals("t.b.d."));
     }
 
     @Test
@@ -184,7 +188,6 @@ public class PlanetaryAssaultServiceTest {
         when(character.getFaction()).thenReturn(Faction.UEF);
 
         GameResultMessage result = new GameResultMessage(
-                UUID.fromString("11111111-1111-1111-1111-111111111111"),
                 123456L,
                 ImmutableList.of(new GamePlayerResult(fafId, BattleParticipantResult.VICTORY, -1L))
         );

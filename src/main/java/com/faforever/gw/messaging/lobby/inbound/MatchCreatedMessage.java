@@ -4,12 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
 @AllArgsConstructor
-public class GameResultMessage extends InboundLobbyMessage {
-    private long gameId;
-    private List<GamePlayerResult> playerResults;
+public class MatchCreatedMessage extends InboundLobbyMessage implements ResponseMessage {
+    UUID requestId;
+    long gameId;
 }

@@ -8,6 +8,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class GwServerProperties {
     private Jwt jwt = new Jwt();
     private OAuth2 oAuth2 = new OAuth2();
+    private Lobby lobby = new Lobby();
 
     @Data
     public static class OAuth2 {
@@ -20,5 +21,13 @@ public class GwServerProperties {
          * The secret used for JWT token verification.
          */
         private String secret;
+    }
+
+    @Data
+    public static class Lobby {
+        private String connectionString;
+        private String protocol;
+        private String host;
+        private int port;
     }
 }

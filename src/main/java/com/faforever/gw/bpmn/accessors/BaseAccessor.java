@@ -1,7 +1,10 @@
 package com.faforever.gw.bpmn.accessors;
 
+import com.faforever.gw.model.Faction;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
+
+import java.util.UUID;
 
 /**
  * Abstract class for conveniently accessing process variables.
@@ -17,6 +20,18 @@ public abstract class BaseAccessor {
 
     protected Object get(String variable) {
         return processContext.getVariable(variable);
+    }
+
+    protected String getString(String variable) {
+        return (String) get(variable);
+    }
+
+    protected UUID getUUID(String variable) {
+        return (UUID) get(variable);
+    }
+
+    protected Faction getFaction(String variable) {
+        return (Faction) get(variable);
     }
 
     protected Object getOrDefault(String variable, Object defaultValue) {

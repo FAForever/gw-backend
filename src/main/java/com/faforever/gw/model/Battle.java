@@ -1,10 +1,11 @@
 package com.faforever.gw.model;
 
 import com.yahoo.elide.annotation.Include;
-
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -12,17 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 
 @Entity
 @Setter
@@ -32,6 +22,7 @@ import javax.validation.constraints.NotNull;
 public class Battle implements Serializable {
 
     private UUID id;
+    private long fafGameId;
     private Planet planet;
     private List<BattleParticipant> participants = new ArrayList<>();
     private BattleStatus status;
@@ -42,7 +33,6 @@ public class Battle implements Serializable {
     private Faction attackingFaction;
     private Faction defendingFaction;
     private Faction winningFaction;
-
     public Battle(UUID id, Planet planet, Faction attackingFaction, Faction defendingFaction) {
         this.id = id;
         this.planet = planet;
@@ -55,6 +45,11 @@ public class Battle implements Serializable {
     @Id
     public UUID getId() {
         return id;
+    }
+
+    @Column(name = "fafGameId")
+    public long getFafGameId() {
+        return fafGameId;
     }
 
     @ManyToOne

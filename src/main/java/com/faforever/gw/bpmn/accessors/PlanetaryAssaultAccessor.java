@@ -20,7 +20,7 @@ public class PlanetaryAssaultAccessor extends UserInteractionProcessAccessor {
     }
 
     public UUID getBattleId() {
-        return (UUID) get("battle");
+        return getUUID("battle");
     }
 
     public PlanetaryAssaultAccessor setBattleId(UUID battleId) {
@@ -29,11 +29,11 @@ public class PlanetaryAssaultAccessor extends UserInteractionProcessAccessor {
     }
 
     public UUID getPlanetId() {
-        return (UUID) get("planet");
+        return getUUID("planet");
     }
 
     public Faction getAttackingFaction() {
-        return (Faction) get("attackingFaction");
+        return getFaction("attackingFaction");
     }
 
     public PlanetaryAssaultAccessor setAttackingFaction(Faction faction) {
@@ -42,7 +42,7 @@ public class PlanetaryAssaultAccessor extends UserInteractionProcessAccessor {
     }
 
     public Faction getDefendingFaction() {
-        return (Faction) get("defendingFaction");
+        return getFaction("defendingFaction");
     }
 
     public PlanetaryAssaultAccessor setDefendingFaction(Faction faction) {
@@ -91,7 +91,7 @@ public class PlanetaryAssaultAccessor extends UserInteractionProcessAccessor {
     }
 
     public BattleRole getWinner() {
-        return BattleRole.fromNameString((String) get("winner"));
+        return BattleRole.fromNameString(getString("winner"));
     }
 
     public PlanetaryAssaultAccessor setWinner(BattleRole winner) {
@@ -100,10 +100,10 @@ public class PlanetaryAssaultAccessor extends UserInteractionProcessAccessor {
     }
 
     public String getErrorCode() {
-        return (String) get("errorCode");
+        return getString("errorCode");
     }
 
     public String getErrorMessage() {
-        return (String) get("errorMessage");
+        return getString("errorMessage");
     }
 }

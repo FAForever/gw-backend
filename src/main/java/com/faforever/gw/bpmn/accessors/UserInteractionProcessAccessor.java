@@ -36,7 +36,7 @@ public class UserInteractionProcessAccessor extends BaseAccessor {
      * @return UUID of the last user request
      */
     public UUID getRequestId() {
-        return (UUID) get("requestId");
+        return getUUID("requestId");
     }
 
     /***
@@ -52,7 +52,7 @@ public class UserInteractionProcessAccessor extends BaseAccessor {
      * @return UUID of the character who made the request
      */
     public UUID getRequestCharacter() {
-        return (UUID) get("requestCharacter");
+        return getUUID("requestCharacter");
     }
 
     /***

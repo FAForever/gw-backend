@@ -7,6 +7,7 @@ import com.faforever.gw.messaging.client.inbound.LeaveAssaultMessage;
 import com.faforever.gw.messaging.client.outbound.ErrorMessage;
 import com.faforever.gw.messaging.lobby.inbound.GameResultMessage;
 import com.faforever.gw.model.*;
+import com.faforever.gw.model.repository.BattleRepository;
 import com.faforever.gw.model.repository.CharacterRepository;
 import com.faforever.gw.model.repository.PlanetRepository;
 import com.faforever.gw.security.User;
@@ -43,14 +44,16 @@ public class PlanetaryAssaultService {
     private final ProcessEngine processEngine;
     private final RuntimeService runtimeService;
     private final ClientMessagingService clientMessagingService;
+    private final BattleRepository battleRepository;
     private final PlanetRepository planetRepository;
     private final CharacterRepository characterRepository;
     private final UserService userService;
 
-    public PlanetaryAssaultService(ProcessEngine processEngine, RuntimeService runtimeService, ClientMessagingService clientMessagingService, PlanetRepository planetRepository, CharacterRepository characterRepository, UserService userService) {
+    public PlanetaryAssaultService(ProcessEngine processEngine, RuntimeService runtimeService, ClientMessagingService clientMessagingService, BattleRepository battleRepository, PlanetRepository planetRepository, CharacterRepository characterRepository, UserService userService) {
         this.processEngine = processEngine;
         this.runtimeService = runtimeService;
         this.clientMessagingService = clientMessagingService;
+        this.battleRepository = battleRepository;
         this.planetRepository = planetRepository;
         this.characterRepository = characterRepository;
         this.userService = userService;
@@ -76,8 +79,7 @@ public class PlanetaryAssaultService {
                 .putValue("attackerCount", 1)
                 .putValue("defenderCount", 0)
                 .putValue("gameFull", false)
-                .putValue("waitingProgress", 0.0d)
-                .putValue("winner", "t.b.d.");
+                .putValue("waitingProgress", 0.0d);
 
         log.debug("-> added processVariables: {}", variables);
         runtimeService.startProcessInstanceByMessage(INITIATE_ASSAULT_MESSAGE, battleUUID.toString(), variables);
@@ -125,11 +127,13 @@ public class PlanetaryAssaultService {
     @EventListener
     @Transactional(dontRollbackOn = BpmnError.class)
     public void onGameResult(GameResultMessage gameResultMessage) {
-        log.debug("onGameResult for battle {}", gameResultMessage.getBattleId());
+        log.debug("onGameResult for game id: {}", gameResultMessage.getGameId());
+        Battle battle = battleRepository.findOneByFafGameId(gameResultMessage.getGameId())
+                .orElseThrow(() -> new IllegalStateException("Lobby server sent game result for unknown game id: " + gameResultMessage.getGameId()));
 
         // The lobby server does not know about GW characters and factions, so we need to convert manually
         GameResult gameResult = new GameResult();
-        gameResult.setBattle(gameResultMessage.getBattleId());
+        gameResult.setBattle(battle.getId());
 
         HashMap<Long, GwCharacter> fafUserIdToCharacter = new HashMap<>();
 
@@ -147,7 +151,7 @@ public class PlanetaryAssaultService {
         );
 
         if (gameResult.getWinner() == null) {
-            String errorMessage = MessageFormat.format("For battle {0} no winning faction could be determined (message={1})", gameResultMessage.getBattleId(), gameResultMessage);
+            String errorMessage = MessageFormat.format("For battle {0} no winning faction could be determined (message={1})", battle.getId(), gameResultMessage);
             log.error(errorMessage);
             throw new IllegalStateException(errorMessage);
         }
@@ -168,7 +172,7 @@ public class PlanetaryAssaultService {
         VariableMap variables = Variables.createVariables()
                 .putValue("gameResult", gameResult);
 
-        runtimeService.correlateMessage(GAME_RESULT_MESSAGE, gameResultMessage.getBattleId().toString(), variables);
+        runtimeService.correlateMessage(GAME_RESULT_MESSAGE, battle.getId().toString(), variables);
     }
 
     public Long calcFactionVictoryXpForCharacter(Battle battle, GwCharacter character) {
@@ -234,5 +238,12 @@ public class PlanetaryAssaultService {
         Double progressNormalizer = mapSlots * 20.0;
 
         return (attackerCount * attackerProgress + defenderCount * defenderProgress) / progressNormalizer;
+    }
+
+    public void onMatchCreated(Battle detachedBattle, long gameId) {
+        log.debug("Match created for battle ''{}'' with faf game id: {}", detachedBattle.getId(), gameId);
+        Battle battle = battleRepository.findOne(detachedBattle.getId());
+        battle.setFafGameId(gameId);
+        battleRepository.save(battle);
     }
 }
