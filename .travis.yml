@@ -1,6 +1,11 @@
 language: java
 
-sudo: true
+services:
+  - docker
+
+sudo: required
+git:
+  depth: 3
 
 jdk:
   - oraclejdk8
@@ -9,7 +14,17 @@ before_install:
  - chmod +x mvnw
 
 script:
-- ./mvnw test
+- ./mvnw package
+
+after_success:
+  - export IMAGE_TAG=faf-gw-backend
+  - export REPO=faforever/faf-gw-backend
+  - docker build -t ${IMAGE_TAG} .
+  - if [ -n "${TRAVIS_TAG}" ]; then
+      docker login -u="${DOCKER_USERNAME}" -p="${DOCKER_PASSWORD}";
+      docker tag ${IMAGE_TAG} ${REPO}:${TRAVIS_TAG};
+      docker push ${REPO};
+    fi
 
 addons:
   apt:
