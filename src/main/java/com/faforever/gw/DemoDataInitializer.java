@@ -71,7 +71,7 @@ public class DemoDataInitializer {
 
         GwCharacter character = new GwCharacter();
         character.setId(UUID.fromString("a1111111-e35c-11e6-bf01-fe55135034f3"));
-        character.setFafId(1);
+        character.setFafId(7);
         character.setName("UEF Alpha");
         character.setFaction(Faction.UEF);
         character.setXp(999L);
@@ -89,7 +89,7 @@ public class DemoDataInitializer {
 
         character = new GwCharacter();
         character.setId(UUID.fromString("a3333333-e4e2-11e6-bf01-fe55135034f3"));
-        character.setFafId(3);
+        character.setFafId(8);
         character.setName("Cybran Charlie");
         character.setFaction(Faction.CYBRAN);
         character.setXp(0L);
@@ -174,7 +174,7 @@ public class DemoDataInitializer {
         // {"expires":4102358400, "authorities": [], "user_id": 5, "user_name": "Aeon Echo"}
 
         System.out.println("-1- UEF Alpha");
-        Jwt token = JwtHelper.encode("{\"expires\":4102358400, \"authorities\": [], \"user_id\": 1, \"user_name\": \"UEF Alpha\"}", macSigner);
+        Jwt token = JwtHelper.encode("{\"expires\":4102358400, \"authorities\": [], \"user_id\": 7, \"user_name\": \"UEF Alpha\"}", macSigner);
         System.out.println(token.getEncoded());
 
         System.out.println("-2- UEF Bravo");
@@ -182,7 +182,7 @@ public class DemoDataInitializer {
         System.out.println(token.getEncoded());
 
         System.out.println("-3- Cybran Charlie");
-        token = JwtHelper.encode("{\"expires\":4102358400, \"authorities\": [], \"user_id\": 3, \"user_name\": \"Cybran Charlie\"}", macSigner);
+        token = JwtHelper.encode("{\"expires\":4102358400, \"authorities\": [], \"user_id\": 8, \"user_name\": \"Cybran Charlie\"}", macSigner);
         System.out.println(token.getEncoded());
 
         System.out.println("-4- Cybran Delta");

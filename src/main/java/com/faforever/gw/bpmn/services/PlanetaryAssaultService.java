@@ -5,7 +5,10 @@ import com.faforever.gw.messaging.client.inbound.InitiateAssaultMessage;
 import com.faforever.gw.messaging.client.inbound.JoinAssaultMessage;
 import com.faforever.gw.messaging.client.inbound.LeaveAssaultMessage;
 import com.faforever.gw.messaging.client.outbound.ErrorMessage;
+import com.faforever.gw.messaging.lobby.inbound.GameInfoMessage;
 import com.faforever.gw.messaging.lobby.inbound.GameResultMessage;
+import com.faforever.gw.messaging.lobby.inbound.PlayerSubMessage;
+import com.faforever.gw.messaging.lobby.inbound.PlayersMessage;
 import com.faforever.gw.model.*;
 import com.faforever.gw.model.repository.BattleRepository;
 import com.faforever.gw.model.repository.CharacterRepository;
@@ -240,10 +243,35 @@ public class PlanetaryAssaultService {
         return (attackerCount * attackerProgress + defenderCount * defenderProgress) / progressNormalizer;
     }
 
+    @Transactional(dontRollbackOn = BpmnError.class)
     public void onMatchCreated(Battle detachedBattle, long gameId) {
         log.debug("Match created for battle ''{}'' with faf game id: {}", detachedBattle.getId(), gameId);
         Battle battle = battleRepository.findOne(detachedBattle.getId());
         battle.setFafGameId(gameId);
         battleRepository.save(battle);
+    }
+
+    @EventListener
+    public void onGameInfo(GameInfoMessage gameInfoMessage) {
+        log.trace("Checking relevance of GameInfo for game id: {}", gameInfoMessage.getId());
+
+        Optional<Battle> battleOptional = battleRepository.findOneByFafGameId(gameInfoMessage.getId());
+
+        if (!battleOptional.isPresent()) {
+            log.debug("GameInfo for game id '{}' ignored, no corresponding battle", gameInfoMessage.getId());
+            return;
+        }
+
+        Battle battle = battleOptional.get();
+        log.debug("GameInfo for game id '{}' belongs to battle id '{}'", battle.getId());
+
+        // TODO: Update information about state of the game (playing)
+    }
+
+    @EventListener
+    public void onPlayersInfo(PlayersMessage playersMessage) {
+        for (PlayerSubMessage playerSubMessage : playersMessage.getPlayers()) {
+
+        }
     }
 }

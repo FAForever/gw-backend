@@ -55,7 +55,7 @@ public class SetupLobbyMatchTask implements JavaDelegate {
 
         CreateMatchRequest createMatchRequest = new CreateMatchRequest()
                 .setTitle("Galactic War battle " + accessor.getBattleId())
-                .setFeaturedMod("faf-gw")
+                .setFeaturedMod("faf") // TODO: set to faf-gw
                 .setMap(battle.getPlanet().getMap().getFafMapVersion())
                 .setParticipants(participants);
 

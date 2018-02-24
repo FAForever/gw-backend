@@ -1,8 +1,6 @@
 package com.faforever.gw.messaging.lobby;
 
-import com.faforever.gw.messaging.lobby.inbound.ErrorMessage;
-import com.faforever.gw.messaging.lobby.inbound.GameResultMessage;
-import com.faforever.gw.messaging.lobby.inbound.MatchCreatedMessage;
+import com.faforever.gw.messaging.lobby.inbound.*;
 import com.faforever.gw.messaging.lobby.outbound.CreateMatchRequest;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
@@ -22,6 +20,8 @@ public class LobbyMessageWrapper {
             @Type(value = ErrorMessage.class, name = "error"),
             @Type(value = MatchCreatedMessage.class, name = "matchCreated"),
             @Type(value = GameResultMessage.class, name = "gameResult"),
+            @Type(value = GameInfoMessage.class, name = "game"),
+            @Type(value = PlayersMessage.class, name = "players"),
 
             // Outbound messages
             @Type(value = CreateMatchRequest.class, name = "createMatch")

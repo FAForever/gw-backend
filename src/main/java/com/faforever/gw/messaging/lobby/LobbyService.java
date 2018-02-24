@@ -14,18 +14,19 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.security.jwt.Jwt;
+import org.springframework.security.jwt.JwtHelper;
+import org.springframework.security.jwt.crypto.sign.MacSigner;
 import org.springframework.stereotype.Service;
 import org.springframework.util.concurrent.ListenableFutureCallback;
-import org.springframework.web.socket.CloseStatus;
-import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketMessage;
-import org.springframework.web.socket.WebSocketSession;
+import org.springframework.web.socket.*;
 import org.springframework.web.socket.client.WebSocketClient;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.net.URI;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
@@ -129,13 +130,18 @@ public class LobbyService {
     }
 
     private CompletableFuture<WebSocketSession> connect(String uri) {
-        return connect(uri, 1);
+        return connect(uri, 20);
     }
 
+    @SneakyThrows
     private CompletableFuture<WebSocketSession> connect(String uri, int reconnectAttemptsLeft) {
         CompletableFuture<WebSocketSession> completableFuture = new CompletableFuture<>();
 
-        webSocketClient.doHandshake(webSocketHandler, uri)
+        WebSocketHttpHeaders headers = new WebSocketHttpHeaders();
+        MacSigner macSigner = new MacSigner("banana");
+        Jwt token = JwtHelper.encode("{\"expires\":4102358400, \"authorities\": [\"ROLE_USER\"], \"client_id\": \"GalacticWar\"}", macSigner);
+        headers.set("Authorization", "Bearer " + token.getEncoded());
+        webSocketClient.doHandshake(webSocketHandler, headers, new URI(uri))
                 .addCallback(new ListenableFutureCallback<WebSocketSession>() {
                     @Override
                     public void onFailure(Throwable throwable) {
