@@ -17,9 +17,12 @@ script:
 - ./mvnw package
 
 after_success:
+  - echo "Building travis tag ${TRAVIS_TAG}"
   - export IMAGE_TAG=faf-gw-backend
   - export REPO=faforever/faf-gw-backend
-  - docker build -t ${IMAGE_TAG} .
+  - export JAR_FILE="target/faf-gw-backend-${TRAVIS_TAG:1}.jar"
+  - echo "Building with JAR_FILE ${JAR_FILE}"
+  - docker build -t ${IMAGE_TAG} --build-arg JAR_FILE=${JAR_FILE} .
   - if [ -n "${TRAVIS_TAG}" ]; then
       docker login -u="${DOCKER_USERNAME}" -p="${DOCKER_PASSWORD}";
       docker tag ${IMAGE_TAG} ${REPO}:${TRAVIS_TAG};

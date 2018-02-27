@@ -4,8 +4,6 @@ faf-gw:
   lobby:
     connection-string: ${faf-gw.lobby.protocol}://${faf-gw.lobby.host}:${faf-gw.lobby.port}/ws
     protocol: ws
-#    host: home.micheljung.ch
-#    port: 8012
     host: localhost
     port: 9001
 spring:

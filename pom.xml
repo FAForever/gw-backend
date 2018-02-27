@@ -3,13 +3,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.faforever.faforever</groupId>
-    <artifactId>gw-server</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <groupId>com.faforever.gw</groupId>
+    <artifactId>faf-gw-backend</artifactId>
+    <version>0.0.3</version>
     <packaging>jar</packaging>
 
-    <name>gw-server</name>
-    <description>FAF Galactic War server</description>
+    <name>faf-gw-backend</name>
+    <description>FAF Galactic War backend server</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
