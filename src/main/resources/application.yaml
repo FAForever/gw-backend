@@ -28,6 +28,6 @@ logging:
   level:
     com.faforever.gw: debug
 server:
-  port: 8012
+  port: 8014
 
 #camunda.bpm.auto-deployment-enabled: false
