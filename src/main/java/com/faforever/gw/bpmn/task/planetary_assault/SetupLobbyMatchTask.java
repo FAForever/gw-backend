@@ -55,7 +55,7 @@ public class SetupLobbyMatchTask implements JavaDelegate {
 
         CreateMatchRequest createMatchRequest = new CreateMatchRequest()
                 .setTitle("Galactic War battle " + accessor.getBattleId())
-                .setFeaturedMod("faf") // TODO: set to faf-gw
+                .setFeaturedMod("fafdevelop") // TODO: set to faf-gw
                 .setMap(battle.getPlanet().getMap().getFafMapVersion())
                 .setParticipants(participants);
 
@@ -65,12 +65,13 @@ public class SetupLobbyMatchTask implements JavaDelegate {
     }
 
     private Void onMatchCreationFailed(Throwable e) {
-        if (!(e instanceof ServerErrorException)) {
-            log.error("Unknown error received (expected ServerErrorException", e);
+        Throwable cause = e.getCause();
+        if (!(cause instanceof ServerErrorException)) {
+            log.error("Unknown error received (expected ServerErrorException", cause);
             return null;
         }
 
-        ServerErrorException error = (ServerErrorException) e;
+        ServerErrorException error = (ServerErrorException) cause;
         //TODO: implement error handling
 
         return null;

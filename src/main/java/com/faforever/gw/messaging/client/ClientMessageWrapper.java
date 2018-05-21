@@ -17,6 +17,7 @@ public class ClientMessageWrapper {
     @JsonTypeInfo(use = Id.NAME, include = As.EXTERNAL_PROPERTY, property = "action")
     @JsonSubTypes({
             // Inbound messages
+            @Type(value = DebugMessage.class, name = "debug"),
             @Type(value = InitiateAssaultMessage.class, name = "initiateAssault"),
             @Type(value = JoinAssaultMessage.class, name = "joinAssault"),
             @Type(value = LeaveAssaultMessage.class, name = "leaveAssault"),

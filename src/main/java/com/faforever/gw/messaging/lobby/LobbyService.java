@@ -139,7 +139,7 @@ public class LobbyService {
 
         WebSocketHttpHeaders headers = new WebSocketHttpHeaders();
         MacSigner macSigner = new MacSigner("banana");
-        Jwt token = JwtHelper.encode("{\"expires\":4102358400, \"authorities\": [\"ROLE_USER\"], \"client_id\": \"GalacticWar\"}", macSigner);
+        Jwt token = JwtHelper.encode("{\"expires\":4102358400, \"authorities\": [\"ROLE_USER\"], \"client_id\": \"faf-gw-backend\"}", macSigner);
         headers.set("Authorization", "Bearer " + token.getEncoded());
         webSocketClient.doHandshake(webSocketHandler, headers, new URI(uri))
                 .addCallback(new ListenableFutureCallback<WebSocketSession>() {

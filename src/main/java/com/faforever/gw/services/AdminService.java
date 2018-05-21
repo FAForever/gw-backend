@@ -2,10 +2,14 @@ package com.faforever.gw.services;
 
 import com.faforever.gw.bpmn.services.GwErrorType;
 import com.faforever.gw.messaging.client.ClientMessagingService;
+import com.faforever.gw.messaging.client.inbound.DebugMessage;
 import com.faforever.gw.messaging.client.inbound.LinkSolarSystemsRequestMessage;
 import com.faforever.gw.messaging.client.inbound.SetPlanetFactionRequestMessage;
 import com.faforever.gw.messaging.client.inbound.UnlinkSolarSystemsRequestMessage;
 import com.faforever.gw.messaging.client.outbound.*;
+import com.faforever.gw.messaging.lobby.LobbyService;
+import com.faforever.gw.messaging.lobby.outbound.CreateMatchRequest;
+import com.faforever.gw.model.Faction;
 import com.faforever.gw.model.Planet;
 import com.faforever.gw.model.SolarSystem;
 import com.faforever.gw.model.repository.PlanetRepository;
@@ -17,6 +21,8 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -26,13 +32,15 @@ public class AdminService {
     private final SolarSystemRepository solarSystemRepository;
     private final PlanetRepository planetRepository;
     private final UserService userService;
+    private final LobbyService lobbyService;
 
     @Inject
-    public AdminService(ClientMessagingService clientMessagingService, SolarSystemRepository solarSystemRepository, PlanetRepository planetRepository, UserService userService) {
+    public AdminService(ClientMessagingService clientMessagingService, SolarSystemRepository solarSystemRepository, PlanetRepository planetRepository, UserService userService, LobbyService lobbyService) {
         this.clientMessagingService = clientMessagingService;
         this.solarSystemRepository = solarSystemRepository;
         this.planetRepository = planetRepository;
         this.userService = userService;
+        this.lobbyService = lobbyService;
     }
 
     @EventListener
@@ -91,6 +99,43 @@ public class AdminService {
         planet.setCurrentOwner(message.getNewOwner());
         sendAckToUser(user, message.getRequestId());
         clientMessagingService.sendToPublic(new PlanetOwnerChangedMessage(planet.getId(), message.getNewOwner()));
+    }
+
+    @EventListener
+    public void onDebugMessage(DebugMessage message) {
+        switch (message.getAction()) {
+            case "dummyHostGame":
+                List<CreateMatchRequest.Participant> participants = new ArrayList<>();
+
+                participants.add(
+                        new CreateMatchRequest.Participant()
+                                .setId(1)
+                                .setName("UEF Alpha")
+                                .setFaction(Faction.UEF)
+                                .setTeam(1)
+                );
+
+                participants.add(
+                        new CreateMatchRequest.Participant()
+                                .setId(3)
+                                .setName("Cybran Charlie")
+                                .setFaction(Faction.CYBRAN)
+                                .setTeam(2)
+                );
+
+                CreateMatchRequest createMatchRequest = new CreateMatchRequest()
+                        .setTitle("Galactic War battle demo")
+                        .setFeaturedMod("fafdevelop") // TODO: set to faf-gw
+                        .setMap(1)
+                        .setParticipants(participants);
+
+                lobbyService.createGame(createMatchRequest)
+                        .thenAccept(matchCreatedMessage -> log.debug("Debug match created"))
+                        .exceptionally(throwable -> {
+                            log.error("Debug match creation failed");
+                            return null;
+                        });
+        }
     }
 
     private void sendErrorToUser(User user, UUID requestId, GwErrorType errorType) {
