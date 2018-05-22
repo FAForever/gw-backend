@@ -113,6 +113,7 @@ public class AdminService {
                                 .setName("UEF Alpha")
                                 .setFaction(Faction.UEF)
                                 .setTeam(1)
+                                .setStartSpot(1)
                 );
 
                 participants.add(
@@ -121,6 +122,7 @@ public class AdminService {
                                 .setName("Cybran Charlie")
                                 .setFaction(Faction.CYBRAN)
                                 .setTeam(2)
+                                .setStartSpot(2)
                 );
 
                 CreateMatchRequest createMatchRequest = new CreateMatchRequest()
