@@ -2,6 +2,7 @@ package com.faforever.gw.messaging.lobby;
 
 import com.faforever.gw.messaging.lobby.inbound.*;
 import com.faforever.gw.messaging.lobby.outbound.CreateMatchRequest;
+import com.faforever.gw.messaging.lobby.outbound.PingMessage;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -24,6 +25,7 @@ public class LobbyMessageWrapper {
             @Type(value = PlayersMessage.class, name = "players"),
 
             // Outbound messages
+            @Type(value = PingMessage.class, name = "ping"),
             @Type(value = CreateMatchRequest.class, name = "createMatch")
     })
     LobbyMessage data;

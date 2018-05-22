@@ -13,6 +13,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.security.jwt.Jwt;
 import org.springframework.security.jwt.JwtHelper;
@@ -48,6 +49,15 @@ public class LobbyService {
     private ThreadPoolTaskExecutor taskExecutor;
     private WebSocketSession currentSession;
     private final Map<UUID, CompletableFuture<ResponseMessage>> pendingRequests;
+
+    @Scheduled(fixedDelay = 30000)
+    @SneakyThrows
+    public void sendPing() {
+        if (currentSession != null && currentSession.isOpen()) {
+            log.debug("Send ping to lobby server");
+            currentSession.sendMessage(new PingMessage());
+        }
+    }
 
     public LobbyService(GwServerProperties properties, ApplicationEventPublisher applicationEventPublisher, ObjectMapper jsonObjectMapper) {
         this.properties = properties;
