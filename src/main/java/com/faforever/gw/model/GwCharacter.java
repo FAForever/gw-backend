@@ -101,4 +101,9 @@ public class GwCharacter implements Serializable {
 
         return currentParticipant.map(BattleParticipant::getBattle);
     }
+
+    //TODO: get transactions
+    //TODO: get availableCredits
+//    @Transient
+//    @Transactional
 }

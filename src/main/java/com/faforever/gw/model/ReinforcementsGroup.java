@@ -23,13 +23,15 @@ public class ReinforcementsGroup {
 	private List<PassiveItem> items = new ArrayList<>();
 	private boolean called;
 	private long delay;
+	private float price;
 
-	public ReinforcementsGroup(ReinforcementsGroupType type, List<Unit> units, List<PassiveItem> items, boolean called, long delay) {
+	public ReinforcementsGroup(ReinforcementsGroupType type, List<Unit> units, List<PassiveItem> items, boolean called, long delay, float price) {
 		this.type = type;
 		this.units = units;
 		this.items = items;
 		this.called = called;
 		this.delay = delay;
+		this.price = price;
 	}
 
 	@Id
@@ -68,5 +70,10 @@ public class ReinforcementsGroup {
 	@Column(name = "delay")
 	public long getDelay() {
 		return delay;
+	}
+
+	@Column(name = "price")
+	public float getPrice() {
+		return price;
 	}
 }

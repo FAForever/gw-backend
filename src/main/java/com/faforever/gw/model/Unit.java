@@ -15,10 +15,16 @@ import java.util.UUID;
 @Table(name = "gw_unit")
 public class Unit {
 	private UUID id;
+	private String faUid;
 	private String name;
+	private Faction faction;
+	private TechLevel techLevel;
 
-	public Unit(String name) {
+	public Unit(String faUid, String name, Faction faction, TechLevel techLevel) {
+		this.faUid = faUid;
 		this.name = name;
+		this.faction = faction;
+		this.techLevel = techLevel;
 	}
 
 	@Id
@@ -31,5 +37,20 @@ public class Unit {
 	@Column(name = "name")
 	public String getName() {
 		return name;
+	}
+
+	@Column(name = "fa_uid")
+	public String getFaUid() {
+		return faUid;
+	}
+
+	@Column(name = "faction")
+	public Faction getFaction() {
+		return faction;
+	}
+
+	@Column(name = "tech_level")
+	public TechLevel getTechLevel() {
+		return techLevel;
 	}
 }

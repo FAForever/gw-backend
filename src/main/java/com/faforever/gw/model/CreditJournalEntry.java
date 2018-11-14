@@ -22,10 +22,10 @@ public class CreditJournalEntry {
 	@Nullable private Battle battle;//todo
 	@Nullable private ReinforcementsTransaction reinforcementsTransaction;
 	private CreditJournalEntryReason reason;
-	private float amount;
+	private double amount;
 	private Timestamp createdAt;
 
-	public CreditJournalEntry(GwCharacter character, @Nullable Battle battle, CreditJournalEntryReason reason, float amount) {
+	public CreditJournalEntry(GwCharacter character, @Nullable Battle battle, CreditJournalEntryReason reason, double amount) {
 		this.character = character;
 		this.battle = battle;
 		this.reason = reason;
@@ -67,7 +67,7 @@ public class CreditJournalEntry {
 	}
 
 	@Column(name = "amount")
-	public float getAmount() {
+	public double getAmount() {
 		return amount;
 	}
 
