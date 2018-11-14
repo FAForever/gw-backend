@@ -26,6 +26,7 @@ public class GwCharacter implements Serializable {
     private GwCharacter killer;
     private Set<GwCharacter> killedBy;
     private Rank rank;
+    private List<CreditJournalEntry> creditJournalList = new ArrayList<>();
 
     @Id
 //    @GeneratedValue(generator = "uuid2")
@@ -74,6 +75,11 @@ public class GwCharacter implements Serializable {
     @JoinColumn(name = "fk_rank")
     public Rank getRank() {
         return rank;
+    }
+
+    @OneToMany(mappedBy = "character")
+    public List<CreditJournalEntry> getCreditJournalList() {
+        return creditJournalList;
     }
 
     @Transient
