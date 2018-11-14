@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -15,23 +16,16 @@ import java.util.UUID;
 @Entity
 @Include(rootLevel = true)
 @Table(name = "gw_reinforcements_group")
-public class ReinforcementsGroup {
+public class ReinforcementsGroup implements Serializable {
 
 	private UUID id;
-	private ReinforcementsGroupType type;
-	private List<Unit> units = new ArrayList<>();
-	private List<PassiveItem> items = new ArrayList<>();
-	private boolean called;
-	private long delay;
-	private float price;
+	private Character character;
+	private ReinforcementsType type;
+	private List<Reinforcement> reinforcements = new ArrayList<>();
 
-	public ReinforcementsGroup(ReinforcementsGroupType type, List<Unit> units, List<PassiveItem> items, boolean called, long delay, float price) {
+	public ReinforcementsGroup(ReinforcementsType type, List<Reinforcement> reinforcements) {
 		this.type = type;
-		this.units = units;
-		this.items = items;
-		this.called = called;
-		this.delay = delay;
-		this.price = price;
+		this.reinforcements = reinforcements;
 	}
 
 	@Id
@@ -41,39 +35,23 @@ public class ReinforcementsGroup {
 		return id;
 	}
 
+	@ManyToOne
+	@JoinColumn(name = "fk_character")
+	public Character getCharacter() {
+		return character;
+	}
+
 	@Column(name = "type")
-	public ReinforcementsGroupType getType() {
+	public ReinforcementsType getType() {
 		return type;
 	}
 
+	//TODO: does this work?
 	@ManyToMany
-	@JoinTable(name = "gw_reinforcements_group_unit",
+	@JoinTable(name = "gw_reinforcements_group_reinforcements",//TODO
 			joinColumns = @JoinColumn(name = "fk_reinforcement_group"),
-			inverseJoinColumns = @JoinColumn(name = "fk_unit"))
-	public List<Unit> getUnits() {
-		return units;
-	}
-
-	@ManyToMany
-	@JoinTable(name = "gw_reinforcements_group_item",
-			joinColumns = @JoinColumn(name = "fk_reinforcement_group"),
-			inverseJoinColumns = @JoinColumn(name = "fk_item"))
-	public List<PassiveItem> getItems() {
-		return items;
-	}
-
-	@Column(name = "called")
-	public boolean isCalled() {
-		return called;
-	}
-
-	@Column(name = "delay")
-	public long getDelay() {
-		return delay;
-	}
-
-	@Column(name = "price")
-	public float getPrice() {
-		return price;
+			inverseJoinColumns = @JoinColumn(name = "fk_reinforcement"))
+	public List<Reinforcement> getReinforcements() {
+		return reinforcements;
 	}
 }

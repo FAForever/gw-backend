@@ -7,6 +7,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.annotation.Nullable;
 import javax.persistence.*;
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.UUID;
@@ -16,11 +17,12 @@ import java.util.UUID;
 @Setter
 @Include
 @NoArgsConstructor
-public class CreditJournalEntry {
+public class CreditJournalEntry implements Serializable {
 	private UUID id;
 	private GwCharacter character;
 	@Nullable private Battle battle;//todo
 	@Nullable private ReinforcementsTransaction reinforcementsTransaction;
+	@Nullable private DefenseStructure defenseStructure;
 	private CreditJournalEntryReason reason;
 	private double amount;
 	private Timestamp createdAt;
@@ -59,6 +61,13 @@ public class CreditJournalEntry {
 	@JoinColumn(name = "fk_reinforcements_transaction")
 	public ReinforcementsTransaction getReinforcementsTransaction() {
 		return reinforcementsTransaction;
+	}
+
+	@Nullable
+	@OneToOne(fetch = FetchType.EAGER, mappedBy = "creditJournalEntry")
+	@JoinColumn(name = "fk_defense_structure")
+	public DefenseStructure getDefenseStructure() {
+		return defenseStructure;
 	}
 
 	@Column(name = "reason", length = 1)

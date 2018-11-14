@@ -5,16 +5,13 @@ import com.faforever.gw.messaging.client.outbound.HelloMessage;
 import com.faforever.gw.model.CreditJournalEntry;
 import com.faforever.gw.model.CreditJournalEntryReason;
 import com.faforever.gw.model.GwCharacter;
-import com.faforever.gw.model.ReinforcementsGroup;
 import com.faforever.gw.model.repository.CharacterRepository;
-import com.faforever.gw.model.repository.ReinforcementRepository;
+import com.faforever.gw.model.repository.ReinforcementsRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -23,13 +20,13 @@ import java.util.UUID;
 public class CharacterService {
     private final CharacterRepository characterRepository;
     private final ClientMessagingService clientMessagingService;
-    private final ReinforcementRepository reinforcementRepository;
+    private final ReinforcementsRepository reinforcementsRepository;
 
     @Inject
-    public CharacterService(CharacterRepository characterRepository, ClientMessagingService clientMessagingService, ReinforcementRepository reinforcementRepository) {
+    public CharacterService(CharacterRepository characterRepository, ClientMessagingService clientMessagingService, ReinforcementsRepository reinforcementsRepository) {
         this.characterRepository = characterRepository;
         this.clientMessagingService = clientMessagingService;
-        this.reinforcementRepository = reinforcementRepository;
+        this.reinforcementsRepository = reinforcementsRepository;
     }
 
     @Transactional
@@ -51,18 +48,6 @@ public class CharacterService {
     public double getAvailableCredits(GwCharacter character) {
         return character.getCreditJournalList().stream()
                 .mapToDouble(CreditJournalEntry::getAmount).sum();
-    }
-
-    @Transactional
-    public Map<ReinforcementsGroup, Integer> getAvailableReinforcements(GwCharacter character) {
-        Map<ReinforcementsGroup, Integer> res = new HashMap<>();
-        reinforcementRepository.findAll().forEach(r -> res.put(r, 0));
-        character.getCreditJournalList().stream()
-                .filter(entry -> entry.getReason() == CreditJournalEntryReason.REINFORCEMENTS)
-                .map(CreditJournalEntry::getReinforcementsTransaction)
-                .forEach(transaction -> res.put(transaction.getGroup(), res.get(transaction.getGroup()) + transaction.getQuantity()));
-
-        return res;
     }
 
     @Transactional

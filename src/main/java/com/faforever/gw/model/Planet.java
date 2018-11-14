@@ -6,6 +6,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,6 +26,7 @@ public class Planet implements Serializable {
     private Map map;
     private Faction currentOwner;
     private SolarSystem solarSystem;
+    private List<DefenseStructure> defenseStructureList = new ArrayList<>();
 
     @Id
     @GeneratedValue(generator = "uuid2")
@@ -78,5 +80,10 @@ public class Planet implements Serializable {
     @Column(name = "current_owner")
     public Faction getCurrentOwner() {
         return currentOwner;
+    }
+
+    @OneToMany(mappedBy = "planet")
+    public List<DefenseStructure> getDefenseStructureList() {
+        return defenseStructureList;
     }
 }

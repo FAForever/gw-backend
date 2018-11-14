@@ -15,7 +15,8 @@ public enum CreditJournalEntryReason {
 	REGULAR_INCOME("I", "regularIncome"),
 	VICTORY("V", "victory"),
 	ACU_KILL("K", "acuKill"),
-	REINFORCEMENTS("R", "reinforcements");
+	REINFORCEMENTS("R", "reinforcements"),
+	DEFENSE_STRUCTURE("D", "defenseStructure");
 
 
 

@@ -27,6 +27,7 @@ public class GwCharacter implements Serializable {
     private Set<GwCharacter> killedBy;
     private Rank rank;
     private List<CreditJournalEntry> creditJournalList = new ArrayList<>();
+    private List<ReinforcementsGroup> reinforcementsGroupList = new ArrayList<>();
 
     @Id
 //    @GeneratedValue(generator = "uuid2")
@@ -80,6 +81,11 @@ public class GwCharacter implements Serializable {
     @OneToMany(mappedBy = "character")
     public List<CreditJournalEntry> getCreditJournalList() {
         return creditJournalList;
+    }
+
+    @OneToMany(mappedBy = "character")
+    public List<ReinforcementsGroup> getReinforcementsGroupList() {
+        return reinforcementsGroupList;
     }
 
     @Transient

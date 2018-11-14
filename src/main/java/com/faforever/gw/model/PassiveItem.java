@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.UUID;
 
 @NoArgsConstructor
@@ -13,7 +14,7 @@ import java.util.UUID;
 @Entity
 @Include(rootLevel = true)
 @Table(name = "gw_item")
-public class PassiveItem {
+public class PassiveItem implements Serializable {
 	private UUID id;
 	private String name;
 

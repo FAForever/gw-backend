@@ -7,6 +7,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.annotation.Nullable;
 import javax.persistence.*;
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.UUID;
@@ -16,20 +17,20 @@ import java.util.UUID;
 @Entity
 @Include(rootLevel = true)
 @Table(name = "gw_reinforcements_transaction")
-public class ReinforcementsTransaction {
+public class ReinforcementsTransaction implements Serializable {
 	private UUID id;
 	private Character character;
 	@Nullable private Battle battle;
-	private CreditJournalEntry creditJournalEntry;
+	@Nullable private CreditJournalEntry creditJournalEntry; // May be null if the reinforcements have been used in a battle
 	private Timestamp createdAt;
-	private ReinforcementsGroup group;
-	private int quantity;
+	private Reinforcement reinforcement;
+	private int quantity; // Negative quantity indicates spending in battle
 
-	public ReinforcementsTransaction(Character character, Battle battle, CreditJournalEntry creditJournalEntry, ReinforcementsGroup group, int quantity) {
+	public ReinforcementsTransaction(Character character, Battle battle, CreditJournalEntry creditJournalEntry, Reinforcement reinforcement, int quantity) {
 		this.character = character;
 		this.battle = battle;
 		this.creditJournalEntry = creditJournalEntry;
-		this.group = group;
+		this.reinforcement = reinforcement;
 		this.quantity = quantity;
 
 		this.createdAt = Timestamp.from(Instant.now());
@@ -66,12 +67,10 @@ public class ReinforcementsTransaction {
 		return createdAt;
 	}
 
-	@ManyToMany
-	@JoinTable(name = "gw_reinforcement_transaction_group",
-			joinColumns = @JoinColumn(name = "fk_reinforcement_transaction"),
-			inverseJoinColumns = @JoinColumn(name = "fk_reinforcement_group"))
-	public ReinforcementsGroup getGroup() {
-		return group;
+	@ManyToOne
+	@JoinColumn(name = "fk_reinforcement")
+	public Reinforcement getReinforcement() {
+		return reinforcement;
 	}
 
 	@Column(name = "quantity")
