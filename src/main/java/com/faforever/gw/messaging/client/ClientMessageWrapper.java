@@ -26,6 +26,7 @@ public class ClientMessageWrapper {
             @Type(value = SelectCharacterNameMessage.class, name = "selectCharacterName"),
             @Type(value = SetPlanetFactionRequestMessage.class, name = "setPlanetFactionRequest"),
             @Type(value = UnlinkSolarSystemsRequestMessage.class, name = "unlinkSolarSystemsRequest"),
+            @Type(value = BuyReinforcementsMessage.class, name = "buyReinforcementsRequest"),
 
             // Outbound messages
             @Type(value = AckMessage.class, name = "ack"),

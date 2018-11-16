@@ -25,7 +25,10 @@ public enum GwErrorType {
     NO_CREATION_WITH_FACTION_MISMATCH("3002", "You can't change your faction during the season"),
     NO_CREATION_WITH_INVALID_SELECTION("3003", "Your chosen character name was not offered"),
     ALREADY_LINKED("4001", "The given solar systems are already linked"),
-    NOT_LINKED("4002", "The given solar systems aren't linked");
+    NOT_LINKED("4002", "The given solar systems aren't linked"),
+    //Reinforcements related error
+    REINFORCEMENT_INVALID("5001", "The given reinforcement does not exist."),
+    NOT_ENOUGH_CREDITS("5002", "Not enough credits owned to complete transaction.");
 
     private final String errorCode;
     private final String errorMessage;

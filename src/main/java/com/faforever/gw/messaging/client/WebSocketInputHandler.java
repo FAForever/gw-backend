@@ -2,8 +2,10 @@ package com.faforever.gw.messaging.client;
 
 import com.faforever.gw.messaging.client.outbound.ErrorMessage;
 import com.faforever.gw.messaging.client.outbound.HelloMessage;
+import com.faforever.gw.messaging.client.outbound.UserIncomeMessage;
 import com.faforever.gw.model.Battle;
 import com.faforever.gw.model.GwCharacter;
+import com.faforever.gw.model.service.CharacterService;
 import com.faforever.gw.security.GwUserRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -32,15 +34,17 @@ public class WebSocketInputHandler extends TextWebSocketHandler {
     private final ClientMessagingService clientMessagingService;
     private final ObjectMapper jsonObjectMapper;
     private final ApplicationEventPublisher eventPublisher;
+    private final CharacterService characterService;
 
     @Inject
-    public WebSocketInputHandler(EntityManager entityManager, WebSocketRegistry webSocketRegistry, GwUserRegistry gwUserRegistry, ClientMessagingService clientMessagingService, ObjectMapper jsonObjectMapper, ApplicationEventPublisher eventPublisher) {
+    public WebSocketInputHandler(EntityManager entityManager, WebSocketRegistry webSocketRegistry, GwUserRegistry gwUserRegistry, ClientMessagingService clientMessagingService, ObjectMapper jsonObjectMapper, ApplicationEventPublisher eventPublisher, CharacterService characterService) {
         this.entityManager = entityManager;
         this.webSocketRegistry = webSocketRegistry;
         this.gwUserRegistry = gwUserRegistry;
         this.clientMessagingService = clientMessagingService;
         this.jsonObjectMapper = jsonObjectMapper;
         this.eventPublisher = eventPublisher;
+        this.characterService = characterService;
     }
 
     @Override
@@ -90,6 +94,7 @@ public class WebSocketInputHandler extends TextWebSocketHandler {
         gwUserRegistry.addConnection(user);
         log.debug("Sending HelloMessage (characterId: {}, currentBattleId: {})", characterId, currentBattleId);
         clientMessagingService.sendToUser(new HelloMessage(characterId, currentBattleId), user);
+        clientMessagingService.sendToUser(new UserIncomeMessage(characterId, (long)characterService.getAvailableCredits(character), 0L), user);
     }
 
     @Override

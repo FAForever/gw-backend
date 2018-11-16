@@ -19,14 +19,14 @@ import java.util.UUID;
 @Table(name = "gw_reinforcements_transaction")
 public class ReinforcementsTransaction implements Serializable {
 	private UUID id;
-	private Character character;
+	private GwCharacter character;
 	@Nullable private Battle battle;
 	@Nullable private CreditJournalEntry creditJournalEntry; // May be null if the reinforcements have been used in a battle
 	private Timestamp createdAt;
 	private Reinforcement reinforcement;
 	private int quantity; // Negative quantity indicates spending in battle
 
-	public ReinforcementsTransaction(Character character, Battle battle, CreditJournalEntry creditJournalEntry, Reinforcement reinforcement, int quantity) {
+	public ReinforcementsTransaction(GwCharacter character, Battle battle, CreditJournalEntry creditJournalEntry, Reinforcement reinforcement, int quantity) {
 		this.character = character;
 		this.battle = battle;
 		this.creditJournalEntry = creditJournalEntry;
@@ -45,7 +45,7 @@ public class ReinforcementsTransaction implements Serializable {
 
 	@ManyToOne
 	@JoinColumn(name = "fk_character")
-	public Character getCharacter() {
+	public GwCharacter getCharacter() {
 		return character;
 	}
 

@@ -37,6 +37,5 @@ public class RegularIncomeNotification implements JavaDelegate {
 
         log.debug("Sending UserIncomeMessage (characterId: {}, creditsTotal: {}, creditsDelta {})", characterId, creditsTotal, creditsDelta);
         clientMessagingService.sendToCharacter(new UserIncomeMessage(characterId, creditsTotal, creditsDelta), characterId);
-
     }
 }
