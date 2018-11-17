@@ -76,6 +76,7 @@ public class DemoDataInitializer {
         character.setFaction(Faction.UEF);
         character.setXp(999L);
         character.setRank(rank1);
+        character.getCreditJournalList().add(new CreditJournalEntry(character, null, CreditJournalEntryReason.REGULAR_INCOME, 600.0));
         characterRepository.save(character);
 
         character = new GwCharacter();
@@ -85,6 +86,7 @@ public class DemoDataInitializer {
         character.setFaction(Faction.UEF);
         character.setXp(25000L);
         character.setRank(rank3);
+        character.getCreditJournalList().add(new CreditJournalEntry(character, null, CreditJournalEntryReason.REGULAR_INCOME, 1400.0));
         characterRepository.save(character);
 
         character = new GwCharacter();
@@ -94,6 +96,7 @@ public class DemoDataInitializer {
         character.setFaction(Faction.CYBRAN);
         character.setXp(0L);
         character.setRank(rank1);
+        character.getCreditJournalList().add(new CreditJournalEntry(character, null, CreditJournalEntryReason.REGULAR_INCOME, 300.0));
         characterRepository.save(character);
 
         character = new GwCharacter();
@@ -103,6 +106,7 @@ public class DemoDataInitializer {
         character.setFaction(Faction.CYBRAN);
         character.setXp(1000L);
         character.setRank(rank2);
+        character.getCreditJournalList().add(new CreditJournalEntry(character, null, CreditJournalEntryReason.REGULAR_INCOME, 100.0));
         characterRepository.save(character);
 
         character = new GwCharacter();
@@ -112,6 +116,7 @@ public class DemoDataInitializer {
         character.setFaction(Faction.AEON);
         character.setXp(900L);
         character.setRank(rank1);
+        character.getCreditJournalList().add(new CreditJournalEntry(character, null, CreditJournalEntryReason.REGULAR_INCOME, 200.0));
         characterRepository.save(character);
 
         Map map = new Map();

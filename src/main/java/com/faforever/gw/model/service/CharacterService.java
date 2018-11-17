@@ -2,8 +2,6 @@ package com.faforever.gw.model.service;
 
 import com.faforever.gw.messaging.client.ClientMessagingService;
 import com.faforever.gw.messaging.client.outbound.HelloMessage;
-import com.faforever.gw.model.CreditJournalEntry;
-import com.faforever.gw.model.CreditJournalEntryReason;
 import com.faforever.gw.model.GwCharacter;
 import com.faforever.gw.model.repository.CharacterRepository;
 import com.faforever.gw.model.repository.ReinforcementsRepository;
@@ -42,22 +40,5 @@ public class CharacterService {
     public void onCharacterDeath(GwCharacter character) {
         log.info("Character {} died in battle", character.getId());
         clientMessagingService.sendToCharacter(new HelloMessage(null, null), character.getId());
-    }
-
-    @Transactional
-    public double getAvailableCredits(GwCharacter character) {
-        return character.getCreditJournalList().stream()
-                .mapToDouble(CreditJournalEntry::getAmount).sum();
-    }
-
-    @Transactional
-    public void addIncome(GwCharacter character, double amount) {
-        character.getCreditJournalList().add(new CreditJournalEntry(
-                character,
-                null,
-                CreditJournalEntryReason.REGULAR_INCOME,
-                amount
-        ));
-        characterRepository.save(character);
     }
 }

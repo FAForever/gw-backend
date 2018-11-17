@@ -26,6 +26,7 @@ public enum GwErrorType {
     NO_CREATION_WITH_INVALID_SELECTION("3003", "Your chosen character name was not offered"),
     ALREADY_LINKED("4001", "The given solar systems are already linked"),
     NOT_LINKED("4002", "The given solar systems aren't linked"),
+    NO_ACTIVE_CHARACTER("4100", "No currently active character found"),
     //Reinforcements related error
     REINFORCEMENT_INVALID("5001", "The given reinforcement does not exist."),
     NOT_ENOUGH_CREDITS("5002", "Not enough credits owned to complete transaction.");

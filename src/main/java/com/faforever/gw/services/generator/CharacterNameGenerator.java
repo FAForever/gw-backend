@@ -3,6 +3,8 @@ package com.faforever.gw.services.generator;
 import com.faforever.gw.model.Faction;
 import org.springframework.stereotype.Service;
 
+import java.util.stream.IntStream;
+
 @Service
 public class CharacterNameGenerator {
 	private final static String[] earthNames;
@@ -271,5 +273,12 @@ public class CharacterNameGenerator {
 			list[i] = generateName(faction);
 		}
 		return list;
+	}
+
+	public static void main(String args[]) {
+		CharacterNameGenerator generator = new CharacterNameGenerator();
+		IntStream.generate(() -> 0).limit(100).forEach(i -> {
+			System.out.println(generator.generateName(Faction.SERAPHIM));
+		});
 	}
 }

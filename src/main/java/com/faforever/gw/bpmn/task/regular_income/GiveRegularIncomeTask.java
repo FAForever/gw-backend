@@ -42,6 +42,6 @@ public class GiveRegularIncomeTask implements JavaDelegate {
         Long creditsTotal = (long) characterService.getAvailableCredits(character);
 
         accessor.setCreditsTotal(creditsTotal);
-        accessor.setCreditsDelta((long) REGULAR_INCOME_AMOUNT)
+        accessor.setCreditsDelta((long) REGULAR_INCOME_AMOUNT);
     }
 }

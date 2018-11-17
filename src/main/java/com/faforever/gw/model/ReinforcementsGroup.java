@@ -1,6 +1,5 @@
 package com.faforever.gw.model;
 
-import com.yahoo.elide.annotation.Include;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
@@ -14,16 +13,15 @@ import java.util.UUID;
 @NoArgsConstructor
 @Setter
 @Entity
-@Include(rootLevel = true)
 @Table(name = "gw_reinforcements_group")
 public class ReinforcementsGroup implements Serializable {
 
 	private UUID id;
 	private Character character;
 	private ReinforcementsType type;
-	private List<Reinforcement> reinforcements = new ArrayList<>();
+	private List<ReinforcementsGroupEntry> reinforcements = new ArrayList<>();
 
-	public ReinforcementsGroup(ReinforcementsType type, List<Reinforcement> reinforcements) {
+	public ReinforcementsGroup(ReinforcementsType type, List<ReinforcementsGroupEntry> reinforcements) {
 		this.type = type;
 		this.reinforcements = reinforcements;
 	}
@@ -47,11 +45,16 @@ public class ReinforcementsGroup implements Serializable {
 	}
 
 	//TODO: does this work?
-	@ManyToMany
-	@JoinTable(name = "gw_reinforcements_group_reinforcements",//TODO
-			joinColumns = @JoinColumn(name = "fk_reinforcement_group"),
-			inverseJoinColumns = @JoinColumn(name = "fk_reinforcement"))
-	public List<Reinforcement> getReinforcements() {
+//	@ManyToMany
+//	@JoinTable(name = "gw_reinforcements_group_reinforcements",//TODO
+//			joinColumns = @JoinColumn(name = "fk_reinforcement_group"),
+//			inverseJoinColumns = @JoinColumn(name = "fk_reinforcement"))
+//	public List<Reinforcement> getReinforcements() {
+//		return reinforcements;
+//	}
+
+
+	public List<ReinforcementsGroupEntry> getReinforcements() {
 		return reinforcements;
 	}
 }

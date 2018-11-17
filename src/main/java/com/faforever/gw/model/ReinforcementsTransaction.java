@@ -1,6 +1,5 @@
 package com.faforever.gw.model;
 
-import com.yahoo.elide.annotation.Include;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
@@ -15,7 +14,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @Setter
 @Entity
-@Include(rootLevel = true)
 @Table(name = "gw_reinforcements_transaction")
 public class ReinforcementsTransaction implements Serializable {
 	private UUID id;

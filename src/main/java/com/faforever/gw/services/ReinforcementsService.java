@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -42,7 +44,7 @@ public class ReinforcementsService {
 	public void onBuyReinforcements(BuyReinforcementsMessage message) {
 		User user = userService.getUserFromContext();
 		GwCharacter character = userService.getActiveCharacter(user);
-		double creditsAvailable = characterService.getAvailableCredits(character);
+		double creditsAvailable = getAvailableCredits(character);
 
 		Reinforcement reinforcement = reinforcementsRepository.findOne(message.getReinforcementId());
 
@@ -72,6 +74,57 @@ public class ReinforcementsService {
 
 		sendAckToUser(user, message.getRequestId());
 	}
+
+
+
+
+	@Transactional
+	public double getAvailableCredits(GwCharacter character) {
+		return character.getCreditJournalList().stream()
+				.mapToDouble(CreditJournalEntry::getAmount).sum();
+	}
+
+	@Transactional
+	public void addIncome(GwCharacter character, double amount) {
+		character.getCreditJournalList().add(new CreditJournalEntry(
+				character,
+				null,
+				CreditJournalEntryReason.REGULAR_INCOME,
+				amount
+		));
+		characterRepository.save(character);
+	}
+
+	@Transactional
+	public java.util.Map<Reinforcement, Integer> getOwnReinforcements(GwCharacter character) {
+		java.util.Map<Reinforcement, Integer> res = new HashMap<>();
+		reinforcementsRepository.findAll().forEach(r -> res.put(r, 0));
+		character.getCreditJournalList().stream()
+				.filter(entry -> entry.getReason() == CreditJournalEntryReason.REINFORCEMENTS)
+				.map(CreditJournalEntry::getReinforcementsTransaction)
+				.forEach(transaction ->
+						res.put(transaction.getReinforcement(), res.get(transaction.getReinforcement()) + transaction.getQuantity())
+				);
+
+		return res;
+	}
+
+	@Transactional
+	public java.util.Map<Reinforcement, Integer> getAvailableOwnReinforcements(GwCharacter character) {
+		Map<Reinforcement, Integer> res = getOwnReinforcements(character);
+
+		character.getReinforcementsGroupList().stream()
+				.flatMap(group -> group.getReinforcements().stream())
+				.forEach(reinforcement ->
+						res.put(reinforcement, res.get(reinforcement) - 1)
+				);
+
+		return res;
+	}
+
+	//TODO: group/ungroup reinforcement
+	//TODO: join game with reinforcement
+	//TODO: buy defense structure
 
 
 	//TODO: duplicate code (e.g. AdminService)
