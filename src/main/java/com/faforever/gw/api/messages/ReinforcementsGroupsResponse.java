@@ -1,4 +1,4 @@
-package com.faforever.gw.messaging.api;
+package com.faforever.gw.api.messages;
 
 import com.faforever.gw.model.Reinforcement;
 import com.faforever.gw.model.ReinforcementsGroup;
@@ -10,7 +10,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Getter
-public class ReinforcementsGroupsResponse extends ApiResponse {
+public class ReinforcementsGroupsResponse {
 
 	private final List<Group> groups;
 	private final Map<UUID, Integer> freeReinforcements;

@@ -17,11 +17,12 @@ import java.util.UUID;
 public class ReinforcementsGroup implements Serializable {
 
 	private UUID id;
-	private Character character;
+	private GwCharacter character;
 	private ReinforcementsType type;
 	private List<ReinforcementsGroupEntry> reinforcements = new ArrayList<>();
 
-	public ReinforcementsGroup(ReinforcementsType type, List<ReinforcementsGroupEntry> reinforcements) {
+	public ReinforcementsGroup(GwCharacter character, ReinforcementsType type, List<ReinforcementsGroupEntry> reinforcements) {
+		this.character = character;
 		this.type = type;
 		this.reinforcements = reinforcements;
 	}
@@ -35,7 +36,7 @@ public class ReinforcementsGroup implements Serializable {
 
 	@ManyToOne
 	@JoinColumn(name = "fk_character")
-	public Character getCharacter() {
+	public GwCharacter getCharacter() {
 		return character;
 	}
 
@@ -53,7 +54,7 @@ public class ReinforcementsGroup implements Serializable {
 //		return reinforcements;
 //	}
 
-
+	@OneToMany(mappedBy = "group")
 	public List<ReinforcementsGroupEntry> getReinforcements() {
 		return reinforcements;
 	}

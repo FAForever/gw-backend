@@ -35,13 +35,13 @@ public class GiveRegularIncomeTest {
         when(delegateExecution.getVariable("character"))
                 .thenReturn(UUID.fromString("11111111-1111-1111-1111-111111111111"));
 
-        task = new GiveRegularIncomeTask(characterService, characterRepository);
+//        task = new GiveRegularIncomeTask(characterService, characterRepository, gwServerProperties);
     }
 
     @Test
     public void dummy() throws Exception {
         when(characterRepository.findOne(UUID.fromString("11111111-1111-1111-1111-111111111111"))).thenReturn(character);
-        when(characterService.addIncome(character, GiveRegularIncomeTask);)
+//        when(characterService.addIncome(character, GiveRegularIncomeTask);)
 
         task.execute(delegateExecution);
     }

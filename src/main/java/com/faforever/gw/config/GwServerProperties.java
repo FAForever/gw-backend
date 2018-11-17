@@ -9,6 +9,7 @@ public class GwServerProperties {
     private Jwt jwt = new Jwt();
     private OAuth2 oAuth2 = new OAuth2();
     private Lobby lobby = new Lobby();
+    private Game game = new Game();
 
     @Data
     public static class OAuth2 {
@@ -29,5 +30,10 @@ public class GwServerProperties {
         private String protocol;
         private String host;
         private int port;
+    }
+
+    @Data
+    public static class Game {
+        private double regularIncomeCredits = 100.0;
     }
 }

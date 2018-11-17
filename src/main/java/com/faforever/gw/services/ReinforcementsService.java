@@ -156,6 +156,8 @@ public class ReinforcementsService {
 
 	@Transactional
 	public java.util.Map<Reinforcement, Integer> getOwnReinforcements(GwCharacter character) {
+//		reinforcementsRepository.findCurrentReinforcements(character);
+
 		java.util.Map<Reinforcement, Integer> res = new HashMap<>();
 		reinforcementsRepository.findAll().forEach(r -> res.put(r, 0));
 		character.getCreditJournalList().stream()

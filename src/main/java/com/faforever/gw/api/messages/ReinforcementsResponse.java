@@ -1,4 +1,4 @@
-package com.faforever.gw.messaging.api;
+package com.faforever.gw.api.messages;
 
 import com.faforever.gw.model.Reinforcement;
 import lombok.Getter;
@@ -8,7 +8,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Getter
-public class ReinforcementsResponse extends ApiResponse {
+public class ReinforcementsResponse {
 	private final Map<UUID, Integer> reinforcements;
 
 	public ReinforcementsResponse(Map<Reinforcement, Integer> reinforcements) {

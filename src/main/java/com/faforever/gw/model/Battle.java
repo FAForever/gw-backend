@@ -3,12 +3,12 @@ package com.faforever.gw.model;
 import com.yahoo.elide.annotation.Include;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -39,7 +39,6 @@ public class Battle implements Serializable {
         this.attackingFaction = attackingFaction;
         this.defendingFaction = defendingFaction;
         this.status = BattleStatus.INITIATED;
-        this.initiatedAt = Timestamp.from(Instant.now());
     }
 
     @Id
@@ -70,6 +69,7 @@ public class Battle implements Serializable {
     }
 
     @Column(name = "initiated_at", nullable = false)
+    @CreationTimestamp
     public Timestamp getInitiatedAt() {
         return initiatedAt;
     }

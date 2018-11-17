@@ -10,6 +10,4 @@ import java.util.UUID;
 public class BuyDefenseStructureMessage extends InboundClientMessage {
 	private UUID defenseStructureId;
 	private UUID planetId;
-
-	//TODO: deployed defense structure
 }

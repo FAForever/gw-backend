@@ -51,7 +51,8 @@ public class DeployedDefenseStructure {
 		return faction;
 	}
 
-	@OneToOne(fetch = FetchType.EAGER, mappedBy = "deployedDefenseStructure")
+	@OneToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "fk_credit_journal_entry")
 	public CreditJournalEntry getCreditJournalEntry() {
 		return creditJournalEntry;
 	}

@@ -2,13 +2,13 @@ package com.faforever.gw.model;
 
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.annotation.Nullable;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.UUID;
 
 @NoArgsConstructor
@@ -30,8 +30,6 @@ public class ReinforcementsTransaction implements Serializable {
 		this.creditJournalEntry = creditJournalEntry;
 		this.reinforcement = reinforcement;
 		this.quantity = quantity;
-
-		this.createdAt = Timestamp.from(Instant.now());
 	}
 
 	@Id
@@ -54,13 +52,14 @@ public class ReinforcementsTransaction implements Serializable {
 		return battle;
 	}
 
-	@OneToOne(fetch = FetchType.EAGER, mappedBy = "creditJournalEntry")
+	@OneToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "fk_credit_journal_entry")
 	public CreditJournalEntry getCreditJournalEntry() {
 		return creditJournalEntry;
 	}
 
 	@Column(name = "created_at")
+	@CreationTimestamp
 	public Timestamp getCreatedAt() {
 		return createdAt;
 	}
