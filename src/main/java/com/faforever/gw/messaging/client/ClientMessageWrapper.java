@@ -27,6 +27,7 @@ public class ClientMessageWrapper {
             @Type(value = SetPlanetFactionRequestMessage.class, name = "setPlanetFactionRequest"),
             @Type(value = UnlinkSolarSystemsRequestMessage.class, name = "unlinkSolarSystemsRequest"),
             @Type(value = BuyReinforcementsMessage.class, name = "buyReinforcementsRequest"),
+            @Type(value = BuyDefenseStructureMessage.class, name = "buyDefenseStructureRequest"),
 
             // Outbound messages
             @Type(value = AckMessage.class, name = "ack"),
@@ -44,7 +45,8 @@ public class ClientMessageWrapper {
             @Type(value = PlanetUnderAssaultMessage.class, name = "planet.attacked"),
             @Type(value = SolarSystemsLinkedMessage.class, name = "universe.solar_systems_linked"),
             @Type(value = SolarSystemsUnlinkedMessage.class, name = "universe.solar_systems_unlinked"),
-            @Type(value = UserIncomeMessage.class, name = "user.income")
+            @Type(value = UserIncomeMessage.class, name = "user.income"),
+            @Type(value = DefenseStructureBuiltMessage.class, name = "planet.defense_structure_built")
     })
     ClientMessage data;
 }

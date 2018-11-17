@@ -2,11 +2,15 @@ package com.faforever.gw.services;
 
 import com.faforever.gw.bpmn.services.GwErrorType;
 import com.faforever.gw.messaging.client.ClientMessagingService;
+import com.faforever.gw.messaging.client.inbound.BuyDefenseStructureMessage;
 import com.faforever.gw.messaging.client.inbound.BuyReinforcementsMessage;
 import com.faforever.gw.messaging.client.outbound.AckMessage;
+import com.faforever.gw.messaging.client.outbound.DefenseStructureBuiltMessage;
 import com.faforever.gw.messaging.client.outbound.ErrorMessage;
 import com.faforever.gw.model.*;
 import com.faforever.gw.model.repository.CharacterRepository;
+import com.faforever.gw.model.repository.DefenseStructureRepository;
+import com.faforever.gw.model.repository.PlanetRepository;
 import com.faforever.gw.model.repository.ReinforcementsRepository;
 import com.faforever.gw.model.service.CharacterService;
 import com.faforever.gw.security.User;
@@ -29,14 +33,18 @@ public class ReinforcementsService {
 	private final UserService userService;
 	private final ReinforcementsRepository reinforcementsRepository;
 	private final CharacterRepository characterRepository;
+	private final DefenseStructureRepository defenseStructureRepository;
+	private final PlanetRepository planetRepository;
 
 	@Inject
-	public ReinforcementsService(ClientMessagingService clientMessagingService, CharacterService characterService, UserService userService, ReinforcementsRepository reinforcementsRepository, CharacterRepository characterRepository) {
+	public ReinforcementsService(ClientMessagingService clientMessagingService, CharacterService characterService, UserService userService, ReinforcementsRepository reinforcementsRepository, CharacterRepository characterRepository, DefenseStructureRepository defenseStructureRepository, PlanetRepository planetRepository) {
 		this.clientMessagingService = clientMessagingService;
 		this.characterService = characterService;
 		this.userService = userService;
 		this.reinforcementsRepository = reinforcementsRepository;
 		this.characterRepository = characterRepository;
+		this.defenseStructureRepository = defenseStructureRepository;
+		this.planetRepository = planetRepository;
 	}
 
 	@EventListener
@@ -44,10 +52,15 @@ public class ReinforcementsService {
 	public void onBuyReinforcements(BuyReinforcementsMessage message) {
 		User user = userService.getUserFromContext();
 		GwCharacter character = userService.getActiveCharacter(user);
+
+		if(character == null) {
+			sendErrorToUser(user, message.getRequestId(), GwErrorType.NO_ACTIVE_CHARACTER);
+			return;
+		}
+
 		double creditsAvailable = getAvailableCredits(character);
 
 		Reinforcement reinforcement = reinforcementsRepository.findOne(message.getReinforcementId());
-
 		if(reinforcement == null) {
 			sendErrorToUser(user, message.getRequestId(), GwErrorType.REINFORCEMENT_INVALID);
 			return;
@@ -59,7 +72,6 @@ public class ReinforcementsService {
 		}
 
 		double cost = reinforcement.getPrice() * (double) message.getQuantity();
-
 		if(cost < creditsAvailable) {
 			sendErrorToUser(user, message.getRequestId(), GwErrorType.NOT_ENOUGH_CREDITS);
 			return;
@@ -75,6 +87,53 @@ public class ReinforcementsService {
 		sendAckToUser(user, message.getRequestId());
 	}
 
+	@EventListener
+	@Transactional
+	public void onBuyDefenseStructure(BuyDefenseStructureMessage message) {
+		User user = userService.getUserFromContext();
+		GwCharacter character = userService.getActiveCharacter(user);
+
+		if(character == null) {
+			sendErrorToUser(user, message.getRequestId(), GwErrorType.NO_ACTIVE_CHARACTER);
+			return;
+		}
+
+		double creditsAvailable = getAvailableCredits(character);
+
+		DefenseStructure defenseStructure = defenseStructureRepository.findOne(message.getDefenseStructureId());
+		if(defenseStructure == null) {
+			sendErrorToUser(user, message.getRequestId(), GwErrorType.STRUCTURE_INVALID);
+			return;
+		}
+
+		double cost = defenseStructure.getPrize();
+		if(cost < creditsAvailable) {
+			sendErrorToUser(user, message.getRequestId(), GwErrorType.NOT_ENOUGH_CREDITS);
+			return;
+		}
+
+		Planet planet = planetRepository.findOne(message.getPlanetId());
+		if(planet == null) {
+			sendErrorToUser(user, message.getRequestId(), GwErrorType.PLANET_DOES_NOT_EXIST);
+			return;
+		}
+
+		if(planet.getCurrentOwner() != character.getFaction()) {
+			sendErrorToUser(user, message.getRequestId(), GwErrorType.PLANET_NOT_CONTROLLED);
+			return;
+		}
+
+		//TODO: limit defense structures on planet
+
+		CreditJournalEntry creditJournalEntry = new CreditJournalEntry(character, null, CreditJournalEntryReason.DEFENSE_STRUCTURE, cost);
+		character.getCreditJournalList().add(creditJournalEntry);
+		characterRepository.save(character);
+
+		planet.getDeployedDefenseStructureList().add(new DeployedDefenseStructure(defenseStructure, planet, planet.getCurrentOwner(), creditJournalEntry));
+		planetRepository.save(planet);
+
+		clientMessagingService.sendToPublic(new DefenseStructureBuiltMessage(defenseStructure.getId(), planet.getId(), planet.getCurrentOwner()));
+	}
 
 
 
@@ -115,16 +174,16 @@ public class ReinforcementsService {
 
 		character.getReinforcementsGroupList().stream()
 				.flatMap(group -> group.getReinforcements().stream())
-				.forEach(reinforcement ->
-						res.put(reinforcement, res.get(reinforcement) - 1)
+				.forEach(entry ->
+						res.put(entry.getReinforcement(), res.get(entry.getReinforcement()) - entry.getQuantity())
 				);
 
 		return res;
 	}
 
 	//TODO: group/ungroup reinforcement
-	//TODO: join game with reinforcement
 	//TODO: buy defense structure
+	//TODO: join game with reinforcement
 
 
 	//TODO: duplicate code (e.g. AdminService)

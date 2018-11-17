@@ -22,7 +22,7 @@ public class CreditJournalEntry implements Serializable {
 	private GwCharacter character;
 	@Nullable private Battle battle;//todo
 	@Nullable private ReinforcementsTransaction reinforcementsTransaction;
-	@Nullable private DefenseStructure defenseStructure;
+	@Nullable private DeployedDefenseStructure deployedDefenseStructure;
 	private CreditJournalEntryReason reason;
 	private double amount;
 	private Timestamp createdAt;
@@ -66,8 +66,8 @@ public class CreditJournalEntry implements Serializable {
 	@Nullable
 	@OneToOne(fetch = FetchType.EAGER, mappedBy = "creditJournalEntry")
 	@JoinColumn(name = "fk_defense_structure")
-	public DefenseStructure getDefenseStructure() {
-		return defenseStructure;
+	public DeployedDefenseStructure getDeployedDefenseStructure() {
+		return deployedDefenseStructure;
 	}
 
 	@Column(name = "reason", length = 1)

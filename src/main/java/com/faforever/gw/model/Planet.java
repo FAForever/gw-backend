@@ -26,7 +26,7 @@ public class Planet implements Serializable {
     private Map map;
     private Faction currentOwner;
     private SolarSystem solarSystem;
-    private List<DefenseStructure> defenseStructureList = new ArrayList<>();
+    private List<DeployedDefenseStructure> deployedDefenseStructureList = new ArrayList<>();
 
     @Id
     @GeneratedValue(generator = "uuid2")
@@ -83,7 +83,7 @@ public class Planet implements Serializable {
     }
 
     @OneToMany(mappedBy = "planet")
-    public List<DefenseStructure> getDefenseStructureList() {
-        return defenseStructureList;
+    public List<DeployedDefenseStructure> getDeployedDefenseStructureList() {
+        return deployedDefenseStructureList;
     }
 }

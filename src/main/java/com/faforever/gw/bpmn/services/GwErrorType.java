@@ -29,7 +29,9 @@ public enum GwErrorType {
     NO_ACTIVE_CHARACTER("4100", "No currently active character found"),
     //Reinforcements related error
     REINFORCEMENT_INVALID("5001", "The given reinforcement does not exist."),
-    NOT_ENOUGH_CREDITS("5002", "Not enough credits owned to complete transaction.");
+    NOT_ENOUGH_CREDITS("5002", "Not enough credits owned to complete transaction."),
+    STRUCTURE_INVALID("5003", "The given defense structure does not exist."),
+    PLANET_NOT_CONTROLLED("5003", "Planet not under your factions control.");
 
     private final String errorCode;
     private final String errorMessage;

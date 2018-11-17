@@ -14,17 +14,14 @@ import java.util.UUID;
 @Include(rootLevel = true)
 @Table(name = "gw_defense_structure")
 public class DefenseStructure {
+
 	private UUID id;
 	private Unit unit;
-	private Planet planet;
-	private Faction faction;
-	private CreditJournalEntry creditJournalEntry;
+	private double prize;
 
-	public DefenseStructure(Unit unit, Planet planet, Faction faction, CreditJournalEntry creditJournalEntry) {
+	public DefenseStructure(Unit unit, double prize) {
 		this.unit = unit;
-		this.planet = planet;
-		this.faction = faction;
-		this.creditJournalEntry = creditJournalEntry;
+		this.prize = prize;
 	}
 
 	@Id
@@ -40,19 +37,8 @@ public class DefenseStructure {
 		return unit;
 	}
 
-	@ManyToOne
-	@JoinColumn(name = "fk_planet")
-	public Planet getPlanet() {
-		return planet;
-	}
-
-	@Column(name = "faction")
-	public Faction getFaction() {
-		return faction;
-	}
-
-	@OneToOne(fetch = FetchType.EAGER, mappedBy = "defenseStructure")
-	public CreditJournalEntry getCreditJournalEntry() {
-		return creditJournalEntry;
+	@Column(name = "prize")
+	public double getPrize() {
+		return prize;
 	}
 }

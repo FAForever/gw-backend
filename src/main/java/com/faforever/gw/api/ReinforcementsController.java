@@ -78,11 +78,6 @@ public class ReinforcementsController {
 	//Get all reinforcements via elide
 	//Get defense structures via elide
 
-	//Todo: buy reinforcements
-	//TODO: buy defense structures
-	//todo: set groups
-
-
 	@RequestMapping(
 			method = RequestMethod.GET,
 			produces = JSON_API_MEDIA_TYPE,
