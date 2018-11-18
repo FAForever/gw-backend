@@ -184,11 +184,9 @@ public class ReinforcementsService {
 	}
 
 	//TODO: group/ungroup reinforcement
-	//TODO: buy defense structure
 	//TODO: join game with reinforcement
 
 
-	//TODO: duplicate code (e.g. AdminService)
 	private void sendErrorToUser(User user, UUID requestId, GwErrorType errorType) {
 		clientMessagingService.sendToUser(new ErrorMessage(requestId, errorType.getErrorCode(), errorType.getErrorMessage()), user);
 	}

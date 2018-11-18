@@ -45,15 +45,6 @@ public class ReinforcementsGroup implements Serializable {
 		return type;
 	}
 
-	//TODO: does this work?
-//	@ManyToMany
-//	@JoinTable(name = "gw_reinforcements_group_reinforcements",//TODO
-//			joinColumns = @JoinColumn(name = "fk_reinforcement_group"),
-//			inverseJoinColumns = @JoinColumn(name = "fk_reinforcement"))
-//	public List<Reinforcement> getReinforcements() {
-//		return reinforcements;
-//	}
-
 	@OneToMany(mappedBy = "group")
 	public List<ReinforcementsGroupEntry> getReinforcements() {
 		return reinforcements;
