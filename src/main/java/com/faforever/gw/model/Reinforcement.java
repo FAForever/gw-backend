@@ -6,7 +6,6 @@ import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.util.UUID;
 
 @NoArgsConstructor
@@ -14,7 +13,7 @@ import java.util.UUID;
 @Entity
 @Include(rootLevel = true)
 @Table(name = "gw_reinforcement")
-public class Reinforcement implements Serializable {
+public class Reinforcement {
 
 	private UUID id;
 	private ReinforcementsType type;
@@ -43,13 +42,13 @@ public class Reinforcement implements Serializable {
 		return type;
 	}
 
-	@ManyToOne
+	@ManyToOne(cascade=CascadeType.ALL)
 	@JoinColumn(name = "fk_unit")
 	public Unit getUnit() {
 		return unit;
 	}
 
-	@ManyToOne
+	@ManyToOne(cascade=CascadeType.ALL)
 	@JoinColumn(name = "fk_item")
 	public PassiveItem getItem() {
 		return item;

@@ -12,6 +12,7 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
@@ -24,15 +25,17 @@ public class DemoDataInitializer {
     private final MapRepository mapRepository;
     private final RankRepository rankRepository;
     private final SolarSystemRepository solarSystemRepository;
+    private final ReinforcementsRepository reinforcementsRepository;
 
     @Inject
-    public DemoDataInitializer(UniverseGenerator universeGenerator, CharacterRepository characterRepository, PlanetRepository planetRepository, MapRepository mapRepository, RankRepository rankRepository, SolarSystemRepository solarSystemRepository) {
+    public DemoDataInitializer(UniverseGenerator universeGenerator, CharacterRepository characterRepository, PlanetRepository planetRepository, MapRepository mapRepository, RankRepository rankRepository, SolarSystemRepository solarSystemRepository, ReinforcementsRepository reinforcementsRepository) {
         this.universeGenerator = universeGenerator;
         this.characterRepository = characterRepository;
         this.planetRepository = planetRepository;
         this.mapRepository = mapRepository;
         this.rankRepository = rankRepository;
         this.solarSystemRepository = solarSystemRepository;
+        this.reinforcementsRepository = reinforcementsRepository;
     }
 
     @Transactional
@@ -142,6 +145,23 @@ public class DemoDataInitializer {
                 from.getConnectedSystems().add(to);
             }
         }
+
+
+        {
+            Unit unit = new Unit("UEL0202", "Pillar", Faction.UEF, TechLevel.T2);
+            Reinforcement reinforcement = new Reinforcement(ReinforcementsType.TRANSPORTED_UNITS, unit, null, 5, 300);
+            reinforcementsRepository.save(reinforcement);
+        }
+
+        Arrays.stream(Faction.values()).forEach(faction -> {
+            Unit unit = new Unit(String.format("XXL_%s_0101", faction.getDbKey()), String.format("%s Unit 1", faction.getName()), faction, TechLevel.T1);
+            Reinforcement reinforcement = new Reinforcement(ReinforcementsType.TRANSPORTED_UNITS, unit, null, 5, 50);
+            reinforcementsRepository.save(reinforcement);
+
+            unit = new Unit(String.format("XXL_%s_0201", faction.getDbKey()), String.format("%s Unit 2", faction.getName()), faction, TechLevel.T2);
+            reinforcement = new Reinforcement(ReinforcementsType.TRANSPORTED_UNITS, unit, null, 30, 200);
+            reinforcementsRepository.save(reinforcement);
+        });
     }
 
     private SolarSystem createSolarSystem(Faction faction, Map map) {
