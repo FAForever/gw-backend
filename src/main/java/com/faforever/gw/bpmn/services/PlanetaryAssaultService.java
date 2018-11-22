@@ -138,14 +138,20 @@ public class PlanetaryAssaultService {
         GameResult gameResult = new GameResult();
         gameResult.setBattle(battle.getId());
 
-        HashMap<Long, GwCharacter> fafUserIdToCharacter = new HashMap<>();
+        HashMap<Integer, GwCharacter> fafUserIdToCharacter = new HashMap<>();
 
         gameResultMessage.getPlayerResults().forEach(
                 playerResult -> {
-                    long fafId = playerResult.getPlayerFafId();
+                    int fafId = playerResult.getPlayerId();
                     GwCharacter character = characterRepository.findActiveCharacterByFafId(fafId);
 
-                    if (playerResult.getResult() == BattleParticipantResult.VICTORY) {
+                    if (playerResult.isWinner()) {
+                        if (gameResult.getWinner() != null && gameResult.getWinner() != character.getFaction()) {
+                            String errorMessage = MessageFormat.format("For battle {0} multiple factions are listed as winner (message={1})", battle.getId(), gameResultMessage);
+                            log.error(errorMessage);
+                            throw new IllegalStateException(errorMessage);
+                        }
+
                         gameResult.setWinner(character.getFaction());
                     }
 
@@ -162,12 +168,24 @@ public class PlanetaryAssaultService {
         List<GameCharacterResult> characterResults = new ArrayList<>();
 
         gameResultMessage.getPlayerResults().forEach(
-                playerResult -> characterResults.add(
-                        new GameCharacterResult(
-                                fafUserIdToCharacter.get(playerResult.getPlayerFafId()).getId(),
-                                playerResult.getResult(),
-                                fafUserIdToCharacter.get(playerResult.getKilledBy()) == null ? null : fafUserIdToCharacter.get(playerResult.getKilledBy()).getId())
-                )
+                playerResult -> {
+                    BattleParticipantResult battleParticipantResult;
+
+                    if (playerResult.isAcuKilled()) {
+                        battleParticipantResult = BattleParticipantResult.DEATH;
+                    } else if (playerResult.isWinner()) {
+                        battleParticipantResult = BattleParticipantResult.VICTORY;
+                    } else {
+                        battleParticipantResult = BattleParticipantResult.RECALL;
+                    }
+
+                    characterResults.add(
+                            new GameCharacterResult(
+                                    fafUserIdToCharacter.get(playerResult.getPlayerId()).getId(),
+                                    battleParticipantResult,
+                                    null)
+                    );
+                }
         );
 
         gameResult.setCharacterResults(characterResults);
@@ -193,9 +211,9 @@ public class PlanetaryAssaultService {
                     .count();
 
             if (battle.getWinningFaction() == character.getFaction()) {
-                Long gainedXP = Math.round(10.0 * noOfEnemies / Math.pow( noOfAllies * 0.9, noOfAllies - 1 ));
+                Long gainedXP = Math.round(10.0 * noOfEnemies / Math.pow(noOfAllies * 0.9, noOfAllies - 1));
 
-                if(participant.getResult() == BattleParticipantResult.RECALL) {
+                if (participant.getResult() == BattleParticipantResult.RECALL) {
                     gainedXP -= XP_MALUS_FOR_RECALL;
                 }
 
@@ -217,8 +235,8 @@ public class PlanetaryAssaultService {
         // + 5% bonus per rank the victim was higher than the killer
 
         Integer killerRank = killer.getRank().getLevel();
-        Double rankDifferenceFactor = Math.min(0.0,victim.getRank().getLevel() - killerRank) * 5 / 100.0;
-        return Math.round(5*killerRank*Math.pow(0.99, killerRank-1)*rankDifferenceFactor);
+        Double rankDifferenceFactor = Math.min(0.0, victim.getRank().getLevel() - killerRank) * 5 / 100.0;
+        return Math.round(5 * killerRank * Math.pow(0.99, killerRank - 1) * rankDifferenceFactor);
     }
 
     public double calcWaitingProgress(int mapSlots, long attackerCount, long defenderCount) {
