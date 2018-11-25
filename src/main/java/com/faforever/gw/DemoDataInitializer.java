@@ -116,8 +116,8 @@ public class DemoDataInitializer {
 
         Map map = new Map();
         map.setGround(Ground.SOIL);
-        map.setFafMapId(1);
-        map.setFafMapVersion(1);
+        map.setFafMapId(2);
+        map.setFafMapVersion(2);
         map.setSize(10);
         map.setTotalSlots(2);
         mapRepository.save(map);
