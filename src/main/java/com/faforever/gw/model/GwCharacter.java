@@ -79,17 +79,17 @@ public class GwCharacter implements Serializable {
         return rank;
     }
 
-    @OneToMany(mappedBy = "character")
+    @OneToMany(mappedBy = "character", cascade=CascadeType.ALL)
     public List<CreditJournalEntry> getCreditJournalList() {
         return creditJournalList;
     }
 
-    @OneToMany(mappedBy = "character")
+    @OneToMany(mappedBy = "character", cascade=CascadeType.ALL)
     public List<ReinforcementsTransaction> getReinforcementsTransactionList() {
         return reinforcementsTransactionList;
     }
 
-    @OneToMany(mappedBy = "character")
+    @OneToMany(mappedBy = "character", cascade=CascadeType.ALL)
     public List<ReinforcementsGroup> getReinforcementsGroupList() {
         return reinforcementsGroupList;
     }

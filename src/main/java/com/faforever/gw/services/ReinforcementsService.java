@@ -4,6 +4,7 @@ import com.faforever.gw.bpmn.services.GwErrorType;
 import com.faforever.gw.messaging.client.ClientMessagingService;
 import com.faforever.gw.messaging.client.inbound.BuyDefenseStructureMessage;
 import com.faforever.gw.messaging.client.inbound.BuyReinforcementsMessage;
+import com.faforever.gw.messaging.client.inbound.GroupReinforcementsMessage;
 import com.faforever.gw.messaging.client.outbound.AckMessage;
 import com.faforever.gw.messaging.client.outbound.DefenseStructureBuiltMessage;
 import com.faforever.gw.messaging.client.outbound.ErrorMessage;
@@ -181,6 +182,65 @@ public class ReinforcementsService {
 				);
 
 		return res;
+	}
+
+	@EventListener
+	@Transactional
+	public void onGroupReinforcements(GroupReinforcementsMessage message) {
+		User user = userService.getUserFromContext();
+		GwCharacter character = userService.getActiveCharacter(user);
+
+		if(character == null) {
+			sendErrorToUser(user, message.getRequestId(), GwErrorType.NO_ACTIVE_CHARACTER);
+			return;
+		}
+
+		ReinforcementsGroup group = character.getReinforcementsGroupList().stream()
+				.filter(g -> g.getId().equals(message.getGroupId()))
+				.findFirst()
+				.orElse(null);
+
+		if(message.getReinforcements() == null || message.getReinforcements().isEmpty()) {
+			if(group != null) {
+				//TODO: garbage collection?
+				character.getReinforcementsGroupList().remove(group);
+				characterRepository.save(character);
+			} else {
+				//return no error, the group to be deleted does not exist, the goal is therefore achieved
+			}
+			return;
+		}
+
+		Map<Reinforcement, Integer> availableReinforcements = getAvailableOwnReinforcements(character);
+
+		if(group == null) {
+			boolean enoughReinforcementsAvailable = message.getReinforcements().entrySet().stream()
+					.allMatch(requestedEntry ->{
+						if(requestedEntry.getKey() == null) {
+							return false;
+						}
+
+						Reinforcement reinforcement = reinforcementsRepository.findOne(requestedEntry.getKey());
+
+						if(reinforcement == null) {
+							return false;
+						}
+
+						return availableReinforcements.get(reinforcement) > requestedEntry.getValue();
+					});
+
+			if(! enoughReinforcementsAvailable) {
+				sendErrorToUser(user, message.getRequestId(), GwErrorType.NOT_ENOUGH_REINFORCEMENTS);
+				return;
+			}
+
+			//TODO: set group
+
+			//TODO: group not null
+
+		} else {
+
+		}
 	}
 
 	//TODO: group/ungroup reinforcement

@@ -31,7 +31,8 @@ public enum GwErrorType {
     REINFORCEMENT_INVALID("5001", "The given reinforcement does not exist."),
     NOT_ENOUGH_CREDITS("5002", "Not enough credits owned to complete transaction."),
     STRUCTURE_INVALID("5003", "The given defense structure does not exist."),
-    PLANET_NOT_CONTROLLED("5003", "Planet not under your factions control.");
+    PLANET_NOT_CONTROLLED("5003", "Planet not under your factions control."),
+    NOT_ENOUGH_REINFORCEMENTS("5004", "Not enough reinforcements to complete or reinforcements invalid.");
 
     private final String errorCode;
     private final String errorMessage;
