@@ -4,21 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Set;
+import java.util.List;
 
 @Getter
 @Setter
 @AllArgsConstructor
 public class GameResultMessage extends InboundLobbyMessage {
-    private int gameId;
-    private boolean draw;
-    private Set<PlayerResult> playerResults;
-
-    @Getter
-    @Setter
-    public static class PlayerResult {
-        private int playerId;
-        private boolean winner;
-        private boolean acuKilled;
-    }
+	private long gameId;
+	private List<GamePlayerResult> playerResults;
 }

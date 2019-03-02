@@ -7,7 +7,6 @@ import com.faforever.gw.messaging.lobby.inbound.ResponseMessage;
 import com.faforever.gw.messaging.lobby.inbound.ServerErrorException;
 import com.faforever.gw.messaging.lobby.outbound.CreateMatchRequest;
 import com.faforever.gw.messaging.lobby.outbound.OutboundLobbyMessage;
-import com.faforever.gw.messaging.lobby.outbound.PingMessage;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
@@ -56,7 +55,7 @@ public class LobbyService {
     public void sendPing() {
         if (currentSession != null && currentSession.isOpen()) {
             log.debug("Send ping to lobby server");
-            currentSession.sendMessage(box(new PingMessage()));
+            currentSession.sendMessage(new PingMessage());
         }
     }
 

@@ -6,16 +6,14 @@ import com.faforever.gw.messaging.client.ClientMessagingService;
 import com.faforever.gw.messaging.client.inbound.InitiateAssaultMessage;
 import com.faforever.gw.messaging.client.inbound.JoinAssaultMessage;
 import com.faforever.gw.messaging.client.inbound.LeaveAssaultMessage;
+import com.faforever.gw.messaging.lobby.inbound.GamePlayerResult;
 import com.faforever.gw.messaging.lobby.inbound.GameResultMessage;
-import com.faforever.gw.model.Battle;
-import com.faforever.gw.model.Faction;
-import com.faforever.gw.model.GwCharacter;
-import com.faforever.gw.model.Planet;
+import com.faforever.gw.model.*;
 import com.faforever.gw.model.repository.BattleRepository;
 import com.faforever.gw.model.repository.CharacterRepository;
 import com.faforever.gw.model.repository.PlanetRepository;
 import com.faforever.gw.security.User;
-import com.google.common.collect.Sets;
+import com.google.common.collect.ImmutableList;
 import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
@@ -190,12 +188,8 @@ public class PlanetaryAssaultServiceTest {
         when(character.getFaction()).thenReturn(Faction.UEF);
 
         GameResultMessage result = new GameResultMessage(
-                123456,
-                false,
-                Sets.newHashSet(new GameResultMessage.PlayerResult()
-                        .setPlayerId(1)
-                        .setWinner(true)
-                        .setAcuKilled(false))
+				123456L,
+				ImmutableList.of(new GamePlayerResult(fafId, BattleParticipantResult.VICTORY, -1L))
         );
         service.onGameResult(result);
         verify(runtimeService).correlateMessage(eq(PlanetaryAssaultService.GAME_RESULT_MESSAGE), anyString(), any());

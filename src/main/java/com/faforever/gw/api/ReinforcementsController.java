@@ -9,16 +9,21 @@ import com.faforever.gw.bpmn.services.GwErrorType;
 import com.faforever.gw.model.GwCharacter;
 import com.faforever.gw.model.Reinforcement;
 import com.faforever.gw.model.ReinforcementsGroup;
+import com.faforever.gw.security.GwUserRegistry;
 import com.faforever.gw.security.User;
 import com.faforever.gw.services.ReinforcementsService;
 import com.faforever.gw.services.UserService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(path = ReinforcementsController.PATH_PREFIX)
@@ -29,12 +34,28 @@ public class ReinforcementsController {
 
 	private final ReinforcementsService reinforcementsService;
 	private final UserService userService;
+	private final GwUserRegistry userRegistry;
 
-	public ReinforcementsController(ReinforcementsService reinforcementsService, UserService userService) {
+	public ReinforcementsController(ReinforcementsService reinforcementsService, UserService userService, GwUserRegistry userRegistry) {
 		this.reinforcementsService = reinforcementsService;
 		this.userService = userService;
+		this.userRegistry = userRegistry;
 	}
 
+	@RequestMapping(
+			method = RequestMethod.GET,
+			produces = JSON_API_MEDIA_TYPE,
+			value = {"/fakeAuthorization"})
+	public Object fakeAuthorize(@RequestParam long fafUserID) {
+		Optional<User> user = userService.getOnlineUserByFafId(fafUserID);
+
+		if (user.isPresent()) {
+
+			return ResponseEntity.status(HttpStatus.OK);
+		} else {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND);
+		}
+	}
 
 	@RequestMapping(
 		method = RequestMethod.GET,
