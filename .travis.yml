@@ -8,7 +8,7 @@ git:
   depth: 3
 
 jdk:
-  - oraclejdk8
+  - openjdk8
 
 before_install:
  - chmod +x mvnw
@@ -28,8 +28,3 @@ after_success:
       docker tag ${IMAGE_TAG} ${REPO}:${TRAVIS_TAG};
       docker push ${REPO};
     fi
-
-addons:
-  apt:
-    packages:
-      - oracle-java8-installer
