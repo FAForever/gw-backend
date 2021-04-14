@@ -7,6 +7,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -19,5 +20,13 @@ public class User extends UsernamePasswordAuthenticationToken {
         super(principal, credentials, authorities);
         this.id = id;
         this.activeCharacter = activeCharacter;
+    }
+
+    public boolean hasPermission(String permission) {
+        Collection<String> authorities = this.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
+
+        return authorities.contains(permission);
     }
 }

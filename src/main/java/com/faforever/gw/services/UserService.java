@@ -29,6 +29,7 @@ public class UserService {
     }
 
     public GwCharacter getActiveCharacter(User user) {
-        return characterService.getActiveCharacterByFafId(user.getId());
+        return characterService.getActiveCharacterByFafId(user.getId())
+                .orElseThrow(() -> new IllegalStateException("No active character found for user: " + user));
     }
 }

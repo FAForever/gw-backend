@@ -16,7 +16,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.UUID;
 
@@ -25,7 +25,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class CreateCharacterTaskTest {
     @Mock
     private DelegateExecution delegateExecution;
@@ -72,7 +72,7 @@ public class CreateCharacterTaskTest {
 
         task.execute(delegateExecution);
 
-        verify(delegateExecution).setVariable(eq("newCharacterId"), any(UUID.class));
+        verify(delegateExecution).setVariable(eq("newCharacterId"), any(String.class));
         verify(characterRepository).save(argumentCaptor.capture());
 
         GwCharacter character = argumentCaptor.getValue();

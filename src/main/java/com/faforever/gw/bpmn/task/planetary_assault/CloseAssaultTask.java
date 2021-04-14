@@ -36,11 +36,11 @@ public class CloseAssaultTask implements JavaDelegate {
         PlanetaryAssaultAccessor accessor = PlanetaryAssaultAccessor.of(execution);
         log.debug("closeAssaultTask for battle {}", accessor.getBusinessKey());
 
-        Battle battle = battleRepository.findOne(accessor.getBattleId());
+        Battle battle = battleRepository.getOne(accessor.getBattleId());
         battle.setEndedAt(Timestamp.from(Instant.now()));
         battle.setStatus(BattleStatus.FINISHED);
 
-        Planet planet = planetRepository.findOne(accessor.getPlanetId());
+        Planet planet = planetRepository.getOne(accessor.getPlanetId());
 
         if(accessor.getWinner() == BattleRole.ATTACKER) {
             battle.setWinningFaction(battle.getAttackingFaction());

@@ -1,17 +1,35 @@
 package com.faforever.gw.data;
 
+import com.faforever.gw.security.ElideUser;
 import com.yahoo.elide.Elide;
 import com.yahoo.elide.ElideResponse;
+import com.yahoo.elide.core.security.User;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.interceptor.KeyGenerator;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.HandlerMapping;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MultivaluedHashMap;
-import java.security.Principal;
+import java.lang.reflect.Method;
 import java.util.Map;
+import java.util.UUID;
+
+import static com.faforever.gw.data.JsonApiMediaType.JSON_API_MEDIA_TYPE;
+import static com.faforever.gw.data.JsonApiMediaType.JSON_API_PATCH_MEDIA_TYPE;
 
 /**
  * JSON-API compliant data API.
@@ -21,7 +39,7 @@ import java.util.Map;
 public class DataController {
 
     public static final String PATH_PREFIX = "/data";
-    private static final String JSON_API_MEDIA_TYPE = "application/vnd.api+json";
+    public static final String API_VERSION = "";
 
     private final Elide elide;
 
@@ -29,70 +47,102 @@ public class DataController {
         this.elide = elide;
     }
 
-    @RequestMapping(
-            method = RequestMethod.GET,
-            produces = JSON_API_MEDIA_TYPE,
-            value = {"/{entity}", "/{entity}/{id}/relationships/{entity2}", "/{entity}/{id}/{child}", "/{entity}/{id}"})
-    @Transactional(readOnly = true)
-//    @PreAuthorize("permitAll()")
+    private static User getPrincipal(final Authentication authentication) {
+        return new ElideUser(authentication);
+    }
+
+    //!!! No @Transactional - transactions are being handled by Elide
+    @GetMapping(value = {"/{entity}", "/{entity}/**"}, produces = JSON_API_MEDIA_TYPE)
+    @Cacheable(cacheResolver = "elideCacheResolver", keyGenerator = GetCacheKeyGenerator.NAME)
     public ResponseEntity<String> get(@RequestParam final Map<String, String> allRequestParams,
                                       final HttpServletRequest request,
-                                      final Principal principal) {
+                                      final Authentication authentication) {
         ElideResponse response = elide.get(
+                getBaseUrlEndpoint(),
                 getJsonApiPath(request),
                 new MultivaluedHashMap<>(allRequestParams),
-                principal
+                getPrincipal(authentication),
+                API_VERSION
         );
         return wrapResponse(response);
     }
 
-    @RequestMapping(
-            method = RequestMethod.POST,
-            produces = JSON_API_MEDIA_TYPE,
-            value = {"/{entity}", "/{entity}/{id}/relationships/{entity2}", "/{entity}/{id}/{child}", "/{entity}/{id}"})
-    @Transactional
-    @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<String> post(@RequestBody final String body,
+    //!!! No @Transactional - transactions are being handled by Elide
+    @PostMapping(value = "/**", consumes = {JSON_API_MEDIA_TYPE, MediaType.APPLICATION_JSON_VALUE}, produces = JSON_API_MEDIA_TYPE)
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<String> post(@RequestParam final Map<String, String> allRequestParams,
+                                       @RequestBody final String body,
                                        final HttpServletRequest request,
-                                       final Principal principal) {
+                                       final Authentication authentication) {
         ElideResponse response = elide.post(
+                getBaseUrlEndpoint(),
                 getJsonApiPath(request),
                 body,
-                principal
+                new MultivaluedHashMap<>(allRequestParams),
+                getPrincipal(authentication),
+                API_VERSION,
+                UUID.randomUUID()
         );
         return wrapResponse(response);
     }
 
-    @RequestMapping(
-            method = RequestMethod.PATCH,
-            produces = JSON_API_MEDIA_TYPE,
-            value = {"/{entity}/{id}", "/{entity}/{id}/relationships/{entity2}"})
-    @Transactional
-    @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<String> patch(@RequestBody final String body,
+    //!!! No @Transactional - transactions are being handled by Elide
+    @PatchMapping(value = "/**", consumes = {JSON_API_MEDIA_TYPE, MediaType.APPLICATION_JSON_VALUE}, produces = JSON_API_MEDIA_TYPE)
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<String> patch(@RequestParam final Map<String, String> allRequestParams,
+                                        @RequestBody final String body,
                                         final HttpServletRequest request,
-                                        final Principal principal) {
-        ElideResponse response = elide.patch(JSON_API_MEDIA_TYPE,
+                                        final Authentication authentication) {
+        ElideResponse response = elide.patch(
+                getBaseUrlEndpoint(),
+                JSON_API_MEDIA_TYPE,
                 JSON_API_MEDIA_TYPE,
                 getJsonApiPath(request),
                 body,
-                principal
+                new MultivaluedHashMap<>(allRequestParams),
+                getPrincipal(authentication),
+                API_VERSION,
+                UUID.randomUUID()
         );
         return wrapResponse(response);
     }
 
-    @RequestMapping(
-            method = RequestMethod.DELETE,
-            produces = JSON_API_MEDIA_TYPE,
-            value = {"/{entity}/{id}", "/{entity}/{id}/relationships/{entity2}"})
-    @Transactional
-    @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<String> delete(final HttpServletRequest request,
-                                         final Principal principal) {
-        ElideResponse response = elide.delete(
+    //!!! No @Transactional - transactions are being handled by Elide
+    @PatchMapping(value = "/**", consumes = JSON_API_PATCH_MEDIA_TYPE, produces = JSON_API_MEDIA_TYPE)
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<String> extensionPatch(@RequestParam final Map<String, String> allRequestParams,
+                                                 @RequestBody final String body,
+                                                 final HttpServletRequest request,
+                                                 final Authentication authentication) {
+        ElideResponse response = elide.patch(
+                getBaseUrlEndpoint(),
+                JSON_API_PATCH_MEDIA_TYPE,
+                JSON_API_MEDIA_TYPE,
                 getJsonApiPath(request),
-                null,
-                principal
+                body,
+                new MultivaluedHashMap<>(allRequestParams),
+                getPrincipal(authentication),
+                API_VERSION,
+                UUID.randomUUID()
+        );
+        return wrapResponse(response);
+    }
+
+    //!!! No @Transactional - transactions are being handled by Elide
+    @DeleteMapping(value = "/**", produces = JSON_API_MEDIA_TYPE)
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<String> delete(@RequestParam final Map<String, String> allRequestParams,
+                                         @RequestBody(required = false) final String body,
+                                         final HttpServletRequest request,
+                                         final Authentication authentication) {
+        ElideResponse response = elide.delete(
+                getBaseUrlEndpoint(),
+                getJsonApiPath(request),
+                body,
+                new MultivaluedHashMap<>(allRequestParams),
+                getPrincipal(authentication),
+                API_VERSION,
+                UUID.randomUUID()
         );
         return wrapResponse(response);
     }
@@ -102,6 +152,29 @@ public class DataController {
     }
 
     private String getJsonApiPath(HttpServletRequest request) {
-        return ((String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE)).replace(PATH_PREFIX, "");
+        String pathname = (String) request
+                .getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+
+        return pathname.replaceFirst(PATH_PREFIX, "");
+    }
+
+
+    private String getBaseUrlEndpoint() {
+        return ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString()
+                + PATH_PREFIX + "/";
+    }
+
+    @Component(GetCacheKeyGenerator.NAME)
+    class GetCacheKeyGenerator implements KeyGenerator {
+        static final String NAME = "elideGetCacheKeyGenerator";
+
+        @Override
+        public Object generate(Object target, Method method, Object... params) {
+            @SuppressWarnings("unchecked")
+            Map<String, String> allRequestParams = (Map<String, String>) params[0];
+            final HttpServletRequest request = (HttpServletRequest) params[1];
+
+            return method.getName() + getJsonApiPath(request) + allRequestParams;
+        }
     }
 }

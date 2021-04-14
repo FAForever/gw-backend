@@ -36,9 +36,9 @@ public class AddCharacterToAssaultTask implements JavaDelegate {
         PlanetaryAssaultAccessor accessor = PlanetaryAssaultAccessor.of(execution);
         log.debug("addCharacterToAssaultTask for battle {}", accessor.getBusinessKey());
 
-        Battle battle = battleRepository.findOne(accessor.getBattleId());
-        Planet planet = planetRepository.findOne(accessor.getPlanetId());
-        GwCharacter character = characterRepository.findOne(accessor.getRequestCharacter());
+        Battle battle = battleRepository.getOne(accessor.getBattleId());
+        Planet planet = planetRepository.getOne(accessor.getPlanetId());
+        GwCharacter character = characterRepository.getOne(accessor.getRequestCharacter());
 
         validationHelper.validateCharacterInBattle(character, battle, false);
         validationHelper.validateCharacterFreeForGame(character);

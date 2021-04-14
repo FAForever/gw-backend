@@ -56,7 +56,7 @@ public class GetRequestTokenAuthenticationFilter extends AbstractPreAuthenticate
         List<SimpleGrantedAuthority> grantedAuthorities = new ArrayList<>();
         accessToken.getAuthorities().forEach(role -> grantedAuthorities.add(new SimpleGrantedAuthority(role)));
 
-        GwCharacter character = characterService.getActiveCharacterByFafId(accessToken.getUserId());
+        GwCharacter character = characterService.getActiveCharacterByFafId(accessToken.getUserId()).orElse(null);
 
         return new User(accessToken.getUserId(), character, accessToken.getUserName(), "N/A", grantedAuthorities);
     }

@@ -32,7 +32,7 @@ public class CheckAndPerformPromotionTask implements JavaDelegate {
 
         CalculatePromotionsAccessor accessor = CalculatePromotionsAccessor.of(execution);
 
-        GwCharacter character = characterRepository.findOne(accessor.getCharacter_Local());
+        GwCharacter character = characterRepository.getOne(accessor.getCharacter_Local());
         Optional<Rank> availableRank = rankRepository.findNextRank(character.getRank().getLevel(), character.getXp());
 
         if(availableRank.isPresent()) {

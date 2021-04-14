@@ -16,7 +16,7 @@ import java.sql.SQLException;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.camunda.bpm.engine.test.assertions.ProcessEngineAssertions.assertThat;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.execute;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.job;
 import static org.mockito.Mockito.mock;

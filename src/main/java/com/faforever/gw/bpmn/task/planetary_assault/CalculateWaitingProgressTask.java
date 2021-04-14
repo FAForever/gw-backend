@@ -31,7 +31,7 @@ public class CalculateWaitingProgressTask implements JavaDelegate{
         PlanetaryAssaultAccessor accessor = PlanetaryAssaultAccessor.of(execution);
         log.debug("calculatePassiveAssaultProgressTask for battle {}", accessor.getBusinessKey());
 
-        Battle battle = battleRepository.findOne(accessor.getBattleId());
+        Battle battle = battleRepository.getOne(accessor.getBattleId());
         Integer mapSlots = battle.getPlanet().getMap().getTotalSlots();
         long attackerCount = battle.getParticipants().stream()
                 .filter(p -> p.getFaction() == battle.getAttackingFaction())

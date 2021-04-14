@@ -42,12 +42,12 @@ public class FafUserAuthenticationConverter extends DefaultUserAuthenticationCon
         String userName = (String) map.get(USERNAME);
         Collection<? extends GrantedAuthority> authorities = getAuthorities(map);
 
-        GwCharacter character = characterService.getActiveCharacterByFafId(userId);
+        GwCharacter character = characterService.getActiveCharacterByFafId(userId).orElse(null);
         return new User(userId, character, userName, "N/A", authorities);
 //        return new GwAuthentication(userId, userName, authorities);
     }
 
-    private Collection<? extends GrantedAuthority> getAuthorities(Map<String, ?> map) {
+    protected Collection<? extends GrantedAuthority> getAuthorities(Map<String, ?> map) {
         if (!map.containsKey(AUTHORITIES)) {
             return Collections.emptySet();
         }
