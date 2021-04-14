@@ -38,11 +38,13 @@ public class CloseAssaultTest {
         when(delegateExecution.getProcessInstance()).thenReturn(delegateExecution);
         when(delegateExecution.getBusinessKey()).thenReturn("test");
 
-        when(delegateExecution.getVariable("battle"))
+        when(delegateExecution.getVariable("planet"))
                 .thenReturn(UUID.fromString("11111111-1111-1111-1111-111111111111"));
+        when(delegateExecution.getVariable("battle"))
+                .thenReturn(UUID.fromString("22222222-2222-2222-2222-222222222222"));
 
-        when(battleRepository.findOne(any(UUID.class))).thenReturn(battle);
-        when(planetRepository.findOne(any(UUID.class))).thenReturn(planet);
+        when(battleRepository.getOne(any(UUID.class))).thenReturn(battle);
+        when(planetRepository.getOne(any(UUID.class))).thenReturn(planet);
         when(battle.getAttackingFaction()).thenReturn(Faction.UEF);
         when(battle.getDefendingFaction()).thenReturn(Faction.CYBRAN);
 

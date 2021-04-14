@@ -15,7 +15,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.Arrays;
 
-import static org.camunda.bpm.engine.test.assertions.ProcessEngineAssertions.assertThat;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
 import static org.mockito.Mockito.mock;
 
 public class CalculatePromotionsTest {

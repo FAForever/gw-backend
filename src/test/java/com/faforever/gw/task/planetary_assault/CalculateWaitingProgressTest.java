@@ -44,7 +44,7 @@ public class CalculateWaitingProgressTest {
                 .thenReturn(UUID.fromString("11111111-1111-1111-1111-111111111111"));
         when(delegateExecution.getVariable("waitingProgress")).thenReturn(0.0);
 
-        when(battleRepository.findOne(any(UUID.class))).thenReturn(battle);
+        when(battleRepository.getOne(any(UUID.class))).thenReturn(battle);
         when(battle.getAttackingFaction()).thenReturn(Faction.UEF);
         when(battle.getDefendingFaction()).thenReturn(Faction.CYBRAN);
         when(battle.getPlanet()).thenReturn(planet);

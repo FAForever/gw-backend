@@ -70,7 +70,7 @@ public class PlanetaryAssaultService {
         UUID battleUUID = UUID.randomUUID();
 
         GwCharacter character = userService.getActiveCharacter(user);
-        Planet planet = planetRepository.findOne(message.getPlanetId());
+        Planet planet = planetRepository.getOne(message.getPlanetId());
 
         // TODO: How do we handle NullPointerException i.e. if planet is null?
 
@@ -143,7 +143,7 @@ public class PlanetaryAssaultService {
         gameResultMessage.getPlayerResults().forEach(
                 playerResult -> {
                     int fafId = playerResult.getPlayerId();
-                    GwCharacter character = characterRepository.findActiveCharacterByFafId(fafId);
+                    GwCharacter character = characterRepository.findActiveCharacterByFafId(fafId).orElse(null);
 
                     if (playerResult.isWinner()) {
                         if (gameResult.getWinner() != null && gameResult.getWinner() != character.getFaction()) {
@@ -264,7 +264,7 @@ public class PlanetaryAssaultService {
     @Transactional(dontRollbackOn = BpmnError.class)
     public void onMatchCreated(Battle detachedBattle, long gameId) {
         log.debug("Match created for battle ''{}'' with faf game id: {}", detachedBattle.getId(), gameId);
-        Battle battle = battleRepository.findOne(detachedBattle.getId());
+        Battle battle = battleRepository.getOne(detachedBattle.getId());
         battle.setFafGameId(gameId);
         battleRepository.save(battle);
     }

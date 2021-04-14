@@ -7,11 +7,15 @@ import com.faforever.gw.model.repository.CharacterRepository;
 import com.faforever.gw.model.repository.RankRepository;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoRule;
+import org.mockito.quality.Strictness;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -20,8 +24,9 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class CheckAndPerformPromotionTest {
+
     @Mock
     GwCharacter character;
     @Mock
@@ -47,7 +52,7 @@ public class CheckAndPerformPromotionTest {
         when(character.getRank()).thenReturn(nextRank);
         when(nextRank.getLevel()).thenReturn(5);
 
-        when(characterRepository.findOne(any(UUID.class))).thenReturn(character);
+        when(characterRepository.getOne(any(UUID.class))).thenReturn(character);
     }
 
     @Test

@@ -12,7 +12,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +22,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class AddCharacterToAssaultTest {
     @Mock
     private Battle battle;
@@ -56,10 +56,10 @@ public class AddCharacterToAssaultTest {
         when(delegateExecution.getVariable("battle"))
                 .thenReturn(UUID.fromString("33333333-3333-3333-3333-333333333333"));
 
-        when(characterRepository.findOne(any(UUID.class))).thenReturn(character);
+        when(characterRepository.getOne(any(UUID.class))).thenReturn(character);
         when(character.getId()).thenReturn(UUID.fromString("11111111-1111-1111-1111-111111111111"));
-        when(battleRepository.findOne(any(UUID.class))).thenReturn(battle);
-        when(planetRepository.findOne(any(UUID.class))).thenReturn(planet);
+        when(battleRepository.getOne(any(UUID.class))).thenReturn(battle);
+        when(planetRepository.getOne(any(UUID.class))).thenReturn(planet);
 
         when(battle.getAttackingFaction()).thenReturn(Faction.UEF);
         when(battle.getDefendingFaction()).thenReturn(Faction.CYBRAN);

@@ -25,12 +25,12 @@ public class CharacterService {
     }
 
     @Transactional
-    public GwCharacter getActiveCharacterByFafId(long fafId) {
+    public Optional<GwCharacter> getActiveCharacterByFafId(long fafId) {
         return characterRepository.findActiveCharacterByFafId(fafId);
     }
 
     public GwCharacter requireCharacter(UUID characterId) {
-        return Optional.ofNullable(characterRepository.getOne(characterId))
+        return characterRepository.findById(characterId)
                 .orElseThrow(() -> new IllegalStateException(String.format("Character does not exist: %s", characterId)));
     }
 

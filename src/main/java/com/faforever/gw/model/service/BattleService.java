@@ -23,7 +23,7 @@ public class BattleService {
     }
 
     public void processGameResult(GameResult result) {
-        Battle battle = Optional.ofNullable(battleRepository.findOne(result.getBattle()))
+        Battle battle = Optional.ofNullable(battleRepository.getOne(result.getBattle()))
                 .orElseThrow(() -> new IllegalStateException(String.format("Battle does not exist: %s", result.getBattle())));
 
         battle.setWinningFaction(result.getWinner());

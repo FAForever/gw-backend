@@ -68,8 +68,8 @@ public class InitiateAssaultTest {
         when(delegateExecution.getVariable("battle"))
                 .thenReturn(UUID.fromString("33333333-3333-3333-3333-333333333333"));
 
-        when(characterRepository.findOne(any(UUID.class))).thenReturn(character);
-        when(planetRepository.findOne(any(UUID.class))).thenReturn(planet);
+        when(characterRepository.getOne(any(UUID.class))).thenReturn(character);
+        when(planetRepository.getOne(any(UUID.class))).thenReturn(planet);
 
         when(character.getFaction())
                 .thenReturn(Faction.UEF);

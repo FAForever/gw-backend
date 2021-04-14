@@ -54,7 +54,7 @@ public class UniverseGenerator {
     public void persist() {
         for (SolarSystem solarSystem : solarSystems) {
             solarSystemRepository.save(solarSystem);
-            planetRepository.save(solarSystem.getPlanets());
+            planetRepository.saveAll(solarSystem.getPlanets());
         }
     }
 

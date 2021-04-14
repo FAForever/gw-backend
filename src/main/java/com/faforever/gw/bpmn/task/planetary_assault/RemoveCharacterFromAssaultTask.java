@@ -36,8 +36,8 @@ public class RemoveCharacterFromAssaultTask implements JavaDelegate {
         PlanetaryAssaultAccessor accessor = PlanetaryAssaultAccessor.of(execution);
         log.debug("removeCharacterFromAssaultTask for battle {}", accessor.getBusinessKey());
 
-        Battle battle = battleRepository.findOne(accessor.getBattleId());
-        GwCharacter character = characterRepository.findOne(accessor.getRequestCharacter());
+        Battle battle = battleRepository.getOne(accessor.getBattleId());
+        GwCharacter character = characterRepository.getOne(accessor.getRequestCharacter());
 
         validationHelper.validateCharacterInBattle(character, battle, true);
 

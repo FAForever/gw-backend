@@ -32,9 +32,8 @@ public class GwUserRegistry {
     }
 
     public Optional<User> getUser(UUID gwCharacterId) {
-        GwCharacter character = characterRepository.findOne(gwCharacterId);
-
-        return getUser(character.getFafId());
+        return characterRepository.findById(gwCharacterId)
+                .flatMap(character -> getUser(character.getFafId()));
     }
 
     public Optional<User> getUser(long fafUserId) {

@@ -25,7 +25,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.context.ApplicationContext;
 
 import java.util.Optional;
@@ -38,7 +38,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class PlanetaryAssaultServiceTest {
     @Mock
     private ApplicationContext applicationContext;
@@ -73,7 +73,7 @@ public class PlanetaryAssaultServiceTest {
     public void setUp() throws Exception {
         when(userService.getUserFromContext()).thenReturn(user);
         when(userService.getActiveCharacter(user)).thenReturn(character);
-        when(planetRepository.findOne(any(UUID.class))).thenReturn(planet);
+        when(planetRepository.getOne(any(UUID.class))).thenReturn(planet);
 
         when(battleRepository.findOneByFafGameId(anyLong())).thenReturn(Optional.of(battle));
         when(battle.getId()).thenReturn(UUID.randomUUID());
@@ -185,7 +185,7 @@ public class PlanetaryAssaultServiceTest {
     @Test
     public void onGameResult() {
         int fafId = 5;
-        when(characterRepository.findActiveCharacterByFafId(fafId)).thenReturn(character);
+        when(characterRepository.findActiveCharacterByFafId(fafId)).thenReturn(Optional.of(character));
         when(character.getId()).thenReturn(UUID.fromString("33333333-3333-3333-3333-333333333333"));
         when(character.getFaction()).thenReturn(Faction.UEF);
 

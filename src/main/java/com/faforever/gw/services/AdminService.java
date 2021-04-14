@@ -49,8 +49,8 @@ public class AdminService {
         User user = userService.getUserFromContext();
         log.debug("onAddSolarSystemLink by user {}", user.getId());
 
-        SolarSystem from = solarSystemRepository.findOne(message.getSolarSystemFrom());
-        SolarSystem to = solarSystemRepository.findOne(message.getSolarSystemTo());
+        SolarSystem from = solarSystemRepository.getOne(message.getSolarSystemFrom());
+        SolarSystem to = solarSystemRepository.getOne(message.getSolarSystemTo());
 
         if (from.getConnectedSystems().contains(to)) {
             log.error("Adding solar system link failed from {} to {} - already linked", from, to);
@@ -69,8 +69,8 @@ public class AdminService {
     public void onRemoveSolarSystemLink(UnlinkSolarSystemsRequestMessage message) {
         User user = userService.getUserFromContext();
         log.debug("onRemoveSolarSystemLink by user {}", user.getId());
-        SolarSystem from = solarSystemRepository.findOne(message.getSolarSystemFrom());
-        SolarSystem to = solarSystemRepository.findOne(message.getSolarSystemTo());
+        SolarSystem from = solarSystemRepository.getOne(message.getSolarSystemFrom());
+        SolarSystem to = solarSystemRepository.getOne(message.getSolarSystemTo());
 
         if (!from.getConnectedSystems().contains(to)) {
             log.error("Removing solar system link failed from {} to {} - not linked", from, to);
@@ -89,7 +89,7 @@ public class AdminService {
     public void onSetPlanetFaction(SetPlanetFactionRequestMessage message) {
         User user = userService.getUserFromContext();
         log.debug("onSetPlanetFaction by user {}", user.getId());
-        Planet planet = planetRepository.findOne(message.getPlanetId());
+        Planet planet = planetRepository.getOne(message.getPlanetId());
 
         if (planet == null) {
             sendErrorToUser(user, message.getRequestId(), GwErrorType.PLANET_DOES_NOT_EXIST);

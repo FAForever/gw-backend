@@ -14,7 +14,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.Arrays;
 
-import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareAssertions.assertThat;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
 
 
 public class RegularIncomeTest {
