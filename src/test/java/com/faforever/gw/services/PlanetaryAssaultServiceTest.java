@@ -184,7 +184,7 @@ public class PlanetaryAssaultServiceTest {
 
     @Test
     public void onGameResult() {
-        long fafId = 5L;
+        int fafId = 5;
         when(characterRepository.findActiveCharacterByFafId(fafId)).thenReturn(character);
         when(character.getId()).thenReturn(UUID.fromString("33333333-3333-3333-3333-333333333333"));
         when(character.getFaction()).thenReturn(Faction.UEF);
@@ -193,7 +193,7 @@ public class PlanetaryAssaultServiceTest {
                 123456,
                 false,
                 Sets.newHashSet(new GameResultMessage.PlayerResult()
-                        .setPlayerId(1)
+                        .setPlayerId(fafId)
                         .setWinner(true)
                         .setAcuKilled(false))
         );
