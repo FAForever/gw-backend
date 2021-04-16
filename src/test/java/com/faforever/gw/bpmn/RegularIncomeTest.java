@@ -40,7 +40,7 @@ public class RegularIncomeTest {
     public void success() throws Exception {
         ProcessInstance processInstance = startProcess();
 
-        assertThat(processInstance).hasPassedInOrder(
+        assertThat(processInstance).hasPassed(
                 "StartEvent_RegularIncomeDue",
                 "ServiceTask_SelectAllActiveCharacters",
                 "StartEvent_GenerateIncomeSub",
