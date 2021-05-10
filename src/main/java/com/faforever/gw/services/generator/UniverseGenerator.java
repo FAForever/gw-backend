@@ -6,6 +6,7 @@ import com.faforever.gw.model.Planet;
 import com.faforever.gw.model.SolarSystem;
 import com.faforever.gw.model.repository.PlanetRepository;
 import com.faforever.gw.model.repository.SolarSystemRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.engine.DecisionService;
@@ -21,6 +22,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class UniverseGenerator {
     private final DecisionService decisionService;
     private final SolarSystemNameGenerator solarSystemNameGenerator;
@@ -40,15 +42,6 @@ public class UniverseGenerator {
     private List<SolarSystem> solarSystems = new ArrayList<>();
     private int averagePlanetsPerSolarSystem;
     private int planetCountMaxDeviation;
-
-    @Inject
-    public UniverseGenerator(DecisionService decisionService, SolarSystemNameGenerator solarSystemNameGenerator, SolarSystemRepository solarSystemRepository, PlanetRepository planetRepository, MapSelectorService mapSelectorService) {
-        this.decisionService = decisionService;
-        this.solarSystemNameGenerator = solarSystemNameGenerator;
-        this.solarSystemRepository = solarSystemRepository;
-        this.planetRepository = planetRepository;
-        this.mapSelectorService = mapSelectorService;
-    }
 
     @Transactional
     public void persist() {

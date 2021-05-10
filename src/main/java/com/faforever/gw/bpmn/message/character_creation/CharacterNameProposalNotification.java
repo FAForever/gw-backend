@@ -5,6 +5,7 @@ import com.faforever.gw.messaging.client.ClientMessagingService;
 import com.faforever.gw.messaging.client.outbound.CharacterNameProposalMessage;
 import com.faforever.gw.security.User;
 import com.faforever.gw.services.UserService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
@@ -16,15 +17,10 @@ import java.util.UUID;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class CharacterNameProposalNotification implements JavaDelegate {
     private final ClientMessagingService clientMessagingService;
     private final UserService userService;
-
-    @Inject
-    public CharacterNameProposalNotification(ClientMessagingService clientMessagingService, UserService userService) {
-        this.clientMessagingService = clientMessagingService;
-        this.userService = userService;
-    }
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {

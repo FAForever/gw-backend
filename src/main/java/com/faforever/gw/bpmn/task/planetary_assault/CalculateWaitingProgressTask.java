@@ -5,6 +5,7 @@ import com.faforever.gw.bpmn.services.PlanetaryAssaultService;
 import com.faforever.gw.model.Battle;
 import com.faforever.gw.model.repository.BattleRepository;
 
+import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
@@ -16,14 +17,10 @@ import javax.transaction.Transactional;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class CalculateWaitingProgressTask implements JavaDelegate{
     private final PlanetaryAssaultService planetaryAssaultService;
     private final BattleRepository battleRepository;
-
-    public CalculateWaitingProgressTask(PlanetaryAssaultService planetaryAssaultService, BattleRepository battleRepository) {
-        this.planetaryAssaultService = planetaryAssaultService;
-        this.battleRepository = battleRepository;
-    }
 
     @Override
     @Transactional(dontRollbackOn = BpmnError.class)

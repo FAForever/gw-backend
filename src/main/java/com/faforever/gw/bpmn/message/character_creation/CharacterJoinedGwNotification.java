@@ -3,6 +3,7 @@ package com.faforever.gw.bpmn.message.character_creation;
 import com.faforever.gw.bpmn.accessors.CharacterCreationAccessor;
 import com.faforever.gw.messaging.client.ClientMessagingService;
 import com.faforever.gw.messaging.client.outbound.CharacterJoinedGwMessage;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -13,13 +14,9 @@ import javax.inject.Inject;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class CharacterJoinedGwNotification implements JavaDelegate {
     private final ClientMessagingService clientMessagingService;
-
-    @Inject
-    public CharacterJoinedGwNotification(ClientMessagingService clientMessagingService) {
-        this.clientMessagingService = clientMessagingService;
-    }
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {

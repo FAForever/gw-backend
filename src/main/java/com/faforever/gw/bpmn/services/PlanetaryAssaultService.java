@@ -15,6 +15,7 @@ import com.faforever.gw.model.repository.CharacterRepository;
 import com.faforever.gw.model.repository.PlanetRepository;
 import com.faforever.gw.security.User;
 import com.faforever.gw.services.UserService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.engine.DecisionService;
@@ -34,6 +35,7 @@ import java.util.*;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 /**
  * Service class for the BPMN process "planetary assault"
  */
@@ -51,16 +53,6 @@ public class PlanetaryAssaultService {
     private final PlanetRepository planetRepository;
     private final CharacterRepository characterRepository;
     private final UserService userService;
-
-    public PlanetaryAssaultService(ProcessEngine processEngine, RuntimeService runtimeService, ClientMessagingService clientMessagingService, BattleRepository battleRepository, PlanetRepository planetRepository, CharacterRepository characterRepository, UserService userService) {
-        this.processEngine = processEngine;
-        this.runtimeService = runtimeService;
-        this.clientMessagingService = clientMessagingService;
-        this.battleRepository = battleRepository;
-        this.planetRepository = planetRepository;
-        this.characterRepository = characterRepository;
-        this.userService = userService;
-    }
 
     @Transactional(dontRollbackOn = BpmnError.class)
     @EventListener

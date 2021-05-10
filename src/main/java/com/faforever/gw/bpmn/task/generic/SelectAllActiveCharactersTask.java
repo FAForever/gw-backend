@@ -3,6 +3,7 @@ package com.faforever.gw.bpmn.task.generic;
 
 import com.faforever.gw.model.GwCharacter;
 import com.faforever.gw.model.repository.CharacterRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
@@ -16,13 +17,9 @@ import java.util.UUID;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class SelectAllActiveCharactersTask implements JavaDelegate {
     private final CharacterRepository characterRepository;
-
-    @Inject
-    public SelectAllActiveCharactersTask(CharacterRepository characterRepository) {
-        this.characterRepository = characterRepository;
-    }
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {

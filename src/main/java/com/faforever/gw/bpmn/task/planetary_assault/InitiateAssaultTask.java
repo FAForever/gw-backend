@@ -12,6 +12,7 @@ import com.faforever.gw.model.repository.BattleRepository;
 import com.faforever.gw.model.repository.CharacterRepository;
 import com.faforever.gw.model.repository.PlanetRepository;
 
+import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
@@ -25,21 +26,13 @@ import javax.transaction.Transactional;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class InitiateAssaultTask implements JavaDelegate {
     private final EntityManager entityManager;
     private final CharacterRepository characterRepository;
     private final PlanetRepository planetRepository;
     private final BattleRepository battleRepository;
     private final ValidationHelper validationHelper;
-
-    @Inject
-    public InitiateAssaultTask(EntityManager entityManager, CharacterRepository characterRepository, PlanetRepository planetRepository, BattleRepository battleRepository, ValidationHelper validationHelper) {
-        this.entityManager = entityManager;
-        this.characterRepository = characterRepository;
-        this.planetRepository = planetRepository;
-        this.battleRepository = battleRepository;
-        this.validationHelper = validationHelper;
-    }
 
     @Override
     @Transactional(dontRollbackOn = BpmnError.class)

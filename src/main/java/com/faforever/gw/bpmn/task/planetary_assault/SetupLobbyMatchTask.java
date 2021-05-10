@@ -9,6 +9,7 @@ import com.faforever.gw.model.Battle;
 import com.faforever.gw.model.BattleParticipant;
 import com.faforever.gw.model.BattleRole;
 import com.faforever.gw.model.repository.BattleRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -22,17 +23,11 @@ import java.util.List;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class SetupLobbyMatchTask implements JavaDelegate {
     private final PlanetaryAssaultService planetaryAssaultService;
     private final LobbyService lobbyService;
     private final BattleRepository battleRepository;
-
-    @Inject
-    public SetupLobbyMatchTask(PlanetaryAssaultService planetaryAssaultService, LobbyService lobbyService, BattleRepository battleRepository) {
-        this.planetaryAssaultService = planetaryAssaultService;
-        this.lobbyService = lobbyService;
-        this.battleRepository = battleRepository;
-    }
 
     @Override
     @Transactional(dontRollbackOn = BpmnError.class)

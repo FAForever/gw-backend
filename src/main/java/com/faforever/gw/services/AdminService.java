@@ -15,6 +15,7 @@ import com.faforever.gw.model.SolarSystem;
 import com.faforever.gw.model.repository.PlanetRepository;
 import com.faforever.gw.model.repository.SolarSystemRepository;
 import com.faforever.gw.security.User;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
@@ -27,21 +28,13 @@ import java.util.UUID;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class AdminService {
     private final ClientMessagingService clientMessagingService;
     private final SolarSystemRepository solarSystemRepository;
     private final PlanetRepository planetRepository;
     private final UserService userService;
     private final LobbyService lobbyService;
-
-    @Inject
-    public AdminService(ClientMessagingService clientMessagingService, SolarSystemRepository solarSystemRepository, PlanetRepository planetRepository, UserService userService, LobbyService lobbyService) {
-        this.clientMessagingService = clientMessagingService;
-        this.solarSystemRepository = solarSystemRepository;
-        this.planetRepository = planetRepository;
-        this.userService = userService;
-        this.lobbyService = lobbyService;
-    }
 
     @EventListener
     @Transactional

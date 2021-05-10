@@ -5,6 +5,7 @@ import com.faforever.gw.messaging.client.ClientMessagingService;
 import com.faforever.gw.messaging.client.outbound.ErrorMessage;
 import com.faforever.gw.security.User;
 import com.faforever.gw.services.UserService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -15,15 +16,10 @@ import javax.inject.Inject;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class UserErrorMessage implements JavaDelegate {
     private final ClientMessagingService clientMessagingService;
     private final UserService userService;
-
-    @Inject
-    public UserErrorMessage(ClientMessagingService clientMessagingService, UserService userService) {
-        this.clientMessagingService = clientMessagingService;
-        this.userService = userService;
-    }
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {

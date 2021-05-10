@@ -5,6 +5,7 @@ import com.faforever.gw.messaging.client.inbound.RequestCharacterMessage;
 import com.faforever.gw.messaging.client.inbound.SelectCharacterNameMessage;
 import com.faforever.gw.security.User;
 import com.faforever.gw.services.UserService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class CharacterCreationService {
     public static final String REQUEST_CHARACTER_MESSAGE = "Message_RequestCharacter";
     public static final String RECEIVE_CHARACTER_NAME_SELECTION_MESSAGE = "Message_ReceiveCharacterNameSelection";
@@ -21,12 +23,6 @@ public class CharacterCreationService {
     private final RuntimeService runtimeService;
     private final ClientMessagingService clientMessagingService;
     private final UserService userService;
-
-    public CharacterCreationService(RuntimeService runtimeService, ClientMessagingService clientMessagingService, UserService userService) {
-        this.runtimeService = runtimeService;
-        this.clientMessagingService = clientMessagingService;
-        this.userService = userService;
-    }
 
     @EventListener
     public void onRequestCharacter(RequestCharacterMessage message) {

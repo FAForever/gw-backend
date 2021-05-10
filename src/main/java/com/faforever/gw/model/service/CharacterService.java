@@ -4,6 +4,7 @@ import com.faforever.gw.messaging.client.ClientMessagingService;
 import com.faforever.gw.messaging.client.outbound.HelloMessage;
 import com.faforever.gw.model.GwCharacter;
 import com.faforever.gw.model.repository.CharacterRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -14,15 +15,10 @@ import java.util.UUID;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class CharacterService {
     private final CharacterRepository characterRepository;
     private final ClientMessagingService clientMessagingService;
-
-    @Inject
-    public CharacterService(CharacterRepository characterRepository, ClientMessagingService clientMessagingService) {
-        this.characterRepository = characterRepository;
-        this.clientMessagingService = clientMessagingService;
-    }
 
     @Transactional
     public Optional<GwCharacter> getActiveCharacterByFafId(long fafId) {

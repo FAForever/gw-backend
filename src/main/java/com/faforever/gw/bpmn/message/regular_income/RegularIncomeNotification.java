@@ -5,6 +5,7 @@ import com.faforever.gw.messaging.client.ClientMessagingService;
 import com.faforever.gw.messaging.client.outbound.UserIncomeMessage;
 import com.faforever.gw.security.GwUserRegistry;
 import com.faforever.gw.services.UserService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -15,17 +16,11 @@ import javax.inject.Inject;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class RegularIncomeNotification implements JavaDelegate {
     private final ClientMessagingService clientMessagingService;
     private final GwUserRegistry gwUserRegistry;
     private final UserService userService;
-
-    @Inject
-    public RegularIncomeNotification(ClientMessagingService clientMessagingService, GwUserRegistry gwUserRegistry, UserService userService) {
-        this.clientMessagingService = clientMessagingService;
-        this.gwUserRegistry = gwUserRegistry;
-        this.userService = userService;
-    }
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {

@@ -6,6 +6,7 @@ import com.faforever.gw.model.GwCharacter;
 import com.faforever.gw.model.Rank;
 import com.faforever.gw.model.repository.CharacterRepository;
 import com.faforever.gw.model.repository.RankRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
@@ -16,15 +17,10 @@ import java.util.Optional;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class CheckAndPerformPromotionTask implements JavaDelegate {
     private final CharacterRepository characterRepository;
     private final RankRepository rankRepository;
-
-    @Inject
-    public CheckAndPerformPromotionTask(CharacterRepository characterRepository, RankRepository rankRepository) {
-        this.characterRepository = characterRepository;
-        this.rankRepository = rankRepository;
-    }
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {

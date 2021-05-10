@@ -3,6 +3,7 @@ package com.faforever.gw;
 import com.faforever.gw.model.*;
 import com.faforever.gw.model.repository.*;
 import com.faforever.gw.services.generator.UniverseGenerator;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.jwt.Jwt;
 import org.springframework.security.jwt.JwtHelper;
 import org.springframework.security.jwt.crypto.sign.MacSigner;
@@ -17,6 +18,7 @@ import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Component
+@RequiredArgsConstructor
 public class DemoDataInitializer {
     private final UniverseGenerator universeGenerator;
     private final CharacterRepository characterRepository;
@@ -24,16 +26,6 @@ public class DemoDataInitializer {
     private final MapRepository mapRepository;
     private final RankRepository rankRepository;
     private final SolarSystemRepository solarSystemRepository;
-
-    @Inject
-    public DemoDataInitializer(UniverseGenerator universeGenerator, CharacterRepository characterRepository, PlanetRepository planetRepository, MapRepository mapRepository, RankRepository rankRepository, SolarSystemRepository solarSystemRepository) {
-        this.universeGenerator = universeGenerator;
-        this.characterRepository = characterRepository;
-        this.planetRepository = planetRepository;
-        this.mapRepository = mapRepository;
-        this.rankRepository = rankRepository;
-        this.solarSystemRepository = solarSystemRepository;
-    }
 
     @Transactional
     public void run() throws SQLException {

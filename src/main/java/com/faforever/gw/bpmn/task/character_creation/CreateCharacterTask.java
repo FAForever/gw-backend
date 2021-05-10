@@ -7,6 +7,7 @@ import com.faforever.gw.bpmn.services.GwErrorType;
 import com.faforever.gw.model.GwCharacter;
 import com.faforever.gw.model.repository.CharacterRepository;
 import com.faforever.gw.model.repository.RankRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
@@ -17,17 +18,11 @@ import java.util.UUID;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class CreateCharacterTask implements JavaDelegate {
     private final GwErrorService gwErrorService;
     private final CharacterRepository characterRepository;
     private final RankRepository rankRepository;
-
-    @Inject
-    public CreateCharacterTask(GwErrorService gwErrorService, CharacterRepository characterRepository, RankRepository rankRepository) {
-        this.gwErrorService = gwErrorService;
-        this.characterRepository = characterRepository;
-        this.rankRepository = rankRepository;
-    }
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {

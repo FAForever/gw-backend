@@ -6,6 +6,7 @@ import com.faforever.gw.messaging.client.outbound.BattleParticipantJoinedAssault
 import com.faforever.gw.model.GwCharacter;
 import com.faforever.gw.model.repository.BattleRepository;
 import com.faforever.gw.model.repository.CharacterRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -16,17 +17,11 @@ import javax.inject.Inject;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class BattleParticipantJoinedAssaultNotification implements JavaDelegate {
     private final CharacterRepository characterRepository;
     private final BattleRepository battleRepository;
     private final ClientMessagingService clientMessagingService;
-
-    @Inject
-    public BattleParticipantJoinedAssaultNotification(CharacterRepository characterRepository, BattleRepository battleRepository, ClientMessagingService clientMessagingService) {
-        this.characterRepository = characterRepository;
-        this.battleRepository = battleRepository;
-        this.clientMessagingService = clientMessagingService;
-    }
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {

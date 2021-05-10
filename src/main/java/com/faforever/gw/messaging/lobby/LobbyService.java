@@ -141,7 +141,7 @@ public class LobbyService {
     }
 
     private CompletableFuture<WebSocketSession> connect(String uri) {
-        return connect(uri, 20);
+        return connect(uri, 2);
     }
 
     @SneakyThrows

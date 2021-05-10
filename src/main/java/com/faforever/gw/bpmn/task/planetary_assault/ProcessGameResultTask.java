@@ -4,6 +4,7 @@ import com.faforever.gw.bpmn.accessors.PlanetaryAssaultAccessor;
 import com.faforever.gw.model.BattleRole;
 import com.faforever.gw.model.GameResult;
 import com.faforever.gw.model.service.BattleService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -15,13 +16,9 @@ import javax.transaction.Transactional;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class ProcessGameResultTask implements JavaDelegate {
     private final BattleService battleService;
-
-    @Inject
-    public ProcessGameResultTask(BattleService battleService) {
-        this.battleService = battleService;
-    }
 
     @Override
     @Transactional(dontRollbackOn = BpmnError.class)

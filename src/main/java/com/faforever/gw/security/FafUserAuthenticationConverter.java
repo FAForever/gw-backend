@@ -3,6 +3,7 @@ package com.faforever.gw.security;
 
 import com.faforever.gw.model.GwCharacter;
 import com.faforever.gw.model.service.CharacterService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.provider.token.DefaultUserAuthenticationConverter;
@@ -16,16 +17,13 @@ import java.util.Map;
 import static org.springframework.security.core.authority.AuthorityUtils.commaSeparatedStringToAuthorityList;
 
 @Component
+@RequiredArgsConstructor
 public class FafUserAuthenticationConverter extends DefaultUserAuthenticationConverter {
     private static final String ID = "user_id";
     private static final String NON_LOCKED = "non_locked";
 
 
     private final CharacterService characterService;
-
-    public FafUserAuthenticationConverter(CharacterService characterService) {
-        this.characterService = characterService;
-    }
 
     @Override
     public Map<String, ?> convertUserAuthentication(Authentication authentication) {

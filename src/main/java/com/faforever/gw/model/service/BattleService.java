@@ -3,6 +3,7 @@ package com.faforever.gw.model.service;
 import com.faforever.gw.bpmn.services.PlanetaryAssaultService;
 import com.faforever.gw.model.*;
 import com.faforever.gw.model.repository.BattleRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -11,16 +12,11 @@ import java.util.Map;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class BattleService {
     private final BattleRepository battleRepository;
     private final PlanetaryAssaultService planetaryAssaultService;
     private final CharacterService characterService;
-
-    public BattleService(BattleRepository battleRepository, PlanetaryAssaultService planetaryAssaultService, CharacterService characterService) {
-        this.battleRepository = battleRepository;
-        this.planetaryAssaultService = planetaryAssaultService;
-        this.characterService = characterService;
-    }
 
     public void processGameResult(GameResult result) {
         Battle battle = Optional.ofNullable(battleRepository.getOne(result.getBattle()))

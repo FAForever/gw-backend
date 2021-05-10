@@ -4,6 +4,7 @@ import com.faforever.gw.model.GwCharacter;
 import com.faforever.gw.model.service.CharacterService;
 import com.faforever.gw.security.GwUserRegistry;
 import com.faforever.gw.security.User;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
@@ -11,14 +12,10 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
     private final CharacterService characterService;
     private final GwUserRegistry gwUserRegistry;
-
-    public UserService(CharacterService characterService, GwUserRegistry gwUserRegistry) {
-        this.characterService = characterService;
-        this.gwUserRegistry = gwUserRegistry;
-    }
 
     public User getUserFromContext() {
         return (User) ((OAuth2Authentication) SecurityContextHolder.getContext().getAuthentication()).getUserAuthentication();

@@ -4,6 +4,7 @@ import com.faforever.gw.model.GwCharacter;
 import com.faforever.gw.model.repository.CharacterRepository;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
@@ -13,15 +14,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Component
+@RequiredArgsConstructor
 public class GwUserRegistry {
-    private final BiMap<User, Long> userCharacterMapping;
+    private final BiMap<User, Long> userCharacterMapping = HashBiMap.create();
     private final CharacterRepository characterRepository;
-
-    @Inject
-    public GwUserRegistry(CharacterRepository characterRepository) {
-        this.characterRepository = characterRepository;
-        userCharacterMapping = HashBiMap.create();
-    }
 
     public void addConnection(User user) {
         userCharacterMapping.forcePut(user, user.getId());
