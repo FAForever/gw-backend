@@ -1,12 +1,12 @@
 package com.faforever.gw.messaging.client.inbound;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Value;
 
 import java.util.UUID;
 
-@Data
-@AllArgsConstructor
-public class LeaveAssaultMessage extends InboundClientMessage {
-    private UUID battleId;
+@Value
+public class LeaveAssaultMessage implements InboundClientMessage {
+    UUID requestId = UUID.randomUUID();
+
+    UUID battleId;
 }

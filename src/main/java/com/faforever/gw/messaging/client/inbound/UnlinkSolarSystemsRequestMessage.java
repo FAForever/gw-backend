@@ -1,13 +1,13 @@
 package com.faforever.gw.messaging.client.inbound;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Value;
 
 import java.util.UUID;
 
-@Data
-@AllArgsConstructor
-public class UnlinkSolarSystemsRequestMessage extends InboundClientMessage {
-    private UUID solarSystemFrom;
-    private UUID solarSystemTo;
+@Value
+public class UnlinkSolarSystemsRequestMessage implements InboundClientMessage {
+    UUID requestId = UUID.randomUUID();
+
+    UUID solarSystemFrom;
+    UUID solarSystemTo;
 }

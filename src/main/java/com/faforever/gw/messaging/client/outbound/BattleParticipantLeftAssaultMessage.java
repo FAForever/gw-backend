@@ -7,18 +7,11 @@ import lombok.Value;
 import java.util.UUID;
 
 @Value
-public class BattleParticipantLeftAssaultMessage extends OutboundClientMessage {
-    private final UUID characterId;
-    private final UUID battleId;
-    private final Faction attackingFaction;
-    private final Faction defendingFaction;
-
-    public BattleParticipantLeftAssaultMessage(UUID characterId, UUID battleId, Faction attackingFaction, Faction defendingFaction) {
-        this.characterId = characterId;
-        this.battleId = battleId;
-        this.attackingFaction = attackingFaction;
-        this.defendingFaction = defendingFaction;
-    }
+public class BattleParticipantLeftAssaultMessage implements OutboundClientMessage {
+    UUID characterId;
+    UUID battleId;
+    Faction attackingFaction;
+    Faction defendingFaction;
 
     @Override
     public Audience getAudience() {

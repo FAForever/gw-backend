@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.UUID;
 
 @Data
-public class CharacterPromotionMessage extends OutboundClientMessage {
+public class CharacterPromotionMessage implements OutboundClientMessage {
     private UUID character;
     private int newRank;
 

@@ -1,11 +1,13 @@
 package com.faforever.gw.messaging.client.inbound;
 
 import com.faforever.gw.model.Faction;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Value;
 
-@Data
-@AllArgsConstructor
-public class RequestCharacterMessage extends InboundClientMessage {
-    private Faction faction;
+import java.util.UUID;
+
+@Value
+public class RequestCharacterMessage implements InboundClientMessage {
+    UUID requestId = UUID.randomUUID();
+
+    Faction faction;
 }

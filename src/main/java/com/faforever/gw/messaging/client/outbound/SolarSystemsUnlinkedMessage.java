@@ -2,18 +2,14 @@ package com.faforever.gw.messaging.client.outbound;
 
 import com.faforever.gw.messaging.client.Audience;
 import lombok.Data;
+import lombok.Value;
 
 import java.util.UUID;
 
-@Data
-public class SolarSystemsUnlinkedMessage extends OutboundClientMessage {
-    private UUID solarSystemFrom;
-    private UUID solarSystemTo;
-
-    public SolarSystemsUnlinkedMessage(UUID solarSystemFrom, UUID solarSystemTo) {
-        this.solarSystemFrom = solarSystemFrom;
-        this.solarSystemTo = solarSystemTo;
-    }
+@Value
+public class SolarSystemsUnlinkedMessage implements OutboundClientMessage {
+    UUID solarSystemFrom;
+    UUID solarSystemTo;
 
     @Override
     public Audience getAudience() {

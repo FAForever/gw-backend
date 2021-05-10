@@ -3,12 +3,14 @@ package com.faforever.gw.messaging.client.inbound;
 import com.faforever.gw.model.Faction;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Value;
 
 import java.util.UUID;
 
-@Data
-@AllArgsConstructor
-public class SetPlanetFactionRequestMessage extends InboundClientMessage {
-    private UUID planetId;
-    private Faction newOwner;
+@Value
+public class SetPlanetFactionRequestMessage implements InboundClientMessage {
+    UUID requestId = UUID.randomUUID();
+
+    UUID planetId;
+    Faction newOwner;
 }
