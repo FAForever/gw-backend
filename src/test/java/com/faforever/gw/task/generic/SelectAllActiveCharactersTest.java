@@ -42,11 +42,11 @@ public class SelectAllActiveCharactersTest {
 
     @Test
     public void testNoActiveCharacters() throws Exception {
-        when(characterRepository.findActiveCharacters()).thenReturn(Collections.EMPTY_LIST);
+        when(characterRepository.findActiveCharacters()).thenReturn(Collections.emptyList());
 
         task.execute(delegateExecution);
 
-        verify(delegateExecution).setVariable("activeCharacters", Collections.EMPTY_LIST);
+        verify(delegateExecution).setVariable("activeCharacters", Collections.emptyList());
     }
 
     @Test
