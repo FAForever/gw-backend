@@ -3,8 +3,7 @@ package com.faforever.gw.bpmn.accessors;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -16,7 +15,7 @@ public class CalculatePromotionsAccessor extends BaseAccessor {
     }
 
     public Collection<UUID> getActiveCharacters() {
-        return (Collection<UUID>) getOrDefault("activeCharacters", Collections.EMPTY_LIST);
+        return (Collection<UUID>) getOrDefault("activeCharacters", List.of());
     }
 
     public UUID getCharacter_Local() {

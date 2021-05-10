@@ -13,13 +13,14 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SelectAllActiveCharactersTest {
@@ -42,11 +43,11 @@ public class SelectAllActiveCharactersTest {
 
     @Test
     public void testNoActiveCharacters() throws Exception {
-        when(characterRepository.findActiveCharacters()).thenReturn(Collections.emptyList());
+        when(characterRepository.findActiveCharacters()).thenReturn(List.of());
 
         task.execute(delegateExecution);
 
-        verify(delegateExecution).setVariable("activeCharacters", Collections.emptyList());
+        verify(delegateExecution).setVariable("activeCharacters", List.of());
     }
 
     @Test

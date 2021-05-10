@@ -4,7 +4,6 @@ import com.faforever.gw.bpmn.task.character_creation.CheckUserCharactersTask;
 import com.faforever.gw.model.Faction;
 import com.faforever.gw.model.GwCharacter;
 import com.faforever.gw.model.repository.CharacterRepository;
-import org.assertj.core.util.Lists;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,7 +11,11 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import static org.mockito.Mockito.*;
+import java.util.List;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class CheckUserCharactersTaskTest {
@@ -41,7 +44,7 @@ public class CheckUserCharactersTaskTest {
 
     @Test
     public void testNoExistingCharacters() throws Exception {
-        when(characterRepository.findByFafId(99L)).thenReturn(Lists.emptyList());
+        when(characterRepository.findByFafId(99L)).thenReturn(List.of());
 
         task.execute(delegateExecution);
 
@@ -52,7 +55,7 @@ public class CheckUserCharactersTaskTest {
 
     @Test
     public void testJustAnActiveCharacterWithFactionMismatch() throws Exception {
-        when(characterRepository.findByFafId(99L)).thenReturn(Lists.newArrayList(activeCharacter));
+        when(characterRepository.findByFafId(99L)).thenReturn(List.of(activeCharacter));
         when(activeCharacter.getFaction()).thenReturn(Faction.AEON);
 
         task.execute(delegateExecution);
@@ -64,7 +67,7 @@ public class CheckUserCharactersTaskTest {
 
     @Test
     public void testJustAnActiveCharacterWithFactionMatch() throws Exception {
-        when(characterRepository.findByFafId(99L)).thenReturn(Lists.newArrayList(activeCharacter));
+        when(characterRepository.findByFafId(99L)).thenReturn(List.of(activeCharacter));
         when(activeCharacter.getFaction()).thenReturn(Faction.UEF);
 
         task.execute(delegateExecution);
@@ -76,7 +79,7 @@ public class CheckUserCharactersTaskTest {
 
     @Test(expected = IllegalStateException.class)
     public void testActiveAndDeadCharacterWithDivergentFactions() throws Exception {
-        when(characterRepository.findByFafId(99L)).thenReturn(Lists.newArrayList(activeCharacter, deadCharacter));
+        when(characterRepository.findByFafId(99L)).thenReturn(List.of(activeCharacter, deadCharacter));
         when(activeCharacter.getFaction()).thenReturn(Faction.UEF);
         when(deadCharacter.getFaction()).thenReturn(Faction.AEON);
 
@@ -85,7 +88,7 @@ public class CheckUserCharactersTaskTest {
 
     @Test
     public void testActiveAndDeadCharacterWithFactionMismatch() throws Exception {
-        when(characterRepository.findByFafId(99L)).thenReturn(Lists.newArrayList(activeCharacter, deadCharacter));
+        when(characterRepository.findByFafId(99L)).thenReturn(List.of(activeCharacter, deadCharacter));
         when(activeCharacter.getFaction()).thenReturn(Faction.AEON);
         when(deadCharacter.getFaction()).thenReturn(Faction.AEON);
 
@@ -98,7 +101,7 @@ public class CheckUserCharactersTaskTest {
 
     @Test
     public void testActiveAndDeadCharacterWithFactionMatch() throws Exception {
-        when(characterRepository.findByFafId(99L)).thenReturn(Lists.newArrayList(activeCharacter, deadCharacter));
+        when(characterRepository.findByFafId(99L)).thenReturn(List.of(activeCharacter, deadCharacter));
         when(activeCharacter.getFaction()).thenReturn(Faction.UEF);
         when(deadCharacter.getFaction()).thenReturn(Faction.UEF);
 

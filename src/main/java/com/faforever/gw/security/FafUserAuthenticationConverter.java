@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 import static org.springframework.security.core.authority.AuthorityUtils.commaSeparatedStringToAuthorityList;
 
@@ -47,7 +47,7 @@ public class FafUserAuthenticationConverter extends DefaultUserAuthenticationCon
 
     protected Collection<? extends GrantedAuthority> getAuthorities(Map<String, ?> map) {
         if (!map.containsKey(AUTHORITIES)) {
-            return Collections.emptySet();
+            return Set.of();
         }
         Object authorities = map.get(AUTHORITIES);
         if (authorities instanceof String) {

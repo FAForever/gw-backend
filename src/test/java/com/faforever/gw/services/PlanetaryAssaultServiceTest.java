@@ -15,7 +15,6 @@ import com.faforever.gw.model.repository.BattleRepository;
 import com.faforever.gw.model.repository.CharacterRepository;
 import com.faforever.gw.model.repository.PlanetRepository;
 import com.faforever.gw.security.User;
-import com.google.common.collect.Sets;
 import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
@@ -37,7 +36,10 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.anyLong;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class PlanetaryAssaultServiceTest {
@@ -193,7 +195,7 @@ public class PlanetaryAssaultServiceTest {
         GameResultMessage result = new GameResultMessage(
                 123456,
                 false,
-                Sets.newHashSet(new GameResultMessage.PlayerResult(fafId, true, false))
+                Set.of(new GameResultMessage.PlayerResult(fafId, true, false))
         );
         service.onGameResult(result);
         verify(runtimeService).correlateMessage(eq(PlanetaryAssaultService.GAME_RESULT_MESSAGE), anyString(), any());

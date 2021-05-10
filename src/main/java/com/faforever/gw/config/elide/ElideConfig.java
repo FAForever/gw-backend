@@ -21,7 +21,7 @@ import javax.persistence.EntityManager;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.OffsetDateTime;
-import java.util.Collections;
+import java.util.Map;
 
 @Configuration
 public class ElideConfig {
@@ -78,7 +78,7 @@ public class ElideConfig {
 
   @Bean
   public EntityDictionary entityDictionary(AutowireCapableBeanFactory beanFactory) {
-    final EntityDictionary entityDictionary = new EntityDictionary(Collections.emptyMap(), new Injector() {
+    final EntityDictionary entityDictionary = new EntityDictionary(Map.of(), new Injector() {
       @Override
       public void inject(Object entity) {
         beanFactory.autowireBean(entity);

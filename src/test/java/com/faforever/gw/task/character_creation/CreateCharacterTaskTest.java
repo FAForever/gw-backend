@@ -7,7 +7,6 @@ import com.faforever.gw.model.GwCharacter;
 import com.faforever.gw.model.Rank;
 import com.faforever.gw.model.repository.CharacterRepository;
 import com.faforever.gw.model.repository.RankRepository;
-import org.assertj.core.util.Lists;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.junit.Before;
@@ -18,12 +17,14 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.UUID;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class CreateCharacterTaskTest {
@@ -54,7 +55,7 @@ public class CreateCharacterTaskTest {
 
     @Test(expected = BpmnError.class)
     public void testSelectedNameInvalid() throws Exception {
-        when(delegateExecution.getVariable("proposedNamesList")).thenReturn(Lists.newArrayList("A", "B"));
+        when(delegateExecution.getVariable("proposedNamesList")).thenReturn(List.of("A", "B"));
         when(delegateExecution.getVariable("selectedName")).thenReturn("C");
         when(gwErrorService.getBpmnErrorOf(any())).thenReturn(mock(BpmnError.class));
 
@@ -63,7 +64,7 @@ public class CreateCharacterTaskTest {
 
     @Test
     public void testSuccess() throws Exception {
-        when(delegateExecution.getVariable("proposedNamesList")).thenReturn(Lists.newArrayList("A", "B"));
+        when(delegateExecution.getVariable("proposedNamesList")).thenReturn(List.of("A", "B"));
         when(delegateExecution.getVariable("selectedName")).thenReturn("A");
         when(delegateExecution.getVariable("requestFafUser")).thenReturn(99L);
         when(delegateExecution.getVariable("requestedFaction")).thenReturn(Faction.UEF);
