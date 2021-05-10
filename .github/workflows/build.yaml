@@ -10,8 +10,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Maven build
-        run: "chmod +x mvnw && ./mvnw package -B"
+      - name: Gradle build
+        env:
+          GRADLE_CLI_OPTS: ""
+        run: "chmod +x ./gradlew && ./gradlew ${GRADLE_CLI_OPTS} build"
       - name: Build and push Docker images
         if: github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/tags')
         uses: docker/build-push-action@v1.1.1
