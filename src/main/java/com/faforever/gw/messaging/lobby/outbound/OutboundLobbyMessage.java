@@ -8,13 +8,6 @@ import lombok.Setter;
 
 import java.util.UUID;
 
-@Getter
-@Setter
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class OutboundLobbyMessage extends LobbyMessage {
-    private UUID requestId;
-
-    protected OutboundLobbyMessage() {
-        requestId = UUID.randomUUID();
-    }
+public interface OutboundLobbyMessage extends LobbyMessage {
+    UUID getRequestId();
 }

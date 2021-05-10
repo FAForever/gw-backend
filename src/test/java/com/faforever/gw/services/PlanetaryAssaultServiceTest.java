@@ -29,6 +29,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.context.ApplicationContext;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
@@ -192,10 +193,7 @@ public class PlanetaryAssaultServiceTest {
         GameResultMessage result = new GameResultMessage(
                 123456,
                 false,
-                Sets.newHashSet(new GameResultMessage.PlayerResult()
-                        .setPlayerId(fafId)
-                        .setWinner(true)
-                        .setAcuKilled(false))
+                Sets.newHashSet(new GameResultMessage.PlayerResult(fafId, true, false))
         );
         service.onGameResult(result);
         verify(runtimeService).correlateMessage(eq(PlanetaryAssaultService.GAME_RESULT_MESSAGE), anyString(), any());

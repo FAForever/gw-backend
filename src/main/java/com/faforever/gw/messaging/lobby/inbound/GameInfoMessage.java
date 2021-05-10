@@ -3,6 +3,7 @@ package com.faforever.gw.messaging.lobby.inbound;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.Value;
 
 import java.time.Instant;
 import java.util.List;
@@ -12,7 +13,7 @@ import java.util.List;
  */
 @Getter
 @Setter
-public class GameInfoMessage extends InboundLobbyMessage {
+public class GameInfoMessage implements InboundLobbyMessage {
     int id;
     String title;
     String gameVisibility; // TODO: Convert back to enum
@@ -29,22 +30,19 @@ public class GameInfoMessage extends InboundLobbyMessage {
     Integer maxRating;
     List<FeaturedModFileVersion> featuredModFileVersions;
 
-    @Getter
-    @Setter
+    @Value
     static class Player {
         int team;
         String name;
     }
 
-    @Getter
-    @Setter
+    @Value
     static class SimMod {
         String uid;
         String displayName;
     }
 
-    @Getter
-    @Setter
+    @Value
     static class FeaturedModFileVersion {
         short id;
         int version;
