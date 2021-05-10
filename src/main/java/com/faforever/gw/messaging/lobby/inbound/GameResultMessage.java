@@ -1,24 +1,19 @@
 package com.faforever.gw.messaging.lobby.inbound;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Value;
 
 import java.util.Set;
 
-@Getter
-@Setter
-@AllArgsConstructor
-public class GameResultMessage extends InboundLobbyMessage {
-    private int gameId;
-    private boolean draw;
-    private Set<PlayerResult> playerResults;
+@Value
+public class GameResultMessage implements InboundLobbyMessage {
+    int gameId;
+    boolean draw;
+    Set<PlayerResult> playerResults;
 
-    @Getter
-    @Setter
+    @Value
     public static class PlayerResult {
-        private int playerId;
-        private boolean winner;
-        private boolean acuKilled;
+        int playerId;
+        boolean winner;
+        boolean acuKilled;
     }
 }

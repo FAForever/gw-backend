@@ -1,15 +1,13 @@
 package com.faforever.gw.messaging.lobby.inbound;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Value;
 
 import java.util.List;
 
 /**
  * Message sent from the server to the client containing information about players.
  */
-@Getter
-@Setter
-public class PlayersMessage extends InboundLobbyMessage {
+@Value
+public class PlayersMessage implements InboundLobbyMessage {
     List<PlayerSubMessage> players;
 }

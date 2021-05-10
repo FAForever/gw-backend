@@ -108,28 +108,31 @@ public class AdminService {
                 List<CreateMatchRequest.Participant> participants = new ArrayList<>();
 
                 participants.add(
-                        new CreateMatchRequest.Participant()
-                                .setId(1)
-                                .setName("UEF Alpha")
-                                .setFaction(Faction.UEF)
-                                .setTeam(1)
-                                .setStartSpot(1)
+                        new CreateMatchRequest.Participant(
+                                3,
+                                Faction.UEF,
+                                1,
+                                1,
+                                "UEF Alpha"
+                        )
                 );
 
                 participants.add(
-                        new CreateMatchRequest.Participant()
-                                .setId(3)
-                                .setName("Cybran Charlie")
-                                .setFaction(Faction.CYBRAN)
-                                .setTeam(2)
-                                .setStartSpot(2)
+                        new CreateMatchRequest.Participant(
+                                3,
+                                Faction.CYBRAN,
+                                2,
+                                2,
+                                "Cybran Charlie"
+                        )
                 );
 
-                CreateMatchRequest createMatchRequest = new CreateMatchRequest()
-                        .setTitle("Galactic War battle demo")
-                        .setFeaturedMod("fafdevelop") // TODO: set to faf-gw
-                        .setMap(1)
-                        .setParticipants(participants);
+                CreateMatchRequest createMatchRequest = new CreateMatchRequest(
+                        "Galactic War battle demo",
+                        1,
+                        "fafdevelop",  // TODO: set to faf-gw
+                        participants
+                );
 
                 lobbyService.createGame(createMatchRequest)
                         .thenAccept(matchCreatedMessage -> log.debug("Debug match created"))

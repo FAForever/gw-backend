@@ -45,19 +45,22 @@ public class SetupLobbyMatchTask implements JavaDelegate {
 
         for (BattleParticipant battleParticipant : battle.getParticipants()) {
             participants.add(
-                    new CreateMatchRequest.Participant()
-                            .setId(battleParticipant.getCharacter().getFafId())
-                            .setName(battleParticipant.getCharacter().getName())
-                            .setFaction(battleParticipant.getFaction())
-                            .setTeam(battleParticipant.getRole() == BattleRole.ATTACKER ? 1 : 2)
+                    new CreateMatchRequest.Participant(
+                            battleParticipant.getCharacter().getFafId(),
+                            battleParticipant.getFaction(),
+                            -1, // TODO: Resolve this
+                            battleParticipant.getRole() == BattleRole.ATTACKER ? 1 : 2,
+                            battleParticipant.getCharacter().getName()
+                    )
             );
         }
 
-        CreateMatchRequest createMatchRequest = new CreateMatchRequest()
-                .setTitle("Galactic War battle " + accessor.getBattleId())
-                .setFeaturedMod("fafdevelop") // TODO: set to faf-gw
-                .setMap(battle.getPlanet().getMap().getFafMapVersion())
-                .setParticipants(participants);
+        CreateMatchRequest createMatchRequest = new CreateMatchRequest(
+                "Galactic War battle " + accessor.getBattleId(),
+                battle.getPlanet().getMap().getFafMapVersion(),
+                "fafdevelop", // TODO: set to faf-gw
+                participants
+        );
 
         lobbyService.createGame(createMatchRequest)
                 .thenAccept(message -> planetaryAssaultService.onMatchCreated(battle, message.getGameId()))
