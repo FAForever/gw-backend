@@ -1,10 +1,12 @@
 package com.faforever.gw.messaging.client.inbound;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Value;
 
-@Data
-@AllArgsConstructor
-public class SelectCharacterNameMessage extends InboundClientMessage {
-    private String name;
+import java.util.UUID;
+
+@Value
+public class SelectCharacterNameMessage implements InboundClientMessage {
+    UUID requestId = UUID.randomUUID();
+
+    String name;
 }

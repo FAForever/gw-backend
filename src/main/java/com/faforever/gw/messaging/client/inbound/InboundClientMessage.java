@@ -8,13 +8,6 @@ import lombok.Setter;
 
 import java.util.UUID;
 
-@Getter
-@Setter
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class InboundClientMessage extends ClientMessage {
-    private UUID requestId;
-
-    protected InboundClientMessage() {
-        requestId = UUID.randomUUID();
-    }
+public interface InboundClientMessage extends ClientMessage {
+    UUID getRequestId();
 }
