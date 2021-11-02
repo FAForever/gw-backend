@@ -4,7 +4,7 @@
 
 plugins {
     id("java")
-    id("org.springframework.boot") version "2.4.5"
+    id("org.springframework.boot") version "2.5.6"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
 }
 
@@ -24,16 +24,16 @@ dependencies {
     implementation("org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure:2.4.5")
     implementation("org.springframework.security.oauth:spring-security-oauth2:2.5.1.RELEASE")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
-    implementation("org.camunda.bpm.springboot:camunda-bpm-spring-boot-starter-webapp:7.15.0")
+    implementation("org.camunda.bpm.springboot:camunda-bpm-spring-boot-starter-webapp:7.16.0")
     implementation("com.yahoo.elide:elide-core:5.1.0")
     implementation("com.yahoo.elide:elide-datastore-jpa:5.1.0")
-    implementation("org.camunda.bpm.springboot:camunda-bpm-spring-boot-starter-test:7.15.0")
-    implementation("com.google.guava:guava:29.0-jre")
-    implementation("org.jetbrains:annotations:20.1.0")
+    implementation("org.camunda.bpm.springboot:camunda-bpm-spring-boot-starter-test:7.16.0")
+    implementation("com.google.guava:guava:31.0.1-jre")
+    implementation("org.jetbrains:annotations:22.0.0")
     runtimeOnly("com.h2database:h2")
     runtimeOnly("org.postgresql:postgresql")
     testImplementation("com.h2database:h2")
-    testImplementation("org.camunda.bpm.extension.mockito:camunda-bpm-mockito:5.14.0")
+    testImplementation("org.camunda.bpm.extension.mockito:camunda-bpm-mockito:5.15.0")
 }
 
 group = "com.faforever.gw"
