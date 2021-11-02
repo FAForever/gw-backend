@@ -26,3 +26,22 @@ logging:
     com.faforever.gw: debug
 server:
   port: 8014
+
+elide:
+  modelPackage: 'com.faforever.gw.model'
+  json-api:
+    path: /api/v1
+    enabled: true
+    enable-links: true
+  graphql:
+    path: /graphql/api/v1
+    enabled: false
+  swagger:
+    path: /doc
+    enabled: true
+  async:
+    enabled: false
+  aggregation-store:
+    enabled: false
+  dynamic-config:
+    enabled: false
