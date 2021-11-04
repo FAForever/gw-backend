@@ -2,11 +2,10 @@ package com.faforever.gw.messaging.lobby;
 
 import com.faforever.gw.messaging.lobby.inbound.GameResultMessage;
 import com.faforever.gw.messaging.lobby.outbound.MatchCreateRequest;
+import com.faforever.gw.messaging.lobby.outbound.MatchCreateRequestHandler;
 import com.faforever.gw.model.Battle;
-import com.faforever.gw.model.BattleParticipant;
 import com.faforever.gw.model.BattleRole;
 import com.faforever.gw.services.MapSlotAssigner;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -19,7 +18,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,6 +25,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class LobbyService {
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final MatchCreateRequestHandler matchCreateRequestHandler;
 
     private final Map<UUID, Pair<Battle, CompletableFuture<Battle>>> pendingGames = new ConcurrentHashMap<>();
     private final Map<Long, Battle> runningGames = new ConcurrentHashMap<>();
@@ -48,12 +47,12 @@ public class LobbyService {
         MatchCreateRequest createMatchRequest = new MatchCreateRequest(
                 requestId,
                 "Galactic War battle " + battle.getId(),
-                battle.getPlanet().getMap().toString(), // TODO: Determine map name
+                "scmp_003", // TODO: Determine map name from battle.getPlanet().getMap()
                 "galactic_war", // TODO: Add this queue to lobby server
                 participants
         );
 
-        // TODO: Send message to RabbitMQ
+        matchCreateRequestHandler.send(createMatchRequest);
 
         CompletableFuture<Battle> future = new CompletableFuture<>();
         pendingGames.put(requestId, Pair.of(battle, future));
