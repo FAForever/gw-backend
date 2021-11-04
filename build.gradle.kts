@@ -12,24 +12,35 @@ repositories {
     mavenCentral()
 }
 
+dependencyManagement {
+    imports {
+        mavenBom("org.springframework.cloud:spring-cloud-dependencies:2020.0.4")
+    }
+}
+
 dependencies {
     annotationProcessor("org.projectlombok:lombok")
     implementation("org.projectlombok:lombok")
 
+    implementation("org.springframework.cloud:spring-cloud-stream")
+    implementation("org.springframework.cloud:spring-cloud-stream-binder-rabbit")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("javax.inject:javax.inject:1")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-websocket")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure:2.4.5")
-    implementation("org.springframework.security.oauth:spring-security-oauth2:2.5.1.RELEASE")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     implementation("org.camunda.bpm.springboot:camunda-bpm-spring-boot-starter-webapp:7.16.0")
     implementation("com.yahoo.elide:elide-core:5.1.0")
     implementation("com.yahoo.elide:elide-datastore-jpa:5.1.0")
     implementation("org.camunda.bpm.springboot:camunda-bpm-spring-boot-starter-test:7.16.0")
     implementation("com.google.guava:guava:31.0.1-jre")
     implementation("org.jetbrains:annotations:22.0.0")
+
+    // For some reason in this setup Hibernate lacks an instance of the expression language
+    implementation("javax.el:javax.el-api:3.0.0")
+    implementation("org.glassfish.web:javax.el:2.2.4")
+
     runtimeOnly("com.h2database:h2")
     runtimeOnly("org.postgresql:postgresql")
     testImplementation("com.h2database:h2")

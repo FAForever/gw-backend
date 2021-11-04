@@ -8,7 +8,7 @@ import com.faforever.gw.messaging.client.inbound.SetPlanetFactionRequestMessage;
 import com.faforever.gw.messaging.client.inbound.UnlinkSolarSystemsRequestMessage;
 import com.faforever.gw.messaging.client.outbound.*;
 import com.faforever.gw.messaging.lobby.LobbyService;
-import com.faforever.gw.messaging.lobby.outbound.CreateMatchRequest;
+import com.faforever.gw.messaging.lobby.outbound.MatchCreateRequest;
 import com.faforever.gw.model.Faction;
 import com.faforever.gw.model.Planet;
 import com.faforever.gw.model.SolarSystem;
@@ -20,7 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
-import javax.inject.Inject;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
@@ -98,10 +97,10 @@ public class AdminService {
     public void onDebugMessage(DebugMessage message) {
         switch (message.getAction()) {
             case "dummyHostGame":
-                List<CreateMatchRequest.Participant> participants = new ArrayList<>();
+                List<MatchCreateRequest.Participant> participants = new ArrayList<>();
 
                 participants.add(
-                        new CreateMatchRequest.Participant(
+                        new MatchCreateRequest.Participant(
                                 3,
                                 Faction.UEF,
                                 1,
@@ -111,7 +110,7 @@ public class AdminService {
                 );
 
                 participants.add(
-                        new CreateMatchRequest.Participant(
+                        new MatchCreateRequest.Participant(
                                 3,
                                 Faction.CYBRAN,
                                 2,
@@ -120,19 +119,19 @@ public class AdminService {
                         )
                 );
 
-                CreateMatchRequest createMatchRequest = new CreateMatchRequest(
-                        "Galactic War battle demo",
-                        1,
-                        "fafdevelop",  // TODO: set to faf-gw
-                        participants
-                );
+//                MatchCreateRequest createMatchRequest = new MatchCreateRequest(
+//                        "Galactic War battle demo",
+//                        1,
+//                        "fafdevelop",  // TODO: set to faf-gw
+//                        participants
+//                );
 
-                lobbyService.createGame(createMatchRequest)
-                        .thenAccept(matchCreatedMessage -> log.debug("Debug match created"))
-                        .exceptionally(throwable -> {
-                            log.error("Debug match creation failed");
-                            return null;
-                        });
+//                lobbyService.createGame(createMatchRequest)
+//                        .thenAccept(matchCreatedMessage -> log.debug("Debug match created"))
+//                        .exceptionally(throwable -> {
+//                            log.error("Debug match creation failed");
+//                            return null;
+//                        });
         }
     }
 

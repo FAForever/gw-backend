@@ -11,6 +11,41 @@ spring:
   oauth2:
     resource:
       filter-order: 3
+  cloud:
+    stream:
+      bindings:
+        createGameRequest-out-0:
+          destination: "faf-lobby"
+        onMatchCreateSuccess-in-0:
+          destination: "faf-lobby"
+          group: "galacticWar.createGame.success"
+        onMatchCreateError-in-0:
+          destination: "faf-lobby"
+          group: "galacticWar.createGame.failed"
+        onGameResult-in-0:
+          destination: "faf-lobby"
+          group: "galacticWar.gameResults"
+      rabbit:
+        bindings:
+          createGameRequest-out-0:
+            producer:
+              routingKeyExpression: headers['routingKey']
+          onMatchCreateSuccess-in-0:
+            consumer:
+              bindingRoutingKey: "success.match.create"
+              autoBindDlq: true
+          onMatchCreateError-in-0:
+            consumer:
+              bindingRoutingKey: "error.match.create"
+              autoBindDlq: true
+          onGameResult-in-0:
+            consumer:
+              bindingRoutingKey: "success.gameResults.create"
+              autoBindDlq: true
+      source: createGameRequest
+    function:
+      definition: onMatchCreateSuccess;onMatchCreateError;onGameResult
+
 camunda.bpm:
   admin-user:
     id: admin

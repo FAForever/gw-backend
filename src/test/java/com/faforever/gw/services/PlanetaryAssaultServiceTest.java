@@ -185,19 +185,19 @@ public class PlanetaryAssaultServiceTest {
         verify(runtimeService).signalEventReceived(PlanetaryAssaultService.UPDATE_OPEN_GAMES_SIGNAL);
     }
 
-    @Test
-    public void onGameResult() {
-        int fafId = 5;
-        when(characterRepository.findActiveCharacterByFafId(fafId)).thenReturn(Optional.of(character));
-        when(character.getId()).thenReturn(UUID.fromString("33333333-3333-3333-3333-333333333333"));
-        when(character.getFaction()).thenReturn(Faction.UEF);
-
-        GameResultMessage result = new GameResultMessage(
-                123456,
-                false,
-                Set.of(new GameResultMessage.PlayerResult(fafId, true, false))
-        );
-        service.onGameResult(result);
-        verify(runtimeService).correlateMessage(eq(PlanetaryAssaultService.GAME_RESULT_MESSAGE), anyString(), any());
-    }
+//    @Test
+//    public void onGameResult() {
+//        int fafId = 5;
+//        when(characterRepository.findActiveCharacterByFafId(fafId)).thenReturn(Optional.of(character));
+//        when(character.getId()).thenReturn(UUID.fromString("33333333-3333-3333-3333-333333333333"));
+//        when(character.getFaction()).thenReturn(Faction.UEF);
+//
+//        GameResultMessage result = new GameResultMessage(
+//                123456,
+//                false,
+//                Set.of(new GameResultMessage.PlayerResult(fafId, true, false))
+//        );
+//        service.onGameResult(result);
+//        verify(runtimeService).correlateMessage(eq(PlanetaryAssaultService.GAME_RESULT_MESSAGE), anyString(), any());
+//    }
 }

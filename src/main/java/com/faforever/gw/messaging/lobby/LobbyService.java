@@ -1,214 +1,108 @@
 package com.faforever.gw.messaging.lobby;
 
-import com.faforever.gw.config.GwServerProperties;
-import com.faforever.gw.messaging.lobby.inbound.ErrorMessage;
-import com.faforever.gw.messaging.lobby.inbound.MatchCreatedMessage;
-import com.faforever.gw.messaging.lobby.inbound.ResponseMessage;
-import com.faforever.gw.messaging.lobby.inbound.ServerErrorException;
-import com.faforever.gw.messaging.lobby.outbound.CreateMatchRequest;
-import com.faforever.gw.messaging.lobby.outbound.OutboundLobbyMessage;
-import com.faforever.gw.messaging.lobby.outbound.PingMessage;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.faforever.gw.messaging.lobby.inbound.GameResultMessage;
+import com.faforever.gw.messaging.lobby.outbound.MatchCreateRequest;
+import com.faforever.gw.model.Battle;
+import com.faforever.gw.model.BattleParticipant;
+import com.faforever.gw.model.BattleRole;
+import com.faforever.gw.services.MapSlotAssigner;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.SneakyThrows;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.event.EventListener;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.security.jwt.Jwt;
-import org.springframework.security.jwt.JwtHelper;
-import org.springframework.security.jwt.crypto.sign.MacSigner;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
-import org.springframework.util.concurrent.ListenableFutureCallback;
-import org.springframework.web.socket.*;
-import org.springframework.web.socket.client.WebSocketClient;
-import org.springframework.web.socket.client.standard.StandardWebSocketClient;
-import org.springframework.web.socket.handler.TextWebSocketHandler;
 
-import javax.annotation.PostConstruct;
-import java.io.IOException;
-import java.net.URI;
-import java.text.MessageFormat;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 @Slf4j
 public class LobbyService {
-    private final GwServerProperties properties;
-    private final Runnable sendingTask;
-    private final BlockingQueue<WebSocketMessage> messageQueue;
     private final ApplicationEventPublisher applicationEventPublisher;
-    private final ObjectMapper jsonObjectMapper;
-    private final WebSocketClient webSocketClient;
-    private final TextWebSocketHandler webSocketHandler;
-    private ThreadPoolTaskExecutor taskExecutor;
-    private WebSocketSession currentSession;
-    private final Map<UUID, CompletableFuture<ResponseMessage>> pendingRequests;
 
-    @Scheduled(fixedDelay = 30000)
-    @SneakyThrows
-    public void sendPing() {
-        if (currentSession != null && currentSession.isOpen()) {
-            log.debug("Send ping to lobby server");
-            currentSession.sendMessage(box(new PingMessage()));
-        }
-    }
+    private final Map<UUID, Pair<Battle, CompletableFuture<Battle>>> pendingGames = new ConcurrentHashMap<>();
+    private final Map<Long, Battle> runningGames = new ConcurrentHashMap<>();
 
-    public LobbyService(GwServerProperties properties, ApplicationEventPublisher applicationEventPublisher, ObjectMapper jsonObjectMapper) {
-        this.properties = properties;
-        resetTaskExecutor();
-        this.messageQueue = new ArrayBlockingQueue<>(50);
-        pendingRequests = new HashMap<>();
+    public CompletableFuture<Battle> createGame(@NotNull Battle battle) {
+        MapSlotAssigner mapSlotAssigner = new MapSlotAssigner();
 
-        this.applicationEventPublisher = applicationEventPublisher;
-        this.jsonObjectMapper = jsonObjectMapper;
-        this.webSocketClient = new StandardWebSocketClient();
+        List<MatchCreateRequest.Participant> participants = battle.getParticipants().stream()
+                .map(battleParticipant -> new MatchCreateRequest.Participant(
+                        battleParticipant.getCharacter().getFafId(),
+                        battleParticipant.getFaction(),
+                        mapSlotAssigner.nextSlot(battleParticipant.getRole()),
+                        battleParticipant.getRole() == BattleRole.ATTACKER ? 1 : 2,
+                        battleParticipant.getCharacter().getName()
+                ))
+                .collect(Collectors.toList());
 
-        this.webSocketHandler = new TextWebSocketHandler() {
+        UUID requestId = UUID.randomUUID();
+        MatchCreateRequest createMatchRequest = new MatchCreateRequest(
+                requestId,
+                "Galactic War battle " + battle.getId(),
+                battle.getPlanet().getMap().toString(), // TODO: Determine map name
+                "galactic_war", // TODO: Add this queue to lobby server
+                participants
+        );
 
-            @Override
-            public void afterConnectionEstablished(WebSocketSession session) {
-                log.debug("Lobby server connection established");
-                taskExecutor.execute(sendingTask);
-            }
+        // TODO: Send message to RabbitMQ
 
-            @Override
-            protected void handleTextMessage(WebSocketSession session, TextMessage message) {
-                log.trace("Incoming lobby message: {}", message.getPayload());
-                LobbyMessage lobbyMessage;
-
-                try {
-                    LobbyMessageWrapper wrapper = jsonObjectMapper.readValue(message.getPayload(), LobbyMessageWrapper.class);
-                    lobbyMessage = wrapper.getData();
-
-                    if (lobbyMessage instanceof ResponseMessage) {
-                        ResponseMessage response = (ResponseMessage) lobbyMessage;
-
-                        if (pendingRequests.containsKey(response.getRequestId())) {
-                            log.debug("Response to request id ''{}'' received", response.getRequestId());
-                            pendingRequests.get(response.getRequestId()).complete(response);
-                        } else {
-                            log.error("Received response to unknown request id: ", response.getRequestId());
-                        }
-                    } else {
-                        log.debug("New message with type {} published", lobbyMessage.getClass());
-                        applicationEventPublisher.publishEvent(lobbyMessage);
-                    }
-
-                } catch (IOException e) {
-                    log.error("An error occured on message handling: ", e);
-                }
-            }
-
-            @Override
-            public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
-                log.debug("Lobby server connection closed, trying to reconnect. CloseStatus: {}", status);
-                resetTaskExecutor();
-                connect(properties.getLobby().getConnectionString());
-            }
-        };
-
-        this.sendingTask = () -> {
-            try {
-                while (true) {
-                    WebSocketMessage message = messageQueue.take();
-                    currentSession.sendMessage(message);
-                }
-            } catch (IOException | InterruptedException e) {
-                e.printStackTrace();
-            }
-        };
-    }
-
-    private void resetTaskExecutor() {
-        if (taskExecutor != null) {
-            taskExecutor.shutdown();
-        }
-
-        taskExecutor = new ThreadPoolTaskExecutor();
-        taskExecutor.initialize();
-    }
-
-    @PostConstruct
-    private void postConstruct() {
-        connect(properties.getLobby().getConnectionString());
-    }
-
-    private CompletableFuture<WebSocketSession> connect(String uri) {
-        return connect(uri, 2);
-    }
-
-    @SneakyThrows
-    private CompletableFuture<WebSocketSession> connect(String uri, int reconnectAttemptsLeft) {
-        CompletableFuture<WebSocketSession> completableFuture = new CompletableFuture<>();
-
-        WebSocketHttpHeaders headers = new WebSocketHttpHeaders();
-        MacSigner macSigner = new MacSigner("banana");
-        Jwt token = JwtHelper.encode("{\"expires\":4102358400, \"authorities\": [\"ROLE_USER\"], \"client_id\": \"faf-gw-backend\"}", macSigner);
-        headers.set("Authorization", "Bearer " + token.getEncoded());
-        webSocketClient.doHandshake(webSocketHandler, headers, new URI(uri))
-                .addCallback(new ListenableFutureCallback<WebSocketSession>() {
-                    @Override
-                    public void onFailure(Throwable throwable) {
-                        log.error("WebSocket handshake failed", throwable);
-
-                        if (reconnectAttemptsLeft > 0) {
-                            try {
-                                Thread.sleep(5000);
-                            } catch (InterruptedException ignored) {
-                            }
-                            log.warn(MessageFormat.format("Could not connect to lobby server. Attempts left: {0} (uri={1})", reconnectAttemptsLeft, uri));
-                            connect(uri, reconnectAttemptsLeft - 1);
-                        } else {
-                            RuntimeException e = new RuntimeException(MessageFormat.format("Could not connect to lobby server. (uri={0})", uri));
-                            log.error(e.getMessage(), e);
-                            completableFuture.completeExceptionally(throwable);
-                        }
-
-                    }
-
-                    @Override
-                    public void onSuccess(WebSocketSession session) {
-                        log.info("WebSocket handshake with Lobby successful");
-                        currentSession = session;
-                        completableFuture.complete(session);
-                    }
-                });
-
-        return completableFuture;
-    }
-
-    private TextMessage box(LobbyMessage message) throws JsonProcessingException {
-        return new TextMessage(jsonObjectMapper.writeValueAsString(new LobbyMessageWrapper(message)));
-    }
-
-    @SneakyThrows
-    @SuppressWarnings("unchecked")
-    private <T extends ResponseMessage> CompletableFuture<T> enqueue(OutboundLobbyMessage message) {
-        TextMessage boxedMessage = box(message);
-        CompletableFuture<T> future = new CompletableFuture<>();
-        pendingRequests.put(message.getRequestId(), (CompletableFuture<ResponseMessage>) future);
-        messageQueue.add(boxedMessage);
-
+        CompletableFuture<Battle> future = new CompletableFuture<>();
+        pendingGames.put(requestId, Pair.of(battle, future));
         return future;
     }
 
-    public CompletableFuture<MatchCreatedMessage> createGame(CreateMatchRequest createMatchRequest) {
-        return enqueue(createMatchRequest);
+    public void onGameCreated(@NotNull UUID requestId, long gameId) {
+        Pair<Battle, CompletableFuture<Battle>> referredBattlePair = pendingGames.remove(requestId);
+
+        if (referredBattlePair == null) {
+            // This could be a game requested by a different service
+            log.debug("Request id {} is unknown, silently ignoring game id {}", requestId, gameId);
+        } else {
+            log.info("Game id {} created successfully for request id {}", gameId, requestId);
+
+            Battle battle = referredBattlePair.getFirst();
+            CompletableFuture<Battle> battleFuture = referredBattlePair.getSecond();
+
+            runningGames.put(gameId, battle);
+            battleFuture.complete(battle);
+
+        }
     }
 
-    @EventListener
-    private void onErrorResponse(ErrorMessage message) {
-        log.error("Error ''{}'': {}\n{}", message.getCode(), message.getTitle(), message.getText());
+    public void onGameCreationFailed(@NotNull UUID requestId, @NotNull String errorCode, Object args) {
+        Pair<Battle, CompletableFuture<Battle>> referredBattlePair = pendingGames.remove(requestId);
 
-        pendingRequests.get(message.getRequestId()).completeExceptionally(
-                new ServerErrorException(message.getCode(), message.getTitle(), message.getText())
-        );
+        if (referredBattlePair == null) {
+            // This could be a game requested by a different service
+            log.debug("Request id {} is unknown, silently ignoring", requestId);
+        } else {
+            log.error("Game for request id {} failed to launch with code {} (args: {})", requestId, errorCode, args);
+
+            Battle battle = referredBattlePair.getFirst();
+            CompletableFuture<Battle> battleFuture = referredBattlePair.getSecond();
+
+            battleFuture.completeExceptionally(new IllegalStateException("Failed to launch with error " + errorCode + "! Args: " + args == null ? "no args" : args.toString()));
+        }
+    }
+
+    public void onGameResult(@NotNull GameResultMessage gameResultMessage) {
+        Battle battle = runningGames.remove(gameResultMessage.gameId());
+
+        if(battle == null) {
+            // This could be a game requested by a different service
+            log.debug("Game id {} is unknown, silently ignoring", gameResultMessage.gameId());
+        } else {
+            log.debug("Game id {} ended with results: {}", gameResultMessage.gameId(), gameResultMessage);
+            applicationEventPublisher.publishEvent(gameResultMessage);
+        }
     }
 }

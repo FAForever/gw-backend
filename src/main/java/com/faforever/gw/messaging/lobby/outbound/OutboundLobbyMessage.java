@@ -9,5 +9,5 @@ import lombok.Setter;
 import java.util.UUID;
 
 public interface OutboundLobbyMessage extends LobbyMessage {
-    UUID getRequestId();
+    UUID requestId();
 }
