@@ -1,4 +1,4 @@
-FROM openjdk:11-jdk-slim
+FROM eclipse-temurin:17-jdk
 VOLUME /tmp
 ARG JAR_FILE
 ADD ${JAR_FILE} app.jar

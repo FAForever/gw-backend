@@ -6,7 +6,7 @@ env:
 jobs:
   test:
     runs-on: ubuntu-latest
-    container: openjdk:11-jdk-slim
+    container: eclipse-temurin:17-jdk
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
