@@ -65,11 +65,9 @@ server:
 elide:
   modelPackage: 'com.faforever.gw.model'
   json-api:
-    path: /api/v1
+    path: /data
     enabled: true
-    enable-links: true
   graphql:
-    path: /graphql/api/v1
     enabled: false
   swagger:
     path: /doc
