@@ -8,6 +8,10 @@ import com.faforever.gw.messaging.client.outbound.ErrorMessage;
 import com.faforever.gw.model.Battle;
 import com.faforever.gw.model.BattleParticipant;
 import com.faforever.gw.model.BattleParticipantResult;
+import com.faforever.gw.model.BattleResult;
+import com.faforever.gw.model.BattleRole;
+import com.faforever.gw.model.GameCharacterResult;
+import com.faforever.gw.model.GameResult;
 import com.faforever.gw.model.GwCharacter;
 import com.faforever.gw.model.Planet;
 import com.faforever.gw.model.repository.BattleRepository;
@@ -30,8 +34,10 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -118,75 +124,38 @@ public class PlanetaryAssaultService {
     public void updateOpenGames() {
         runtimeService.signalEventReceived(UPDATE_OPEN_GAMES_SIGNAL);
     }
-//
-//    @EventListener
-//    @Transactional(dontRollbackOn = BpmnError.class)
-//    public void onGameResult(GameResultMessage gameResultMessage) {
-//        log.debug("onGameResult for game id: {}", gameResultMessage.gameId());
-//        Battle battle = battleRepository.findOneByFafGameId(gameResultMessage.gameId())
-//                .orElseThrow(() -> new IllegalStateException("Lobby server sent game result for unknown game id: " + gameResultMessage.gameId()));
-//
-//        // The lobby server does not know about GW characters and factions, so we need to convert manually
-//        GameResult gameResult = new GameResult();
-//        gameResult.setBattle(battle.getId());
-//
-//        HashMap<Integer, GwCharacter> fafUserIdToCharacter = new HashMap<>();
-//
-//        gameResultMessage.getPlayerResults().forEach(
-//                playerResult -> {
-//                    int fafId = playerResult.getPlayerId();
-//                    GwCharacter character = characterRepository.findActiveCharacterByFafId(fafId).orElse(null);
-//
-//                    if (playerResult.isWinner()) {
-//                        if (gameResult.getWinner() != null && gameResult.getWinner() != character.getFaction()) {
-//                            String errorMessage = MessageFormat.format("For battle {0} multiple factions are listed as winner (message={1})", battle.getId(), gameResultMessage);
-//                            log.error(errorMessage);
-//                            throw new IllegalStateException(errorMessage);
-//                        }
-//
-//                        gameResult.setWinner(character.getFaction());
-//                    }
-//
-//                    fafUserIdToCharacter.put(fafId, character);
-//                }
-//        );
-//
-//        if (gameResult.getWinner() == null) {
-//            String errorMessage = MessageFormat.format("For battle {0} no winning faction could be determined (message={1})", battle.getId(), gameResultMessage);
-//            log.error(errorMessage);
-//            throw new IllegalStateException(errorMessage);
-//        }
-//
-//        List<GameCharacterResult> characterResults = new ArrayList<>();
-//
-//        gameResultMessage.getPlayerResults().forEach(
-//                playerResult -> {
-//                    BattleParticipantResult battleParticipantResult;
-//
-//                    if (playerResult.isAcuKilled()) {
-//                        battleParticipantResult = BattleParticipantResult.DEATH;
-//                    } else if (playerResult.isWinner()) {
-//                        battleParticipantResult = BattleParticipantResult.VICTORY;
-//                    } else {
-//                        battleParticipantResult = BattleParticipantResult.RECALL;
-//                    }
-//
-//                    characterResults.add(
-//                            new GameCharacterResult(
-//                                    fafUserIdToCharacter.get(playerResult.getPlayerId()).getId(),
-//                                    battleParticipantResult,
-//                                    null)
-//                    );
-//                }
-//        );
-//
-//        gameResult.setCharacterResults(characterResults);
-//
-//        VariableMap variables = Variables.createVariables()
-//                .putValue("gameResult", gameResult);
-//
-//        runtimeService.correlateMessage(GAME_RESULT_MESSAGE, battle.getId().toString(), variables);
-//    }
+
+    @EventListener
+    @Transactional(dontRollbackOn = BpmnError.class)
+    public void onBattleResult(BattleResult battleResult) {
+        log.debug("onGameResult for battle id: {}", battleResult.battleId());
+
+        Battle battle = battleRepository.findById(battleResult.battleId())
+                .orElseThrow(() -> new IllegalStateException("Unknown battle id: " + battleResult.battleId()));
+
+        GameResult gameResult = new GameResult();
+        gameResult.setBattle(battle.getId());
+        gameResult.setWinner(switch (battleResult.winningTeam().orElse(BattleRole.DEFENDER)) {
+            case ATTACKER -> battle.getAttackingFaction();
+            case DEFENDER -> battle.getDefendingFaction();
+        });
+
+        List<GameCharacterResult> gameCharacterResults = battleResult.participantResults().entrySet().stream()
+                .map(entry -> {
+                    UUID characterId = entry.getKey();
+                    BattleParticipantResult result = entry.getValue();
+
+                    return new GameCharacterResult(characterId, result, null);
+                })
+                .toList();
+
+        gameResult.setCharacterResults(gameCharacterResults);
+
+        VariableMap variables = Variables.createVariables()
+                .putValue("gameResult", gameResult);
+
+        runtimeService.correlateMessage(GAME_RESULT_MESSAGE, battle.getId().toString(), variables);
+    }
 
     public Long calcFactionVictoryXpForCharacter(Battle battle, GwCharacter character) {
         Optional<BattleParticipant> participantOptional = battle.getParticipant(character);

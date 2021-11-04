@@ -26,7 +26,7 @@ public record GameResultMessage(
     public static record TeamResult(
             GameOutcome outcome,
             @JsonProperty("player_ids")
-            List<Integer> playerIds,
+            List<Long> playerIds,
             @JsonProperty("army_results")
             List<ArmyResult> armyResults
     ) {}
