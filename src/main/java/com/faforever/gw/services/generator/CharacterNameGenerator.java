@@ -1,8 +1,6 @@
 package com.faforever.gw.services.generator;
-
 import com.faforever.gw.model.Faction;
 import org.springframework.stereotype.Service;
-
 @Service
 public class CharacterNameGenerator {
 	private final static String[] earthNames;
@@ -199,9 +197,8 @@ public class CharacterNameGenerator {
 	//Redundant letters simply increase their occurance.
 
 	// Creates a single seraphim name based on alternating lists of typical vowels and consonants. Creates names that are two to five syllables long.
-	public static String makeSeraphimName(){
+	public static String makeSeraphimName(int size){
 		String str = "";
-		int size = 3 + (int) (Math.random() * 3);
 		boolean rand = Math.random() > 0.5;
 		if(rand) str+= firstVowel[(int) (firstVowel.length*Math.random())];
 		else str+= firstConsonant[(int) (firstConsonant.length*Math.random())];
@@ -257,7 +254,8 @@ public class CharacterNameGenerator {
 			if(findString(name, blacklistNames)) return generateName(faction);
 			return name + ", " + epithet + " of " + virtue;
 		case SERAPHIM:
-			name = makeSeraphimName() + "-" + makeSeraphimName();
+			int size = 3 + (int) (Math.random() * 3);
+			name = makeSeraphimName(2) + "-" + makeSeraphimName(size);
 			if(findString(name, blacklistNames)) return generateName(faction);
 			return name;
 		}
