@@ -12,6 +12,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.springframework.security.core.authority.AuthorityUtils.commaSeparatedStringToAuthorityList;
@@ -40,7 +41,7 @@ public class FafUserAuthenticationConverter extends DefaultUserAuthenticationCon
         String userName = (String) map.get(USERNAME);
         Collection<? extends GrantedAuthority> authorities = getAuthorities(map);
 
-        GwCharacter character = characterService.getActiveCharacterByFafId(userId).orElse(null);
+        Optional<GwCharacter> character = characterService.getActiveCharacterByFafId(userId);
         return new User(userId, character, userName, "N/A", authorities);
 //        return new GwAuthentication(userId, userName, authorities);
     }

@@ -1,5 +1,6 @@
 package com.faforever.gw.security;
 
+import com.faforever.gw.model.GwCharacter;
 import org.springframework.security.core.Authentication;
 
 import java.security.Principal;
@@ -17,7 +18,10 @@ public class ElideUser extends com.yahoo.elide.core.security.User {
 
   @Override
   public String getName() {
-    return getFafUserDetails().map(details -> details.getActiveCharacter().getName()).orElse("");
+    return getFafUserDetails()
+            .flatMap(User::getActiveCharacter)
+            .map(GwCharacter::getName)
+            .orElse("");
   }
 
   @Override

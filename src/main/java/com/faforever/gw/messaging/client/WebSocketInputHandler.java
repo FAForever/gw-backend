@@ -74,12 +74,12 @@ public class WebSocketInputHandler extends TextWebSocketHandler {
         log.debug("User `{}` has connected via WebSocket", session.getPrincipal().getName());
 
         webSocketRegistry.add(session);
-        val user = webSocketRegistry.getUser(session);
+        var user = webSocketRegistry.getUser(session);
 
         UUID characterId = null;
         UUID currentBattleId = null;
 
-        GwCharacter character = user.getActiveCharacter();
+        GwCharacter character = user.getActiveCharacter().orElse(null);
 
         if (character != null) {
             character = entityManager.merge(character);

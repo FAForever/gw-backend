@@ -15,7 +15,6 @@ import com.faforever.gw.model.GameResult;
 import com.faforever.gw.model.GwCharacter;
 import com.faforever.gw.model.Planet;
 import com.faforever.gw.model.repository.BattleRepository;
-import com.faforever.gw.model.repository.CharacterRepository;
 import com.faforever.gw.model.repository.PlanetRepository;
 import com.faforever.gw.security.User;
 import com.faforever.gw.services.UserService;
@@ -37,14 +36,13 @@ import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
-@Slf4j
-@Service
-@RequiredArgsConstructor
 /**
  * Service class for the BPMN process "planetary assault"
  */
+@Slf4j
+@Service
+@RequiredArgsConstructor
 public class PlanetaryAssaultService {
     public static final String UPDATE_OPEN_GAMES_SIGNAL = "Signal_UpdateOpenGames";
     public static final String INITIATE_ASSAULT_MESSAGE = "Message_InitiateAssault";
@@ -57,22 +55,22 @@ public class PlanetaryAssaultService {
     private final ClientMessagingService clientMessagingService;
     private final BattleRepository battleRepository;
     private final PlanetRepository planetRepository;
-    private final CharacterRepository characterRepository;
     private final UserService userService;
 
     @Transactional(dontRollbackOn = BpmnError.class)
     @EventListener
     public void onCharacterInitiatesAssault(InitiateAssaultMessage message) {
         User user = userService.getUserFromContext();
-        log.debug("onCharacterInitiatesAssault by user {}", user.getId());
+        GwCharacter character = user.getActiveCharacter()
+                .orElseThrow(() -> new IllegalStateException("User has no active character: " + user.getId()));
         UUID battleUUID = UUID.randomUUID();
 
-        GwCharacter character = userService.getActiveCharacter(user);
-        Planet planet = planetRepository.getOne(message.getPlanetId());
+        log.debug("onCharacterInitiatesAssault by user {}", user.getId());
 
-        // TODO: How do we handle NullPointerException i.e. if planet is null?
+        Planet planet = planetRepository.findById(message.getPlanetId())
+                .orElseThrow(() -> new IllegalStateException("Unknown planet id: " + message.getPlanetId()));
 
-        VariableMap variables = clientMessagingService.createVariables(user.getId(), message.getRequestId(), user.getActiveCharacter().getId())
+        VariableMap variables = clientMessagingService.createVariables(user.getId(), message.getRequestId(), character.getId())
                 .putValue("battle", battleUUID)
                 .putValue("planet", planet.getId())
                 .putValue("attackingFaction", character.getFaction())
@@ -89,9 +87,11 @@ public class PlanetaryAssaultService {
     @EventListener
     public void onCharacterJoinsAssault(JoinAssaultMessage message) {
         User user = userService.getUserFromContext();
+        GwCharacter character = user.getActiveCharacter()
+                .orElseThrow(() -> new IllegalStateException("User has no active character: " + user.getId()));
         log.debug("onCharacterJoinsAssault for battle {}", message.getBattleId());
 
-        VariableMap variables = clientMessagingService.createVariables(user.getId(), message.getRequestId(), userService.getActiveCharacter(user).getId());
+        VariableMap variables = clientMessagingService.createVariables(user.getId(), message.getRequestId(), character.getId());
 
         try {
             runtimeService.correlateMessage(PLAYER_JOINS_ASSAULT_MESSAGE, message.getBattleId().toString(), variables);
@@ -104,9 +104,11 @@ public class PlanetaryAssaultService {
     @EventListener
     public void onCharacterLeavesAssault(LeaveAssaultMessage message) {
         User user = userService.getUserFromContext();
+        GwCharacter character = user.getActiveCharacter()
+                .orElseThrow(() -> new IllegalStateException("User has no active character: " + user.getId()));
         log.debug("onCharacterLeavesAssault for battle {}", message.getBattleId());
 
-        VariableMap variables = clientMessagingService.createVariables(user.getId(), message.getRequestId(), userService.getActiveCharacter(user).getId());
+        VariableMap variables = clientMessagingService.createVariables(user.getId(), message.getRequestId(), character.getId());
 
         try {
             runtimeService.correlateMessage(PLAYER_LEAVES_ASSAULT_MESSAGE, message.getBattleId().toString(), variables);
@@ -157,22 +159,22 @@ public class PlanetaryAssaultService {
         runtimeService.correlateMessage(GAME_RESULT_MESSAGE, battle.getId().toString(), variables);
     }
 
-    public Long calcFactionVictoryXpForCharacter(Battle battle, GwCharacter character) {
+    public long calcFactionVictoryXpForCharacter(Battle battle, GwCharacter character) {
         Optional<BattleParticipant> participantOptional = battle.getParticipant(character);
 
         if (participantOptional.isPresent()) {
             BattleParticipant participant = participantOptional.get();
 
-            Long noOfAllies = battle.getParticipants().stream()
+            long noOfAllies = battle.getParticipants().stream()
                     .filter(battleParticipant -> battleParticipant.getFaction() == character.getFaction())
                     .count();
 
-            Long noOfEnemies = battle.getParticipants().stream()
+            long noOfEnemies = battle.getParticipants().stream()
                     .filter(battleParticipant -> battleParticipant.getFaction() != character.getFaction())
                     .count();
 
             if (battle.getWinningFaction() == character.getFaction()) {
-                Long gainedXP = Math.round(10.0 * noOfEnemies / Math.pow(noOfAllies * 0.9, noOfAllies - 1));
+               long gainedXP = Math.round(10.0 * noOfEnemies / Math.pow(noOfAllies * 0.9, noOfAllies - 1));
 
                 if (participant.getResult() == BattleParticipantResult.RECALL) {
                     gainedXP -= XP_MALUS_FOR_RECALL;
@@ -187,16 +189,16 @@ public class PlanetaryAssaultService {
         }
     }
 
-    public Long calcTeamkillXpMalus(GwCharacter character) {
+    public long calcTeamkillXpMalus(GwCharacter character) {
         return Math.round(30.0 / Math.pow(0.88, character.getRank().getLevel()));
     }
 
-    public Long calcKillXpBonus(GwCharacter killer, GwCharacter victim) {
+    public long calcKillXpBonus(GwCharacter killer, GwCharacter victim) {
         // Killing an ACU is worth 5 points per Rank, with an added factor for drop off with higher ranked players
         // + 5% bonus per rank the victim was higher than the killer
 
-        Integer killerRank = killer.getRank().getLevel();
-        Double rankDifferenceFactor = Math.min(0.0, victim.getRank().getLevel() - killerRank) * 5 / 100.0;
+        int killerRank = killer.getRank().getLevel();
+        double rankDifferenceFactor = Math.min(0.0, victim.getRank().getLevel() - killerRank) * 5 / 100.0;
         return Math.round(5 * killerRank * Math.pow(0.99, killerRank - 1) * rankDifferenceFactor);
     }
 
@@ -214,10 +216,10 @@ public class PlanetaryAssaultService {
         DmnDecisionTableResult defenderResult = decisionService.evaluateDecisionTableByKey("assault_progress_factor", defenderVariables);
 
         // we can securely access getFirstResult, because the DMN table gives a unique result
-        Double attackerProgress = attackerResult.getFirstResult().getEntry("progress_factor");
-        Double defenderProgress = defenderResult.getFirstResult().getEntry("progress_factor");
+        double attackerProgress = attackerResult.getFirstResult().getEntry("progress_factor");
+        double defenderProgress = defenderResult.getFirstResult().getEntry("progress_factor");
 
-        Double progressNormalizer = mapSlots * 20.0;
+        double progressNormalizer = mapSlots * 20.0;
 
         return (attackerCount * attackerProgress + defenderCount * defenderProgress) / progressNormalizer;
     }
@@ -225,7 +227,8 @@ public class PlanetaryAssaultService {
     @Transactional(dontRollbackOn = BpmnError.class)
     public void onMatchCreated(Battle detachedBattle, long gameId) {
         log.debug("Match created for battle ''{}'' with faf game id: {}", detachedBattle.getId(), gameId);
-        Battle battle = battleRepository.getOne(detachedBattle.getId());
+        Battle battle = battleRepository.findById(detachedBattle.getId())
+                .orElseThrow(() -> new IllegalStateException("Unknown battle id: " + detachedBattle.getId()));
         battle.setFafGameId(gameId);
         battleRepository.save(battle);
     }

@@ -7,6 +7,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Getter
@@ -14,9 +15,9 @@ import java.util.stream.Collectors;
 public class User extends UsernamePasswordAuthenticationToken {
 
     private final long id;
-    private GwCharacter activeCharacter;
+    private Optional<GwCharacter> activeCharacter;
 
-    public User(long id, GwCharacter activeCharacter, Object principal, Object credentials, Collection<? extends GrantedAuthority> authorities) {
+    public User(long id, Optional<GwCharacter> activeCharacter, Object principal, Object credentials, Collection<? extends GrantedAuthority> authorities) {
         super(principal, credentials, authorities);
         this.id = id;
         this.activeCharacter = activeCharacter;
