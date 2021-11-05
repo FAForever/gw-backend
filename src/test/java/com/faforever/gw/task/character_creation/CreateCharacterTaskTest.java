@@ -1,11 +1,11 @@
 package com.faforever.gw.task.character_creation;
 
+import com.faforever.gw.bpmn.services.CharacterCreationService;
 import com.faforever.gw.bpmn.services.GwErrorService;
 import com.faforever.gw.bpmn.task.character_creation.CreateCharacterTask;
 import com.faforever.gw.model.Faction;
 import com.faforever.gw.model.GwCharacter;
 import com.faforever.gw.model.Rank;
-import com.faforever.gw.model.repository.CharacterRepository;
 import com.faforever.gw.model.repository.RankRepository;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -34,7 +34,7 @@ public class CreateCharacterTaskTest {
     @Mock
     private GwErrorService gwErrorService;
     @Mock
-    private CharacterRepository characterRepository;
+    private CharacterCreationService characterCreationService;
     @Mock
     private RankRepository rankRepository;
     @Mock
@@ -50,7 +50,7 @@ public class CreateCharacterTaskTest {
         when(delegateExecution.getProcessInstance()).thenReturn(delegateExecution);
         when(delegateExecution.getBusinessKey()).thenReturn("test");
 
-        task = new CreateCharacterTask(gwErrorService, characterRepository, rankRepository);
+        task = new CreateCharacterTask(gwErrorService, characterCreationService, rankRepository);
     }
 
     @Test(expected = BpmnError.class)
@@ -74,7 +74,7 @@ public class CreateCharacterTaskTest {
         task.execute(delegateExecution);
 
         verify(delegateExecution).setVariable(eq("newCharacterId"), any(String.class));
-        verify(characterRepository).save(argumentCaptor.capture());
+        verify(characterCreationService).persistNewCharacter(argumentCaptor.capture());
 
         GwCharacter character = argumentCaptor.getValue();
 

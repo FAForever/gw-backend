@@ -5,6 +5,7 @@ import com.faforever.gw.messaging.client.ClientMessagingService;
 import com.faforever.gw.messaging.client.inbound.RequestCharacterMessage;
 import com.faforever.gw.messaging.client.inbound.SelectCharacterNameMessage;
 import com.faforever.gw.model.Faction;
+import com.faforever.gw.model.repository.CharacterRepository;
 import com.faforever.gw.security.User;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -30,6 +31,8 @@ public class CharacterCreationServiceTest {
     @Mock
     private UserService userService;
     @Mock
+    private CharacterRepository characterRepository;
+    @Mock
     private User user;
 
     private CharacterCreationService service;
@@ -39,7 +42,7 @@ public class CharacterCreationServiceTest {
         when(userService.getUserFromContext()).thenReturn(user);
         when(user.getId()).thenReturn(5L);
 
-        service = new CharacterCreationService(runtimeService, clientMessagingService, userService);
+        service = new CharacterCreationService(runtimeService, clientMessagingService, userService, characterRepository);
     }
 
     @Test
