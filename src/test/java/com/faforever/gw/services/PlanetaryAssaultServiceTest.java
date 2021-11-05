@@ -76,18 +76,18 @@ public class PlanetaryAssaultServiceTest {
     public void setUp() throws Exception {
         when(userService.getUserFromContext()).thenReturn(user);
         when(userService.getActiveCharacter(user)).thenReturn(character);
-        when(planetRepository.getOne(any(UUID.class))).thenReturn(planet);
+        when(planetRepository.findById(any(UUID.class))).thenReturn(Optional.of(planet));
 
         when(battleRepository.findOneByFafGameId(anyLong())).thenReturn(Optional.of(battle));
         when(battle.getId()).thenReturn(UUID.randomUUID());
 
         when(user.getId()).thenReturn(5L);
-        when(user.getActiveCharacter()).thenReturn(character);
+        when(user.getActiveCharacter()).thenReturn(Optional.of(character));
 
         map = Variables.createVariables();
         when(clientMessagingService.createVariables(anyLong(), any(), any())).thenReturn(map);
 
-        service = new PlanetaryAssaultService(processEngine, runtimeService, clientMessagingService, battleRepository, planetRepository, characterRepository, userService);
+        service = new PlanetaryAssaultService(processEngine, runtimeService, clientMessagingService, battleRepository, planetRepository, userService);
     }
 
     @Test
