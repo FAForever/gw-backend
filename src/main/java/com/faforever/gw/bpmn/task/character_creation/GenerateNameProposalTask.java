@@ -25,7 +25,7 @@ public class GenerateNameProposalTask implements JavaDelegate {
 
         CharacterCreationAccessor accessor = CharacterCreationAccessor.of(execution);
 
-        List<String> proposedNames = Arrays.asList(characterNameGenerator.generateNames(accessor.getRequestedFaction()));
+        List<String> proposedNames = characterNameGenerator.generateNames(accessor.getRequestedFaction());
         accessor.setProposedNamesList(proposedNames);
         log.debug("-> proposedNames: {}", proposedNames);
     }

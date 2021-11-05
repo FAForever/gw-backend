@@ -30,7 +30,6 @@ public class CheckUserCharactersTask implements JavaDelegate {
         boolean hasActiveCharacter = false;
         boolean hasDeadCharacter = false;
         Faction previousFaction = null;
-        boolean factionMatches = false;
 
         List<GwCharacter> characterList = characterRepository.findByFafId(accessor.getRequestFafUser());
 
@@ -48,9 +47,10 @@ public class CheckUserCharactersTask implements JavaDelegate {
             previousFaction = character.getFaction();
         }
 
-        factionMatches = previousFaction == accessor.getRequestedFaction();
+        boolean factionMatches = previousFaction == accessor.getRequestedFaction();
 
-        log.info("User {} has following state: hasActiveCharacter={0}, hasDeadCharacter={1}, previousFaction={2}", hasActiveCharacter, hasDeadCharacter, previousFaction);
+        log.info("User {} has following state: hasActiveCharacter={}, hasDeadCharacter={}, previousFaction={}",
+                accessor.getRequestFafUser(), hasActiveCharacter, hasDeadCharacter, previousFaction);
         accessor.setHasActiveCharacter(hasActiveCharacter)
                 .setHasDeadCharacter(hasDeadCharacter)
                 .setFactionMatches(factionMatches);

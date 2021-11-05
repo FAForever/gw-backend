@@ -34,7 +34,7 @@ public class GenerateNameProposalTaskTest {
     @Before
     public void setUp() throws Exception {
         when(delegateExecution.getProcessInstance()).thenReturn(delegateExecution);
-        when(characterNameGenerator.generateNames(any())).thenReturn(new String[]{"1", "2", "3", "4", "5"});
+        when(characterNameGenerator.generateNames(any())).thenReturn(List.of("1", "2", "3", "4", "5"));
         when(delegateExecution.getBusinessKey()).thenReturn("test");
 
         task = new GenerateNameProposalTask(characterNameGenerator);

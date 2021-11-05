@@ -7,6 +7,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.List;
+
 import static junit.framework.TestCase.assertTrue;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -48,7 +50,7 @@ public class CharacterNameGeneratorTest {
     }
 
     private void testFaction(Faction faction) throws Exception {
-        String[] names = instance.generateNames(faction);
+        List<String> names = instance.generateNames(faction);
 
         for (String name : names) {
             assertTrue(name.length() >= 5);

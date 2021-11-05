@@ -54,8 +54,6 @@ public class PlanetaryAssaultServiceTest {
     @Mock
     private PlanetRepository planetRepository;
     @Mock
-    private CharacterRepository characterRepository;
-    @Mock
     private UserService userService;
     @Mock
     private BattleRepository battleRepository;
@@ -75,7 +73,6 @@ public class PlanetaryAssaultServiceTest {
     @Before
     public void setUp() throws Exception {
         when(userService.getUserFromContext()).thenReturn(user);
-        when(userService.getActiveCharacter(user)).thenReturn(character);
         when(planetRepository.findById(any(UUID.class))).thenReturn(Optional.of(planet));
 
         when(battleRepository.findOneByFafGameId(anyLong())).thenReturn(Optional.of(battle));

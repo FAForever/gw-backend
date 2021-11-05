@@ -40,7 +40,7 @@ public class CreateCharacterTask implements JavaDelegate {
         character.setName(accessor.getSelectedName());
         character.setFaction(accessor.getRequestedFaction());
         character.setXp(0L);
-        character.setRank(rankRepository.getOne(1));
+        character.setRank(rankRepository.getById(1));
         characterRepository.save(character);
 
         accessor.setNewCharacterId(character.getId());
