@@ -1,19 +1,17 @@
 package com.faforever.gw.services.generator;
 
-import lombok.extern.slf4j.Slf4j;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.springframework.test.util.AssertionErrors.assertTrue;
 
-@RunWith(MockitoJUnitRunner.class)
-@Slf4j
+@ExtendWith(MockitoExtension.class)
 public class SolarSystemNameGeneratorTest {
     private SolarSystemNameGenerator instance;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         instance = new SolarSystemNameGenerator();
     }

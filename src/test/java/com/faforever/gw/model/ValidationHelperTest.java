@@ -3,11 +3,11 @@ package com.faforever.gw.model;
 import com.faforever.gw.bpmn.services.GwErrorService;
 import com.faforever.gw.bpmn.services.GwErrorType;
 import org.camunda.bpm.engine.delegate.BpmnError;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.jwt.Jwt;
 import org.springframework.security.jwt.JwtHelper;
 import org.springframework.security.jwt.crypto.sign.MacSigner;
@@ -15,20 +15,22 @@ import org.springframework.security.jwt.crypto.sign.MacSigner;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.mockito.Matchers.any;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.Silent.class)
+@ExtendWith(MockitoExtension.class)
 public class ValidationHelperTest {
-    ValidationHelper validationHelper;
+    private ValidationHelper validationHelper;
 
     @Mock
-    GwErrorService gwErrorService;
+    private GwErrorService gwErrorService;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
-        when(gwErrorService.getBpmnErrorOf(any(GwErrorType.class))).thenReturn(new BpmnError("test"));
+        lenient().when(gwErrorService.getBpmnErrorOf(any(GwErrorType.class))).thenReturn(new BpmnError("test"));
 
         validationHelper = new ValidationHelper(gwErrorService);
     }
@@ -48,7 +50,7 @@ public class ValidationHelperTest {
         validationHelper.validateCharacterInBattle(character, battle, true);
     }
 
-    @Test(expected = BpmnError.class)
+    @Test
     public void validateCharacterInBattle__ExpectTrue_Error() {
         GwCharacter character = mock(GwCharacter.class);
 
@@ -57,7 +59,7 @@ public class ValidationHelperTest {
 
         when(battle.getParticipants()).thenReturn(battleParticipantList);
 
-        validationHelper.validateCharacterInBattle(character, battle, true);
+        assertThrows(BpmnError.class, () -> validationHelper.validateCharacterInBattle(character, battle, true));
     }
 
     @Test
@@ -75,7 +77,7 @@ public class ValidationHelperTest {
         validationHelper.validateCharacterInBattle(mock(GwCharacter.class), battle, false);
     }
 
-    @Test(expected = BpmnError.class)
+    @Test
     public void validateCharacterInBattle__ExpectFalse_Error() {
         GwCharacter character = mock(GwCharacter.class);
         BattleParticipant participant = mock(BattleParticipant.class);
@@ -87,7 +89,7 @@ public class ValidationHelperTest {
 
         when(battle.getParticipants()).thenReturn(battleParticipantList);
 
-        validationHelper.validateCharacterInBattle(character, battle, false);
+        assertThrows(BpmnError.class, () -> validationHelper.validateCharacterInBattle(character, battle, false));
     }
 
     @Test
@@ -100,7 +102,7 @@ public class ValidationHelperTest {
         validationHelper.validateCharacterFreeForGame(character);
     }
 
-    @Test(expected = BpmnError.class)
+    @Test
     public void validateCharacterFreeForGame_BattleInitiated() {
         GwCharacter character = mock(GwCharacter.class);
         BattleParticipant participant = mock(BattleParticipant.class);
@@ -112,10 +114,10 @@ public class ValidationHelperTest {
         battleParticipantList.add(participant);
         when(character.getBattleParticipantList()).thenReturn(battleParticipantList);
 
-        validationHelper.validateCharacterFreeForGame(character);
+        assertThrows(BpmnError.class, () -> validationHelper.validateCharacterFreeForGame(character));
     }
 
-    @Test(expected = BpmnError.class)
+    @Test
     public void validateCharacterFreeForGame_BattleRunning() {
         GwCharacter character = mock(GwCharacter.class);
         BattleParticipant participant = mock(BattleParticipant.class);
@@ -127,7 +129,7 @@ public class ValidationHelperTest {
         battleParticipantList.add(participant);
         when(character.getBattleParticipantList()).thenReturn(battleParticipantList);
 
-        validationHelper.validateCharacterFreeForGame(character);
+        assertThrows(BpmnError.class, () -> validationHelper.validateCharacterFreeForGame(character));
     }
 
     @Test
@@ -178,7 +180,7 @@ public class ValidationHelperTest {
         validationHelper.validateOpenSlotForCharacter(battle, BattleRole.ATTACKER);
     }
 
-    @Test(expected = BpmnError.class)
+    @Test
     public void validateOpenSlotForCharacter_Attacker_NoSlot() {
         Battle battle = mock(Battle.class);
         Planet planet = mock(Planet.class);
@@ -193,7 +195,7 @@ public class ValidationHelperTest {
         battleParticipants.add(participant);
         when(battle.getParticipants()).thenReturn(battleParticipants);
 
-        validationHelper.validateOpenSlotForCharacter(battle, BattleRole.ATTACKER);
+        assertThrows(BpmnError.class, () -> validationHelper.validateOpenSlotForCharacter(battle, BattleRole.ATTACKER));
     }
 
     @Test
@@ -214,7 +216,7 @@ public class ValidationHelperTest {
         validationHelper.validateOpenSlotForCharacter(battle, BattleRole.DEFENDER);
     }
 
-    @Test(expected = BpmnError.class)
+    @Test
     public void validateOpenSlotForCharacter_Defender_NoSlot() {
         Battle battle = mock(Battle.class);
         Planet planet = mock(Planet.class);
@@ -229,7 +231,7 @@ public class ValidationHelperTest {
         battleParticipants.add(participant);
         when(battle.getParticipants()).thenReturn(battleParticipants);
 
-        validationHelper.validateOpenSlotForCharacter(battle, BattleRole.DEFENDER);
+        assertThrows(BpmnError.class, () -> validationHelper.validateOpenSlotForCharacter(battle, BattleRole.DEFENDER));
     }
 
     //    @Test
@@ -280,24 +282,19 @@ public class ValidationHelperTest {
 
     }
 
-    @Test(expected = BpmnError.class)
+    @Test
     public void validateAssaultOnPlanet_ownFaction() {
 
         GwCharacter character = mock(GwCharacter.class);
         when(character.getFaction()).thenReturn(Faction.AEON);
 
-        SolarSystem solarSystem = mock(SolarSystem.class);
-        when(solarSystem.isReachable(Faction.AEON)).thenReturn(true);
-
         Planet planet = mock(Planet.class);
         when(planet.getCurrentOwner()).thenReturn(Faction.AEON);
-        when(planet.getSolarSystem()).thenReturn(solarSystem);
 
-        validationHelper.validateAssaultOnPlanet(character, planet);
-
+        assertThrows(BpmnError.class, () -> validationHelper.validateAssaultOnPlanet(character, planet));
     }
 
-    @Test(expected = BpmnError.class)
+    @Test
     public void validateAssaultOnPlanet_unreachableSolarSystem() {
 
         GwCharacter character = mock(GwCharacter.class);
@@ -310,8 +307,7 @@ public class ValidationHelperTest {
         when(planet.getSolarSystem()).thenReturn(system);
         when(planet.getCurrentOwner()).thenReturn(Faction.CYBRAN);
 
-        validationHelper.validateAssaultOnPlanet(character, planet);
-
+        assertThrows(BpmnError.class, () -> validationHelper.validateAssaultOnPlanet(character, planet));
     }
 
     @Test
@@ -328,7 +324,6 @@ public class ValidationHelperTest {
         when(planet.getCurrentOwner()).thenReturn(Faction.CYBRAN);
 
         validationHelper.validateAssaultOnPlanet(character, planet);
-
     }
 
 }

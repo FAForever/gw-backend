@@ -6,21 +6,20 @@ import com.faforever.gw.model.*;
 import com.faforever.gw.model.repository.BattleRepository;
 import com.faforever.gw.model.service.BattleService;
 import com.faforever.gw.model.service.CharacterService;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.Silent.class)
+@ExtendWith(MockitoExtension.class)
 public class BattleServiceTest {
     @Mock
     private BattleRepository battleRepository;
@@ -39,7 +38,7 @@ public class BattleServiceTest {
     private List<GameCharacterResult> characterResults;
     private ArrayList<BattleParticipant> battleParticipants;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         service = new BattleService(battleRepository, planetaryAssaultService, characterService);
 
@@ -51,8 +50,6 @@ public class BattleServiceTest {
         gameResult.setCharacterResults(characterResults);
 
         when(battleRepository.getOne(any(UUID.class))).thenReturn(battle);
-        when(battle.getAttackingFaction()).thenReturn(Faction.UEF);
-        when(battle.getDefendingFaction()).thenReturn(Faction.CYBRAN);
         when(battle.getParticipants()).thenReturn(battleParticipants);
     }
 
@@ -202,19 +199,14 @@ public class BattleServiceTest {
             characterResults.add(this.result);
             battleParticipants.add(participant);
             when(battle.getParticipant(character)).thenReturn(Optional.of(participant));
-            when(characterService.requireCharacter(id)).thenReturn(character);
 
             when(participant.getCharacter()).thenReturn(character);
 
             when(character.getId()).thenReturn(id);
-            when(character.getFaction()).thenReturn(faction);
-            when(participant.getFaction()).thenReturn(faction);
+            lenient().when(character.getFaction()).thenReturn(faction);
 
             Rank r = mock(Rank.class);
-            when(character.getRank()).thenReturn(r);
-            when(r.getLevel()).thenReturn(rank);
 
-            when(participant.getResult()).thenReturn(result);
             when(battle.getParticipant(character)).thenReturn(Optional.of(participant));
         }
     }

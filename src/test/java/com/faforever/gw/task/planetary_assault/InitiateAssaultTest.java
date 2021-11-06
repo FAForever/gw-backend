@@ -1,16 +1,5 @@
 package com.faforever.gw.task.planetary_assault;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import com.faforever.gw.bpmn.task.planetary_assault.InitiateAssaultTask;
 import com.faforever.gw.model.Battle;
 import com.faforever.gw.model.BattleParticipant;
@@ -22,22 +11,32 @@ import com.faforever.gw.model.ValidationHelper;
 import com.faforever.gw.model.repository.BattleRepository;
 import com.faforever.gw.model.repository.CharacterRepository;
 import com.faforever.gw.model.repository.PlanetRepository;
-
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.UUID;
 
-import javax.persistence.EntityManager;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class InitiateAssaultTest {
     @Mock
     private DelegateExecution delegateExecution;
@@ -56,7 +55,7 @@ public class InitiateAssaultTest {
 
     private InitiateAssaultTask task;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         when(delegateExecution.getProcessInstance()).thenReturn(delegateExecution);
         when(delegateExecution.getBusinessKey()).thenReturn("test");
@@ -118,20 +117,20 @@ public class InitiateAssaultTest {
         verify(delegateExecution).setVariable("defendingFaction", Faction.CYBRAN);
     }
 
-    @Test(expected = BpmnError.class)
+    @Test
     public void testValidateAssaultOnPlanetThrowsException() throws Exception {
         doThrow(new BpmnError("validationHelper.validateAssaultOnPlanet"))
                 .when(validationHelper).validateAssaultOnPlanet(character, planet);
 
-        task.execute(delegateExecution);
+        assertThrows(BpmnError.class, () -> task.execute(delegateExecution));
     }
 
-    @Test(expected = BpmnError.class)
+    @Test
     public void testValidateCharacterFreeForGameThrowsException() throws Exception {
         doThrow(new BpmnError("validationHelper.validateCharacterFreeForGame"))
                 .when(validationHelper).validateCharacterFreeForGame(character);
 
-        task.execute(delegateExecution);
+        assertThrows(BpmnError.class, () -> task.execute(delegateExecution));
     }
 
 }

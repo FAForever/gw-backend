@@ -10,19 +10,23 @@ import com.faforever.gw.security.User;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class CharacterCreationServiceTest {
     @Mock
     private RuntimeService runtimeService;
@@ -37,10 +41,10 @@ public class CharacterCreationServiceTest {
 
     private CharacterCreationService service;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
-        when(userService.getUserFromContext()).thenReturn(user);
-        when(user.getId()).thenReturn(5L);
+        lenient().when(userService.getUserFromContext()).thenReturn(user);
+        lenient().when(user.getId()).thenReturn(5L);
 
         service = new CharacterCreationService(runtimeService, clientMessagingService, userService, characterRepository);
     }

@@ -4,25 +4,25 @@ import com.faforever.gw.bpmn.task.generic.SelectAllActiveCharactersTask;
 import com.faforever.gw.model.GwCharacter;
 import com.faforever.gw.model.repository.CharacterRepository;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class SelectAllActiveCharactersTest {
 
     @Mock
@@ -36,7 +36,7 @@ public class SelectAllActiveCharactersTest {
     private SelectAllActiveCharactersTask task;
 
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         task = new SelectAllActiveCharactersTask(characterRepository);
     }

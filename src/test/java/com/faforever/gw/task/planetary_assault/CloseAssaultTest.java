@@ -8,17 +8,22 @@ import com.faforever.gw.model.Planet;
 import com.faforever.gw.model.repository.BattleRepository;
 import com.faforever.gw.model.repository.PlanetRepository;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.UUID;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class CloseAssaultTest {
     @Mock
     private DelegateExecution delegateExecution;
@@ -33,7 +38,7 @@ public class CloseAssaultTest {
 
     private CloseAssaultTask task;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         when(delegateExecution.getProcessInstance()).thenReturn(delegateExecution);
         when(delegateExecution.getBusinessKey()).thenReturn("test");
@@ -45,8 +50,8 @@ public class CloseAssaultTest {
 
         when(battleRepository.getOne(any(UUID.class))).thenReturn(battle);
         when(planetRepository.getOne(any(UUID.class))).thenReturn(planet);
-        when(battle.getAttackingFaction()).thenReturn(Faction.UEF);
-        when(battle.getDefendingFaction()).thenReturn(Faction.CYBRAN);
+        lenient().when(battle.getAttackingFaction()).thenReturn(Faction.UEF);
+        lenient().when(battle.getDefendingFaction()).thenReturn(Faction.CYBRAN);
 
         task = new CloseAssaultTask(battleRepository, planetRepository);
     }

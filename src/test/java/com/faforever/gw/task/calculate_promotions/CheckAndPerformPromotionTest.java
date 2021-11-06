@@ -6,25 +6,23 @@ import com.faforever.gw.model.Rank;
 import com.faforever.gw.model.repository.CharacterRepository;
 import com.faforever.gw.model.repository.RankRepository;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.mockito.junit.MockitoRule;
-import org.mockito.quality.Strictness;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.Silent.class)
+@ExtendWith(MockitoExtension.class)
 public class CheckAndPerformPromotionTest {
 
     @Mock
@@ -39,11 +37,8 @@ public class CheckAndPerformPromotionTest {
     @Mock
     private RankRepository rankRepository;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
-        when(delegateExecution.getProcessInstance()).thenReturn(delegateExecution);
-        when(delegateExecution.getBusinessKey()).thenReturn("test");
-
         when(delegateExecution.getVariable("character"))
                 .thenReturn(UUID.fromString("11111111-1111-1111-1111-111111111111"));
 

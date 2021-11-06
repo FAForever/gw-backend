@@ -1,10 +1,13 @@
 package com.faforever.gw.model;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 public class SolarSystemTest {
@@ -12,7 +15,7 @@ public class SolarSystemTest {
     SolarSystem system, connectedSystem;
     Planet planetA, planetB, planetC, planetConnectedSystem;
 
-    @Before
+    @BeforeEach
     public void init() {
         system = new SolarSystem(); connectedSystem = new SolarSystem();
         planetA = new Planet(); planetB = new Planet(); planetC = new Planet(); planetConnectedSystem = new Planet();
@@ -33,7 +36,7 @@ public class SolarSystemTest {
 
     @Test
     public void uniqueOwnerTest_allPlanetsFactionless() {
-        Assert.assertEquals("Planets do not have owners, thus uniqueowner is null", null, system.uniqueOwner());
+        assertNull(system.uniqueOwner(), "Planets do not have owners, thus uniqueowner is null");
     }
 
     @Test
@@ -41,44 +44,44 @@ public class SolarSystemTest {
         planetA.setCurrentOwner(Faction.AEON);
         planetB.setCurrentOwner(Faction.AEON);
         planetC.setCurrentOwner(Faction.AEON);
-        Assert.assertEquals("All planets in SolarSystem owned by AEON", Faction.AEON, system.uniqueOwner());
+        assertEquals(Faction.AEON, system.uniqueOwner(), "All planets in SolarSystem owned by AEON");
     }
     @Test
     public void uniqueOwnerTest_notAllPlanetsOwnedByAeon() {
         planetC.setCurrentOwner(Faction.CYBRAN);
-        Assert.assertEquals("One planet not owned by AEON but by CYBRAN", null, system.uniqueOwner());
+        assertNull(system.uniqueOwner(), "One planet not owned by AEON but by CYBRAN");
     }
 
     @Test
     public void isReachableTest_notReachable() {
-        Assert.assertFalse(system.isReachable(Faction.AEON));
-        Assert.assertFalse(system.isReachable(Faction.CYBRAN));
-        Assert.assertFalse(system.isReachable(Faction.UEF));
-        Assert.assertFalse(system.isReachable(Faction.SERAPHIM));
+        assertFalse(system.isReachable(Faction.AEON));
+        assertFalse(system.isReachable(Faction.CYBRAN));
+        assertFalse(system.isReachable(Faction.UEF));
+        assertFalse(system.isReachable(Faction.SERAPHIM));
     }
 
     @Test
     public void isReachableTest_reachableThroughPlanet() {
         planetA.setCurrentOwner(Faction.AEON);
-        Assert.assertTrue("A planet within the system is owned by AEON, AEON should reach the planet", system.isReachable(Faction.AEON));
-        Assert.assertFalse(system.isReachable(Faction.CYBRAN));
-        Assert.assertFalse(system.isReachable(Faction.UEF));
-        Assert.assertFalse(system.isReachable(Faction.SERAPHIM));
+        assertTrue(system.isReachable(Faction.AEON), "A planet within the system is owned by AEON, AEON should reach the planet");
+        assertFalse(system.isReachable(Faction.CYBRAN));
+        assertFalse(system.isReachable(Faction.UEF));
+        assertFalse(system.isReachable(Faction.SERAPHIM));
     }
 
     @Test
     public void isReachableTest_reachableThroughConnectedSystem() {
         planetConnectedSystem.setCurrentOwner(Faction.AEON);
-        Assert.assertTrue("Connected system owned by AEON, AEON should reach the planet", system.isReachable(Faction.AEON));
-        Assert.assertFalse(system.isReachable(Faction.CYBRAN));
-        Assert.assertFalse(system.isReachable(Faction.UEF));
-        Assert.assertFalse(system.isReachable(Faction.SERAPHIM));
+        assertTrue(system.isReachable(Faction.AEON), "Connected system owned by AEON, AEON should reach the planet");
+        assertFalse(system.isReachable(Faction.CYBRAN));
+        assertFalse(system.isReachable(Faction.UEF));
+        assertFalse(system.isReachable(Faction.SERAPHIM));
     }
 
     @Test
     public void isReachableTest_isolatedSystem() {
         system.setConnectedSystems(new HashSet<>());
-        Assert.assertFalse("System is isolated, thus unreachable", system.isReachable(Faction.AEON));
+        assertFalse(system.isReachable(Faction.AEON), "System is isolated, thus unreachable");
     }
 
 }

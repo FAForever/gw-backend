@@ -1,28 +1,41 @@
 package com.faforever.gw.task.planetary_assault;
 
 import com.faforever.gw.bpmn.task.planetary_assault.RemoveCharacterFromAssaultTask;
-import com.faforever.gw.model.*;
+import com.faforever.gw.model.Battle;
+import com.faforever.gw.model.BattleParticipant;
+import com.faforever.gw.model.Faction;
+import com.faforever.gw.model.GwCharacter;
+import com.faforever.gw.model.Planet;
+import com.faforever.gw.model.ValidationHelper;
 import com.faforever.gw.model.repository.BattleRepository;
 import com.faforever.gw.model.repository.CharacterRepository;
 import com.faforever.gw.model.repository.PlanetRepository;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.Silent.class)
+@ExtendWith(MockitoExtension.class)
 public class RemoveCharacterFromAssaultTest {
     @Mock
     private Battle battle;
@@ -42,35 +55,35 @@ public class RemoveCharacterFromAssaultTest {
     @Mock
     private Planet planet;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         when(delegateExecution.getProcessInstance()).thenReturn(delegateExecution);
         when(delegateExecution.getBusinessKey()).thenReturn("test");
 
-        when(delegateExecution.getVariable("requestCharacter"))
+        lenient().when(delegateExecution.getVariable("requestCharacter"))
                 .thenReturn(UUID.fromString("11111111-1111-1111-1111-111111111111"));
-        when(delegateExecution.getVariable("planet"))
+        lenient().when(delegateExecution.getVariable("planet"))
                 .thenReturn(UUID.fromString("22222222-2222-2222-2222-222222222222"));
-        when(delegateExecution.getVariable("battle"))
+        lenient().when(delegateExecution.getVariable("battle"))
                 .thenReturn(UUID.fromString("33333333-3333-3333-3333-333333333333"));
 
         when(characterRepository.getOne(any(UUID.class))).thenReturn(character);
-        when(character.getId()).thenReturn(UUID.fromString("11111111-1111-1111-1111-111111111111"));
+        lenient().when(character.getId()).thenReturn(UUID.fromString("11111111-1111-1111-1111-111111111111"));
         when(battleRepository.getOne(any(UUID.class))).thenReturn(battle);
-        when(planetRepository.getOne(any(UUID.class))).thenReturn(planet);
+        lenient().when(planetRepository.getOne(any(UUID.class))).thenReturn(planet);
 
-        when(battle.getAttackingFaction()).thenReturn(Faction.UEF);
-        when(battle.getDefendingFaction()).thenReturn(Faction.CYBRAN);
+        lenient().when(battle.getAttackingFaction()).thenReturn(Faction.UEF);
+        lenient().when(battle.getDefendingFaction()).thenReturn(Faction.CYBRAN);
         ArrayList<BattleParticipant> battleParticipants = new ArrayList<>();
-        when(battle.getParticipants()).thenReturn(battleParticipants);
+        lenient().when(battle.getParticipants()).thenReturn(battleParticipants);
 
 
         task = new RemoveCharacterFromAssaultTask(characterRepository, battleRepository, validationHelper);
 
 
         // default setUp
-        when(character.getFaction()).thenReturn(Faction.UEF);
-        when(delegateExecution.getVariable("attackerCount")).thenReturn(1);
+        lenient().when(character.getFaction()).thenReturn(Faction.UEF);
+        lenient().when(delegateExecution.getVariable("attackerCount")).thenReturn(1);
     }
 
     @Test
@@ -82,8 +95,6 @@ public class RemoveCharacterFromAssaultTest {
 
         // Setup defender
         GwCharacter defenderCharacter = mock(GwCharacter.class);
-        when(defenderCharacter.getFaction()).thenReturn(Faction.CYBRAN);
-        when(defenderCharacter.getId()).thenReturn(UUID.fromString("12345678-1111-1111-1111-111111111111"));
         BattleParticipant defenderParticipant = mock(BattleParticipant.class);
         when(defenderParticipant.getCharacter()).thenReturn(defenderCharacter);
         battle.getParticipants().add(defenderParticipant);
@@ -124,8 +135,6 @@ public class RemoveCharacterFromAssaultTest {
 
         // Setup defender
         GwCharacter attackerCharacter = mock(GwCharacter.class);
-        when(attackerCharacter.getFaction()).thenReturn(Faction.UEF);
-        when(attackerCharacter.getId()).thenReturn(UUID.fromString("12345678-1111-1111-1111-111111111111"));
         BattleParticipant attackerParticipant = mock(BattleParticipant.class);
         when(attackerParticipant.getCharacter()).thenReturn(attackerCharacter);
         battle.getParticipants().add(attackerParticipant);
@@ -154,12 +163,12 @@ public class RemoveCharacterFromAssaultTest {
         verify(delegateExecution, never()).setVariable(eq("winner"), anyString());
     }
 
-    @Test(expected = BpmnError.class)
+    @Test
     public void testValidateCharacterInBattleThrowsException() throws Exception {
         doThrow(new BpmnError("validationHelper.validateCharacterInBattle"))
                 .when(validationHelper).validateCharacterInBattle(character, battle, true);
 
-        task.execute(delegateExecution);
+        assertThrows(BpmnError.class, () -> task.execute(delegateExecution));
     }
 
 }

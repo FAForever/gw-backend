@@ -6,13 +6,11 @@ import com.faforever.gw.messaging.client.ClientMessagingService;
 import com.faforever.gw.messaging.client.inbound.InitiateAssaultMessage;
 import com.faforever.gw.messaging.client.inbound.JoinAssaultMessage;
 import com.faforever.gw.messaging.client.inbound.LeaveAssaultMessage;
-import com.faforever.gw.messaging.lobby.inbound.GameResultMessage;
 import com.faforever.gw.model.Battle;
 import com.faforever.gw.model.Faction;
 import com.faforever.gw.model.GwCharacter;
 import com.faforever.gw.model.Planet;
 import com.faforever.gw.model.repository.BattleRepository;
-import com.faforever.gw.model.repository.CharacterRepository;
 import com.faforever.gw.model.repository.PlanetRepository;
 import com.faforever.gw.security.User;
 import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
@@ -20,28 +18,28 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationContext;
 
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.Silent.class)
+@ExtendWith(MockitoExtension.class)
 public class PlanetaryAssaultServiceTest {
     @Mock
     private ApplicationContext applicationContext;
@@ -70,19 +68,19 @@ public class PlanetaryAssaultServiceTest {
     private VariableMap map;
     private PlanetaryAssaultService service;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
-        when(userService.getUserFromContext()).thenReturn(user);
-        when(planetRepository.findById(any(UUID.class))).thenReturn(Optional.of(planet));
+        lenient().when(userService.getUserFromContext()).thenReturn(user);
+        lenient().when(planetRepository.findById(any(UUID.class))).thenReturn(Optional.of(planet));
 
-        when(battleRepository.findOneByFafGameId(anyLong())).thenReturn(Optional.of(battle));
-        when(battle.getId()).thenReturn(UUID.randomUUID());
+        lenient().when(battleRepository.findOneByFafGameId(anyLong())).thenReturn(Optional.of(battle));
+        lenient().when(battle.getId()).thenReturn(UUID.randomUUID());
 
-        when(user.getId()).thenReturn(5L);
-        when(user.getActiveCharacter()).thenReturn(Optional.of(character));
+        lenient().when(user.getId()).thenReturn(5L);
+        lenient().when(user.getActiveCharacter()).thenReturn(Optional.of(character));
 
         map = Variables.createVariables();
-        when(clientMessagingService.createVariables(anyLong(), any(), any())).thenReturn(map);
+        lenient().when(clientMessagingService.createVariables(anyLong(), any(), any())).thenReturn(map);
 
         service = new PlanetaryAssaultService(processEngine, runtimeService, clientMessagingService, battleRepository, planetRepository, userService);
     }
@@ -135,9 +133,6 @@ public class PlanetaryAssaultServiceTest {
 
         doThrow(MismatchingMessageCorrelationException.class).when(runtimeService).correlateMessage(anyString(), anyString(), any());
 
-        UserErrorMessage userErrorMessage = new UserErrorMessage(clientMessagingService, userService);
-        when(applicationContext.getBean(UserErrorMessage.class)).thenReturn(userErrorMessage);
-
         service.onCharacterJoinsAssault(message);
 
         verify(clientMessagingService).createVariables(user.getId(), message.getRequestId(), character.getId());
@@ -165,9 +160,6 @@ public class PlanetaryAssaultServiceTest {
         );
 
         doThrow(MismatchingMessageCorrelationException.class).when(runtimeService).correlateMessage(anyString(), anyString(), any());
-
-        UserErrorMessage userErrorMessage = new UserErrorMessage(clientMessagingService, userService);
-        when(applicationContext.getBean(UserErrorMessage.class)).thenReturn(userErrorMessage);
 
         service.onCharacterLeavesAssault(message);
 

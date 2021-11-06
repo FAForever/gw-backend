@@ -1,22 +1,20 @@
 package com.faforever.gw.services.generator;
 
 import com.faforever.gw.model.Faction;
-import lombok.extern.slf4j.Slf4j;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
-import static junit.framework.TestCase.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@RunWith(MockitoJUnitRunner.class)
-@Slf4j
+@ExtendWith(MockitoExtension.class)
 public class CharacterNameGeneratorTest {
     private CharacterNameGenerator instance;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         instance = new CharacterNameGenerator();
     }

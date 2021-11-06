@@ -5,19 +5,21 @@ import com.faforever.gw.model.Faction;
 import com.faforever.gw.model.GwCharacter;
 import com.faforever.gw.model.repository.CharacterRepository;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.Silent.class)
+@ExtendWith(MockitoExtension.class)
 public class CheckUserCharactersTaskTest {
     @Mock
     private DelegateExecution delegateExecution;
@@ -30,14 +32,11 @@ public class CheckUserCharactersTaskTest {
 
     private CheckUserCharactersTask task;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
-        when(delegateExecution.getProcessInstance()).thenReturn(delegateExecution);
-        when(delegateExecution.getBusinessKey()).thenReturn("test");
-
-        when(delegateExecution.getVariable("requestFafUser")).thenReturn(99L);
-        when(delegateExecution.getVariable("requestedFaction")).thenReturn(Faction.UEF);
-        when(deadCharacter.getKiller()).thenReturn(mock(GwCharacter.class));
+        lenient().when(delegateExecution.getVariable("requestFafUser")).thenReturn(99L);
+        lenient().when(delegateExecution.getVariable("requestedFaction")).thenReturn(Faction.UEF);
+        lenient().when(deadCharacter.getKiller()).thenReturn(mock(GwCharacter.class));
 
         task = new CheckUserCharactersTask(characterRepository);
     }
@@ -77,13 +76,13 @@ public class CheckUserCharactersTaskTest {
         verify(delegateExecution).setVariable("factionMatches", true);
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void testActiveAndDeadCharacterWithDivergentFactions() throws Exception {
         when(characterRepository.findByFafId(99L)).thenReturn(List.of(activeCharacter, deadCharacter));
         when(activeCharacter.getFaction()).thenReturn(Faction.UEF);
         when(deadCharacter.getFaction()).thenReturn(Faction.AEON);
 
-        task.execute(delegateExecution);
+        assertThrows(IllegalStateException.class, () -> task.execute(delegateExecution));
     }
 
     @Test
