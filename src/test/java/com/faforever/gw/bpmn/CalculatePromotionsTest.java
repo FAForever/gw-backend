@@ -2,15 +2,16 @@ package com.faforever.gw.bpmn;
 
 import com.faforever.gw.model.GwCharacter;
 import com.google.common.collect.ImmutableMap;
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
-import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.mock.Mocks;
+import org.camunda.bpm.extension.junit5.test.ProcessEngineExtension;
 import org.camunda.bpm.extension.mockito.DelegateExpressions;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockitoAnnotations;
 
 import java.util.Arrays;
@@ -18,12 +19,12 @@ import java.util.Arrays;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
 import static org.mockito.Mockito.mock;
 
+@ExtendWith(ProcessEngineExtension.class)
 public class CalculatePromotionsTest {
 
-    @Rule
-    public ProcessEngineRule processEngineRule = new ProcessEngineRule();
+    public ProcessEngine processEngine;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         DelegateExpressions.registerJavaDelegateMock("selectAllActiveCharactersTask").onExecutionSetVariables(ImmutableMap.of("activeCharacters", Arrays.asList(mock(GwCharacter.class), mock(GwCharacter.class))));
@@ -31,7 +32,7 @@ public class CalculatePromotionsTest {
         DelegateExpressions.registerJavaDelegateMock("characterPromotionNotification");
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         Mocks.reset();
     }
@@ -81,7 +82,7 @@ public class CalculatePromotionsTest {
     }
 
     private ProcessInstance startProcess() {
-        return processEngineRule.getRuntimeService().startProcessInstanceByKey("Process_CalculatePromotions");
-//        processEngineRule.getRuntimeService().signalEventReceived("Signal_UpdatePromotions");
+        return processEngine.getRuntimeService().startProcessInstanceByKey("Process_CalculatePromotions");
+//        processEngine.getRuntimeService().signalEventReceived("Signal_UpdatePromotions");
     }
 }

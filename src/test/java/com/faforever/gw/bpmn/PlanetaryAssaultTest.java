@@ -2,14 +2,20 @@ package com.faforever.gw.bpmn;
 
 import com.faforever.gw.bpmn.services.PlanetaryAssaultService;
 import com.faforever.gw.model.GameResult;
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
-import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.mock.Mocks;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.extension.junit5.test.ProcessEngineExtension;
 import org.camunda.bpm.extension.mockito.DelegateExpressions;
 import org.h2.tools.Server;
-import org.junit.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockitoAnnotations;
 
 import java.sql.SQLException;
@@ -21,26 +27,25 @@ import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.execute
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.job;
 import static org.mockito.Mockito.mock;
 
-
+@ExtendWith(ProcessEngineExtension.class)
 public class PlanetaryAssaultTest {
 
-    @Rule
-    public ProcessEngineRule processEngineRule = new ProcessEngineRule();
+    public ProcessEngine processEngine;
 
     private static Server webServer;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() throws Exception {
         webServer = org.h2.tools.Server.createWebServer("-web");
         webServer.start();
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDownClass() {
         webServer.stop();
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws SQLException {
         MockitoAnnotations.initMocks(this);
         DelegateExpressions.registerJavaDelegateMock("initiateAssaultTask").onExecutionSetVariables(
@@ -64,7 +69,7 @@ public class PlanetaryAssaultTest {
         DelegateExpressions.registerJavaDelegateMock("planetDefendedNotification");
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         Mocks.reset();
     }
@@ -97,7 +102,7 @@ public class PlanetaryAssaultTest {
 
         assertThat(processInstance).isWaitingAt("ExclusiveGateway_SetupMatch");
 
-        processEngineRule.getRuntimeService().correlateMessage("Message_PlayerJoinsAssault", "test");
+        processEngine.getRuntimeService().correlateMessage("Message_PlayerJoinsAssault", "test");
 
         assertThat(processInstance).hasPassedInOrder(
                 "StartEvent_AssaultInitiated",
@@ -117,7 +122,7 @@ public class PlanetaryAssaultTest {
                 "ServiceTask_ConsumePlayersReinforcements",
                 "ServiceTask_CommandLobbyServerToSetupMatch");
 
-        processEngineRule.getRuntimeService().correlateMessage("Message_GameResult", "test",
+        processEngine.getRuntimeService().correlateMessage("Message_GameResult", "test",
                 Variables.createVariables()
                         .putValue("gameResult", mock(GameResult.class))
         );
@@ -171,7 +176,7 @@ public class PlanetaryAssaultTest {
 
         assertThat(processInstance).isWaitingAt("ExclusiveGateway_SetupMatch");
 
-        processEngineRule.getRuntimeService().correlateMessage("Message_PlayerJoinsAssault", "test");
+        processEngine.getRuntimeService().correlateMessage("Message_PlayerJoinsAssault", "test");
 
         assertThat(processInstance).hasPassedInOrder(
                 "StartEvent_AssaultInitiated",
@@ -205,7 +210,7 @@ public class PlanetaryAssaultTest {
 
         assertThat(processInstance).isWaitingAt("ExclusiveGateway_SetupMatch");
 
-        processEngineRule.getRuntimeService().correlateMessage("Message_PlayerLeavesAssault", "test");
+        processEngine.getRuntimeService().correlateMessage("Message_PlayerLeavesAssault", "test");
 
         assertThat(processInstance).hasPassedInOrder(
                 "StartEvent_AssaultInitiated",
@@ -241,7 +246,7 @@ public class PlanetaryAssaultTest {
 
         assertThat(processInstance).isWaitingAt("ExclusiveGateway_SetupMatch");
 
-        processEngineRule.getRuntimeService().signalEventReceived("Signal_UpdateOpenGames");
+        processEngine.getRuntimeService().signalEventReceived("Signal_UpdateOpenGames");
 
         assertThat(processInstance).hasPassedInOrder(
                 "StartEvent_AssaultInitiated",
@@ -258,7 +263,7 @@ public class PlanetaryAssaultTest {
 
         assertThat(processInstance).isWaitingAt("ExclusiveGateway_SetupMatch");
 
-        processEngineRule.getRuntimeService().correlateMessage("Message_PlayerLeavesAssault", "test");
+        processEngine.getRuntimeService().correlateMessage("Message_PlayerLeavesAssault", "test");
 
         assertThat(processInstance).hasPassedInOrder(
                 "ExclusiveGateway_WaitingProgress",
@@ -310,7 +315,7 @@ public class PlanetaryAssaultTest {
 
         assertThat(processInstance).isWaitingAt("ExclusiveGateway_SetupMatch");
 
-        processEngineRule.getRuntimeService().correlateMessage("Message_PlayerJoinsAssault", "test");
+        processEngine.getRuntimeService().correlateMessage("Message_PlayerJoinsAssault", "test");
 
         assertThat(processInstance).hasPassedInOrder(
                 "StartEvent_AssaultInitiated",
@@ -325,7 +330,7 @@ public class PlanetaryAssaultTest {
 
         assertThat(processInstance).isWaitingAt("ExclusiveGateway_SetupMatch");
 
-        processEngineRule.getRuntimeService().signalEventReceived("Signal_UpdateOpenGames");
+        processEngine.getRuntimeService().signalEventReceived("Signal_UpdateOpenGames");
 
         assertThat(processInstance).hasPassedInOrder(
                 "ExclusiveGateway_SetupMatch",
@@ -365,7 +370,7 @@ public class PlanetaryAssaultTest {
                 .putValue("attackerCount", 1)
                 .putValue("defenderCount", 0);
 
-        return processEngineRule.getRuntimeService().startProcessInstanceByMessage(
+        return processEngine.getRuntimeService().startProcessInstanceByMessage(
                 PlanetaryAssaultService.INITIATE_ASSAULT_MESSAGE, "test", processVariables
         );
     }

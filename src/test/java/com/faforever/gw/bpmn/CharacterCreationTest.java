@@ -2,28 +2,29 @@ package com.faforever.gw.bpmn;
 
 import com.faforever.gw.bpmn.services.CharacterCreationService;
 import com.google.common.collect.ImmutableMap;
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
-import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.mock.Mocks;
+import org.camunda.bpm.extension.junit5.test.ProcessEngineExtension;
 import org.camunda.bpm.extension.mockito.DelegateExpressions;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockitoAnnotations;
 
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.execute;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.job;
 
+@ExtendWith(ProcessEngineExtension.class)
 public class CharacterCreationTest {
 
-    @Rule
-    public ProcessEngineRule processEngineRule = new ProcessEngineRule();
+    public ProcessEngine processEngine;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         DelegateExpressions.registerJavaDelegateMock("checkUserCharactersTask");
@@ -36,7 +37,7 @@ public class CharacterCreationTest {
         DelegateExpressions.registerJavaDelegateMock("userErrorMessage");
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         Mocks.reset();
     }
@@ -100,7 +101,7 @@ public class CharacterCreationTest {
         )
                 .isWaitingAt("ReceiveTask_ReceiveNameSelection");
 
-        processEngineRule.getRuntimeService().correlateMessage(CharacterCreationService.RECEIVE_CHARACTER_NAME_SELECTION_MESSAGE, "test");
+        processEngine.getRuntimeService().correlateMessage(CharacterCreationService.RECEIVE_CHARACTER_NAME_SELECTION_MESSAGE, "test");
 
         assertThat(processInstance).hasPassedInOrder(
                 "IntermediateThrowEvent_SendNameProposal",
@@ -168,7 +169,7 @@ public class CharacterCreationTest {
         )
                 .isWaitingAt("ReceiveTask_ReceiveNameSelection");
 
-        processEngineRule.getRuntimeService().correlateMessage(CharacterCreationService.RECEIVE_CHARACTER_NAME_SELECTION_MESSAGE, "test");
+        processEngine.getRuntimeService().correlateMessage(CharacterCreationService.RECEIVE_CHARACTER_NAME_SELECTION_MESSAGE, "test");
 
         assertThat(processInstance).hasPassedInOrder(
                 "IntermediateThrowEvent_SendNameProposal",
@@ -189,6 +190,6 @@ public class CharacterCreationTest {
 
 
     private ProcessInstance startProcess() {
-        return processEngineRule.getRuntimeService().startProcessInstanceByMessage(CharacterCreationService.REQUEST_CHARACTER_MESSAGE, "test");
+        return processEngine.getRuntimeService().startProcessInstanceByMessage(CharacterCreationService.REQUEST_CHARACTER_MESSAGE, "test");
     }
 }

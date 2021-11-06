@@ -43,6 +43,7 @@ dependencies {
     runtimeOnly("com.h2database:h2")
     runtimeOnly("org.postgresql:postgresql")
     testImplementation("com.h2database:h2")
+    testImplementation("org.camunda.bpm.extension:camunda-bpm-junit5:1.0.2")
     testImplementation("org.camunda.bpm.extension.mockito:camunda-bpm-mockito:5.15.0")
 }
 

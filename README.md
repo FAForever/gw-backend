@@ -1,5 +1,5 @@
 # FAF Galactic War backend
-master: [![Build status](https://travis-ci.org/FAForever/gw-backend.svg?branch=master)](https://travis-ci.org/FAForever/gw-backend)   develop: [![Build status](https://travis-ci.org/FAForever/gw-backend.svg?branch=develop)](https://travis-ci.org/FAForever/gw-backend/tree/develop)
+   develop: [![Build](https://github.com/FAForever/gw-backend/actions/workflows/build.yaml/badge.svg?branch=develop)](https://github.com/FAForever/gw-backend/actions/workflows/build.yaml)
 
 This is the server-backend for Galactic War provided by [faforever.com](https://www.faforever.com) (or FAF).
 
