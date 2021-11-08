@@ -29,7 +29,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-websocket")
     implementation("org.springframework.boot:spring-boot-starter-security")
-    implementation("org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure:2.4.5")
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
     implementation("org.camunda.bpm.springboot:camunda-bpm-spring-boot-starter-webapp:7.16.0")
     implementation("com.yahoo.elide:elide-spring-boot-starter:5.1.0")
     implementation("org.camunda.bpm.springboot:camunda-bpm-spring-boot-starter-test:7.16.0")

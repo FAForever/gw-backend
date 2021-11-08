@@ -45,6 +45,11 @@ spring:
       source: createGameRequest
     function:
       definition: onMatchCreateSuccess;onMatchCreateError;onGameResult
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://hydra.test.faforever.com/
 
 camunda.bpm:
   admin-user:
@@ -59,6 +64,7 @@ camunda.bpm:
 logging:
   level:
     com.faforever.gw: debug
+    org.springframework: debug
 server:
   port: 8014
 

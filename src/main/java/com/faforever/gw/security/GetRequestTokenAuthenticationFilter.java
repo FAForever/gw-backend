@@ -5,9 +5,6 @@ import com.faforever.gw.model.service.CharacterService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.jwt.Jwt;
-import org.springframework.security.jwt.JwtHelper;
-import org.springframework.security.jwt.crypto.sign.MacSigner;
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
 import org.springframework.stereotype.Component;
 
@@ -20,7 +17,6 @@ import java.util.Optional;
 @Slf4j
 @Component
 public class GetRequestTokenAuthenticationFilter extends AbstractPreAuthenticatedProcessingFilter {
-    private final MacSigner macSigner = new MacSigner("secret");
     private final ObjectMapper jsonObjectMapper;
     private final CharacterService characterService;
 
@@ -47,19 +43,18 @@ public class GetRequestTokenAuthenticationFilter extends AbstractPreAuthenticate
 
         JsonAccessToken accessToken;
         try {
-            Jwt jwt = JwtHelper.decodeAndVerify(accessTokenString, macSigner);
-            accessToken = jsonObjectMapper.readValue(jwt.getClaims(), JsonAccessToken.class);
         } catch (Exception e) {
             log.error("JWT could not be mapped to JsonAccessToken - probably malformed", e);
             return request.getUserPrincipal();
         }
 
         List<SimpleGrantedAuthority> grantedAuthorities = new ArrayList<>();
-        accessToken.getAuthorities().forEach(role -> grantedAuthorities.add(new SimpleGrantedAuthority(role)));
-
-        Optional<GwCharacter> character = characterService.getActiveCharacterByFafId(accessToken.getUserId());
-
-        return new User(accessToken.getUserId(), character, accessToken.getUserName(), "N/A", grantedAuthorities);
+//        accessToken.getAuthorities().forEach(role -> grantedAuthorities.add(new SimpleGrantedAuthority(role)));
+//
+//        Optional<GwCharacter> character = characterService.getActiveCharacterByFafId(accessToken.getUserId());
+//
+//        return new User(accessToken.getUserId(), character, accessToken.getUserName(), "N/A", grantedAuthorities);
+        return null;
     }
 
     @Override

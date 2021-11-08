@@ -8,9 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.jwt.Jwt;
-import org.springframework.security.jwt.JwtHelper;
-import org.springframework.security.jwt.crypto.sign.MacSigner;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -235,17 +232,17 @@ public class ValidationHelperTest {
     }
 
     //    @Test
-    public void generateTestUser() {
-        MacSigner macSigner = new MacSigner("secret");
-
-        // {"user_id": 1, "user_name": "UEF Alpha", "authorities":["ROLE_USER"], "exp": 4102444740}
-        // {"user_id": 2, "user_name": "UEF Bravo", "authorities":["ROLE_USER"], "exp": 4102444740}
-        // {"user_id": 3, "user_name": "Cybran Charlie", "authorities":["ROLE_USER"], "exp": 4102444740}
-        String tokenData = "{\"user_id\": 2, \"user_name\": \"UEF Bravo\", \"authorities\":[\"ROLE_USER\"], \"exp\": 4102444740}";
-        Jwt token = JwtHelper.encode(tokenData, macSigner);
-        String stringToken = token.getEncoded();
-        System.out.println(stringToken);
-        ;
+//    public void generateTestUser() {
+//        MacSigner macSigner = new MacSigner("secret");
+//
+//        // {"user_id": 1, "user_name": "UEF Alpha", "authorities":["ROLE_USER"], "exp": 4102444740}
+//        // {"user_id": 2, "user_name": "UEF Bravo", "authorities":["ROLE_USER"], "exp": 4102444740}
+//        // {"user_id": 3, "user_name": "Cybran Charlie", "authorities":["ROLE_USER"], "exp": 4102444740}
+//        String tokenData = "{\"user_id\": 2, \"user_name\": \"UEF Bravo\", \"authorities\":[\"ROLE_USER\"], \"exp\": 4102444740}";
+//        Jwt token = JwtHelper.encode(tokenData, macSigner);
+//        String stringToken = token.getEncoded();
+//        System.out.println(stringToken);
+//        ;
 //    public static User getUserFromJwtToken(String stringToken) {
 //        try {
 //            Jwt token = JwtHelper.decodeAndVerify(stringToken, new MacSigner("secret"));
@@ -262,7 +259,7 @@ public class ValidationHelperTest {
 //        catch(Exception e) {
 //            throw new RuntimeException("user not authorized");
 //        }
-    }
+//    }
 
     @Test
     public void validateAssaultOnPlanet_enemyFaction() {

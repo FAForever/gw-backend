@@ -1,15 +1,21 @@
 package com.faforever.gw;
 
-import com.faforever.gw.model.*;
-import com.faforever.gw.model.repository.*;
+import com.faforever.gw.model.Faction;
+import com.faforever.gw.model.Ground;
+import com.faforever.gw.model.GwCharacter;
+import com.faforever.gw.model.Map;
+import com.faforever.gw.model.Planet;
+import com.faforever.gw.model.Rank;
+import com.faforever.gw.model.SolarSystem;
+import com.faforever.gw.model.repository.CharacterRepository;
+import com.faforever.gw.model.repository.MapRepository;
+import com.faforever.gw.model.repository.PlanetRepository;
+import com.faforever.gw.model.repository.RankRepository;
+import com.faforever.gw.model.repository.SolarSystemRepository;
 import com.faforever.gw.services.generator.UniverseGenerator;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.jwt.Jwt;
-import org.springframework.security.jwt.JwtHelper;
-import org.springframework.security.jwt.crypto.sign.MacSigner;
 import org.springframework.stereotype.Component;
 
-import javax.inject.Inject;
 import javax.transaction.Transactional;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -31,8 +37,6 @@ public class DemoDataInitializer {
     public void run() throws SQLException {
 //        Collection<SolarSystem> solarSystems = universeGenerator.generate(100L, 100L, 1L, 300, 5, 1);
 //        universeGenerator.persist();
-
-        generateUserToken();
 
         Rank rank1 = new Rank();
         rank1.setLevel(1);
@@ -155,38 +159,5 @@ public class DemoDataInitializer {
         planet.setMap(map);
         planet.setCurrentOwner(faction);
         planetRepository.save(planet);
-    }
-
-    private void generateUserToken() {
-        MacSigner macSigner = new MacSigner("secret");
-        // {"expires":4102358400, "authorities": [], "user_id": 1, "user_name": "UEF Alpha"}
-        // {"expires":4102358400, "authorities": [], "user_id": 2, "user_name": "UEF Bravo"}
-        // {"expires":4102358400, "authorities": [], "user_id": 3, "user_name": "Cybran Charlie"}
-        // {"expires":4102358400, "authorities": [], "user_id": 4, "user_name": "Cybran Delta"}
-        // {"expires":4102358400, "authorities": [], "user_id": 5, "user_name": "Aeon Echo"}
-
-        System.out.println("-1- UEF Alpha");
-        Jwt token = JwtHelper.encode("{\"expires\":4102358400, \"authorities\": [], \"user_id\": 1, \"user_name\": \"UEF Alpha\"}", macSigner); // Batto
-        System.out.println(token.getEncoded());
-
-        System.out.println("-2- UEF Bravo");
-        token = JwtHelper.encode("{\"expires\":4102358400, \"authorities\": [], \"user_id\": 2, \"user_name\": \"UEF Bravo\"}", macSigner);
-        System.out.println(token.getEncoded());
-
-        System.out.println("-3- Cybran Charlie");
-        token = JwtHelper.encode("{\"expires\":4102358400, \"authorities\": [], \"user_id\": 3, \"user_name\": \"Cybran Charlie\"}", macSigner); // TAG_ROCK
-        System.out.println(token.getEncoded());
-
-        System.out.println("-4- Cybran Delta");
-        token = JwtHelper.encode("{\"expires\":4102358400, \"authorities\": [], \"user_id\": 4, \"user_name\": \"Cybran Delta\"}", macSigner);
-        System.out.println(token.getEncoded());
-
-        System.out.println("-5- Aeon Echo");
-        token = JwtHelper.encode("{\"expires\":4102358400, \"authorities\": [], \"user_id\": 5, \"user_name\": \"Aeon Echo\"}", macSigner);
-        System.out.println(token.getEncoded());
-
-        System.out.println("-X- Unregistered user");
-        token = JwtHelper.encode("{\"expires\":4102358400, \"authorities\": [], \"user_id\": 6, \"user_name\": \"Unregistered user\"}", macSigner);
-        System.out.println(token.getEncoded());
     }
 }
